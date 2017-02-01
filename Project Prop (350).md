@@ -12,8 +12,8 @@ CMPT 350
 
 *Project Proposal*
 
-Our proposed group project is to create a data visualization app that will allow
-a user to find a movie that they want to want watch. The app will be a web app
+Our proposed group project is to create a data visualization tool that will
+allow a user to find a movie that they want to watch. The tool will be a web app
 which will help solve the issue of users trying to determine which movie to
 watch.
 
@@ -24,7 +24,7 @@ choices. Some user stories for an app that would address this issue are:
 
 -   As a movie watcher, I want to discover movies that I find interesting.
 
--   As a user, I want to be to find movies with similar subject matter that I am
+-   As a user, I want to find movies with similar subject matter that I am
     interested in.
 
 -   As a movie watcher, I want relevant suggestions of movies so I can find new
@@ -33,8 +33,8 @@ choices. Some user stories for an app that would address this issue are:
 -   As a movie watcher, I want to easily and quickly find movies to watch so
     that I can save time looking for movies.
 
-The app will solve this problem and create many benefits for users. The app will
-help users:
+The app will solve these problems and create many benefits for users. The app
+will help users:
 
 -   Find a movie or movies that the they will enjoy.
 
@@ -56,12 +56,16 @@ additional features such as Movie posters, Oscar awards and plot synopsis.
 
 Task and Data Abstraction:
 
-The task that user is doing is searching the data. Once a target is found, they
-can query the data to see additional attributes. For example, the movies will be
-filtered based on similar movies to the movie the user selects. This will allow
-the user to query the movies selected by clicking over a movie and see
-additional data from the OMDB database such as a plot synopsis, Oscar wins and
-nominations and additional cast and crew information.
+The task that the user is doing is searching the data. Once a target is found,
+they can query the data to see additional attributes. For example, the movies
+will be filtered based on similar movies to the movie the user selects. The app
+will also allow the user to query the movies selected by clicking over a movie
+and see additional data from the OMDB database such as a plot synopsis, Oscar
+wins and nominations and extra cast and crew information.
+
+The data abstraction plan is to abstract data from the domain of all data into a
+more usable form. We will group the data by relating similar attributes between
+table values to create sets.
 
 Visual Encoding/Integration Idiom:
 
@@ -83,7 +87,7 @@ The algorithm uses the attributes of a film such as actors, director, genre,
 keywords to find other films with similar attributes. When two films have
 similar attributes, the score of that attribute is added to a total called the
 “relevancy score”. The films with the highest relevancy scores are deemed to be
-the most like the initial film selected by the user. Broader attributes, such as
+the most like the film selected by the user. Broader attributes, such as
 language, have lower weights and therefore have less effect on the relevancy
 score. Conversely, precise attributes like keywords yield higher scores and add
 more greatly to the relevancy score.
