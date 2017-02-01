@@ -1,7 +1,7 @@
 ##### Readme 
 #Force Directed Graph Demo
 
-* to view this demo, download the graphdemo/ directory and it's to a local
+* to view this demo, download the graphdemo/ directory and it's contents to a local
   directory
 * serve the page inside of a simple python server by running:
 
