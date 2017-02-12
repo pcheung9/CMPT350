@@ -25,7 +25,7 @@ class movie:
     def __lt__(self, other):
         return self.relevance > other.relevance
 
-input = None
+inputs = []
 movies = []
 with open('movie_metadata.txt', 'r', encoding="utf8") as csvfile:
     CSVreader = csv.reader(csvfile, delimiter='\t', quotechar='"', skipinitialspace=True)
@@ -56,94 +56,103 @@ with open('movie_metadata.txt', 'r', encoding="utf8") as csvfile:
         count += 1
 
 for i in movies:
-    if i.title == "The Big Lebowski".lower():
-        input = i
-        print(input.titleWords)
-        print(input.genres)
-        print(input.keywords)
+    if i.title == "Robocop".lower():
+        inputs.append(i)
+        print(i.titleWords)
+        print(i.genres)
+        print(i.keywords)
 
-if input == None:
+for i in movies:
+    if i.title == "Dredd".lower():
+        inputs.append(i)
+        print(i.titleWords)
+        print(i.genres)
+        print(i.keywords)
+
+
+if len(inputs) < 2:
     exit(1)
 
 
 relevance = []
 top = []
 for i in movies:
-    #Actor Check
-    if i.actor1 == input.actor1 or i.actor1 == input.actor2 or i.actor1 == input.actor3:
-        i.relevance += 35
-        i.criteria.append("Actor: "+i.actor1)
-    if i.actor2 == input.actor1 or i.actor2 == input.actor2 or i.actor2 == input.actor3:
-        i.relevance += 35
-        i.criteria.append("Actor: "+i.actor2)
-    if i.actor3 == input.actor1 or i.actor3 == input.actor2 or i.actor3 == input.actor3:
-        i.relevance += 35
-        i.criteria.append("Actor: "+i.actor3)
+    for input in inputs:
+        #Actor Check
+        if i.actor1 == input.actor1 or i.actor1 == input.actor2 or i.actor1 == input.actor3:
+            i.relevance += 35
+            i.criteria.append("Actor: "+i.actor1)
+        if i.actor2 == input.actor1 or i.actor2 == input.actor2 or i.actor2 == input.actor3:
+            i.relevance += 35
+            i.criteria.append("Actor: "+i.actor2)
+        if i.actor3 == input.actor1 or i.actor3 == input.actor2 or i.actor3 == input.actor3:
+            i.relevance += 35
+            i.criteria.append("Actor: "+i.actor3)
 
-    #Director Check
-    if i.director == input.director:
-        i.relevance = 35
-        i.criteria.append("Director: "+i.director)
+        #Director Check
+        if i.director == input.director:
+            i.relevance = 35
+            i.criteria.append("Director: "+i.director)
 
-    #Country Check
-    if i.country == input.country:
-        i.relevance += 10
-        i.criteria.append("country")
-
-    #Language Check
-    if i.language != input.language:
-        i.relevance -= 50
-
-    #Rating Check
-    if i.rating != 0:
-        if i.rating == input.rating:
-            i.relevance += 20
-        if i.rating == (input.rating + 1) or i.rating == (input.rating - 1):
+        #Country Check
+        if i.country == input.country:
             i.relevance += 10
-        if i.rating == (input.rating + 3) or i.rating == (input.rating - 3):
-            i.relevance -= 100
-        if i.rating == (input.rating + 4) or i.rating == (input.rating - 4):
-            i.relevance -= 200
+            i.criteria.append("country")
 
-    #Keyword Check
-    for j in i.keywords:
-        for k in input.keywords:
-            if j == k:
-                i.relevance += 40
-                i.criteria.append("Keyword: "+j)
+        #Language Check
+        if i.language != input.language:
+            i.relevance -= 50
 
-    #Genre Check
-    for j in i.genres:
-        for k in input.genres:
-            if j == k:
-                i.relevance += 30
-                i.criteria.append("genre: "+j)
+        #Rating Check
+        if i.rating != 0:
+            if i.rating == input.rating:
+                i.relevance += 20
+            if i.rating == (input.rating + 1) or i.rating == (input.rating - 1):
+                i.relevance += 10
+            if i.rating == (input.rating + 3) or i.rating == (input.rating - 3):
+                i.relevance -= 100
+            if i.rating == (input.rating + 4) or i.rating == (input.rating - 4):
+                i.relevance -= 200
 
-    #Title Check
-    count = 0;
-    for j in i.titleWords:
-        if not j.isdigit():
-            for k in input.titleWords:
+        #Keyword Check
+        for j in i.keywords:
+            for k in input.keywords:
                 if j == k:
-                    count += 1
-    if count > (len(input.titleWords)/3):
-        i.criteria.append(str(count)+" Title words")
-        i.relevance += 20
+                    i.relevance += 40
+                    i.criteria.append("Keyword: "+j)
 
-    #Year Check
-    if (input.year - 5) <= i.year <= (input.year + 5):
-        i.relevance += 10
-        i.criteria.append("Year: 10")
-    elif (input.year - 5) <= i.year <= (input.year + 5):
-        i.relevance += 5
-        i.criteria.append("Year: 5")
+        #Genre Check
+        for j in i.genres:
+            for k in input.genres:
+                if j == k:
+                    i.relevance += 30
+                    i.criteria.append("genre: "+j)
 
-    #IMDB Score
-    i.relevance += 3*i.score
+        #Title Check
+        count = 0;
+        for j in i.titleWords:
+            if not j.isdigit():
+                for k in input.titleWords:
+                    if j == k:
+                        count += 1
+        if count > (len(input.titleWords)/3):
+            i.criteria.append(str(count)+" Title words")
+            i.relevance += 20
 
-    bisect.insort_right(top, i);
+        #Year Check
+        if (input.year - 5) <= i.year <= (input.year + 5):
+            i.relevance += 10
+            i.criteria.append("Year: 10")
+        elif (input.year - 5) <= i.year <= (input.year + 5):
+            i.relevance += 5
+            i.criteria.append("Year: 5")
+
+        #IMDB Score
+        i.relevance += 3*i.score
+
+        bisect.insort_right(top, i);
 
 
 for i in range(0, 15):
-    print(top[i].title, top[i].relevance, top[i].criteria)
+    print(top[i].title, "%.2f" %top[i].relevance, top[i].criteria)
 
