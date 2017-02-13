@@ -56,14 +56,14 @@ with open('movieDB.txt', 'r', encoding="utf8") as csvfile:
         count += 1
 
 for i in movies:
-    if i.title == "Robocop".lower():
+    if i.title == "XXX".lower():
         inputs.append(i)
         print(i.titleWords)
         print(i.genres)
         print(i.keywords)
 
 for i in movies:
-    if i.title == "Dredd".lower():
+    if i.title == "The fast and The Furious".lower():
         inputs.append(i)
         print(i.titleWords)
         print(i.genres)
