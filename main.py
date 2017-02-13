@@ -27,7 +27,7 @@ class movie:
 
 inputs = []
 movies = []
-with open('movie_metadata.txt', 'r', encoding="utf8") as csvfile:
+with open('movieDB.txt', 'r', encoding="utf8") as csvfile:
     CSVreader = csv.reader(csvfile, delimiter='\t', quotechar='"', skipinitialspace=True)
     count = 0
     for row in CSVreader:
