@@ -18,3 +18,4 @@ class MovieObj(models.Model):
     rating = models.IntegerField(null=True) 
     score = models.IntegerField(null=True)     
     movieID = models.CharField(max_length=50,null=True)
+    relevance = models.IntegerField(null=True)
