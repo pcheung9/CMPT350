@@ -9,10 +9,10 @@ import bisect
 from django.http import HttpResponse
 from django.http import JsonResponse
 from explore.models import MovieObj
-#from django.forms.models import model_to_dict
 from django.template.response import TemplateResponse
 import json
 from django.core import serializers
+from itertools import chain
 
 def load(request):
     data = {}
@@ -31,23 +31,25 @@ def explore(request):
     resultsList = results.split()
     for pair in resultsList:
         split=pair.split(':')
-        pairs.append(split)
-        idList.append(split[0])
+        print(split[0] + ' ' + split[1])
+
+        temp = get_object_or_404(MovieObj, movieID=str(split[0]))
+        temp.relevance = split[1]
+
+        print(temp.movieID + ' ' + temp.title + ' ' + temp.relevance)
         
+        pairs.append(temp)
+
     print(pairs)
-    print(idList)
-
+    
+    object_list = list(pairs)
+    nonetype_querySet = MovieObj.objects.none()
+    
     #generate queryset somehow?
-    querySet = list(MovieObj.objects.filter(movieID=idList[0]))
-    print(querySet)
-     
-    #data = serializers.serialize('json', querySet)
-    #
-    #return HttpResponse(data, content_type="application/json")
+    querySet = list(chain(nonetype_querySet, object_list))
 
+    print(querySet)
     return TemplateResponse(request, 'index.html', {"data": querySet})
-    #return JsonResponse(querySet)
-                        
 
 # Dictionary assigns numeric value to ratings
 ratings = {"Passed": 0, "Approved": 0, "Unrated": 0, "Not Rated": 0, "": 0,"TV-Y": 0, "TV-G": 1,
@@ -55,6 +57,7 @@ ratings = {"Passed": 0, "Approved": 0, "Unrated": 0, "Not Rated": 0, "": 0,"TV-Y
             "M": 4, "R": 4, "NC-17": 4, "X": 5}
 
 common = ["the", "and", "of"]  # List of common words to be filtered from titles
+flag = True
 
 class Movie:
     def __init__(self):
@@ -116,15 +119,17 @@ def reader(fileName):
                 temp.score = float(row[25])
                 temp.ID = row[28].lower()
                 
-                #uncomment if you want to repopulate the database from scratch for some ungodly reason. You animal. Or, load the fixture like a reasonable human.
-                #makeMovieObj(temp)
+                #uncomment if you want to repopulate the database from scratch for some reason. Or, load the fixture like a reasonable human.
+                #global flag
+                #if flag == True:
+                    #makeMovieObj(temp, count)
                 
                 movies.append(temp)
             count += 1
     return(movies)
 
 #makes movie object from models.py for saving into sqlite database out of Movie() class.
-def makeMovieObj(temp):
+def makeMovieObj(temp, count):
     movie = MovieObj()
     
     movie.title = temp.title
@@ -143,7 +148,11 @@ def makeMovieObj(temp):
     movie.movieID = temp.ID
     
     movie.save()
-    
+    print(movie)
+    print(count)
+    if count == 4920:
+        global flag
+        flag = False
 
 # Function Name: Related
 # Function Purpose: Takes an input string of IMDB ID's and returns the top 15 most related films
@@ -239,14 +248,15 @@ def related(num_results, ID_string):
 
             # IMDB Score
             i.relevance += 3*i.score
-            
+            #bisect.insort_right(top, i.relevance)            
             #add relevance to string, need to pass that forward so we can apply it to the movie ID's
             bisect.insort_right(top, i.ID + ":" + str(i.relevance))
+
+
             #bisect.insort_right(top, i.ID)
-            
-    #for i in range(0, num_results):
-    #    print(top[i].relevance)
+    
     topString = " ".join(top[:15])
+
     return topString
 
 # Temp function. Use to make generate input strings for now. Enter names into array.

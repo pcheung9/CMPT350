@@ -23,7 +23,7 @@ python <<EOF
 print("\n\tLoading fixture\n")
 EOF
 
-python manage.py loaddata CMPT350/fixtures/initial_dump.json
+python manage.py loaddata CMPT350/fixtures/dump.json
 
 python <<EOF
 print("<-----build.sh - end script------>")
