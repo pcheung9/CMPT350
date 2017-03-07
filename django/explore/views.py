@@ -1,6 +1,9 @@
 from django.shortcuts import render, render_to_response, get_object_or_404
 from django.template.loader import render_to_string
 import random
+                        
+import csv
+import bisect
 
 # Create your views here.
 from django.http import HttpResponse
@@ -9,17 +12,42 @@ from explore.models import MovieObj
 #from django.forms.models import model_to_dict
 from django.template.response import TemplateResponse
 import json
+from django.core import serializers
+
+def load(request):
+    data = {}
+    data = MovieObj.objects.all()
+    json_data = serializers.serialize('json', data)
+    print("Test console output")
+    return HttpResponse(json_data, content_type="application/json")
 
 def explore(request):
     IDs = stringBuilder()
     print(IDs)
     results = related(15, IDs)
-    #print(results)
-    return HttpResponse(results)
+    pairs = []
+    idList = []
+    
+    resultsList = results.split()
+    for pair in resultsList:
+        split=pair.split(':')
+        pairs.append(split)
+        idList.append(split[0])
+        
+    print(pairs)
+    print(idList)
 
+    #generate queryset somehow?
+    querySet = list(MovieObj.objects.filter(movieID=idList[0]))
+    print(querySet)
+     
+    #data = serializers.serialize('json', querySet)
+    #
+    #return HttpResponse(data, content_type="application/json")
 
-import csv
-import bisect
+    return TemplateResponse(request, 'index.html', {"data": querySet})
+    #return JsonResponse(querySet)
+                        
 
 # Dictionary assigns numeric value to ratings
 ratings = {"Passed": 0, "Approved": 0, "Unrated": 0, "Not Rated": 0, "": 0,"TV-Y": 0, "TV-G": 1,
