@@ -23,33 +23,36 @@ def load(request):
 
 def explore(request):
     IDs = stringBuilder()
-    print(IDs)
+    #print(IDs)
     results = related(15, IDs)
     pairs = []
     idList = []
     
     resultsList = results.split()
-    for pair in resultsList:
-        split=pair.split(':')
-        print(split[0] + ' ' + split[1])
 
+    for pair in resultsList:
+        movie = MovieObj()
+        split = pair.split('|')
         temp = get_object_or_404(MovieObj, movieID=str(split[0]))
         temp.relevance = split[1]
 
-        print(temp.movieID + ' ' + temp.title + ' ' + temp.relevance)
-        
+        #print(temp.movieID + ' ' + temp.title + ' ' + temp.relevance)
+        #print(pairs)
         pairs.append(temp)
 
+
     print(pairs)
-    
+
     object_list = list(pairs)
     nonetype_querySet = MovieObj.objects.none()
     
     #generate queryset somehow?
-    querySet = list(chain(nonetype_querySet, object_list))
+    data = {}
+    data = list(chain(nonetype_querySet, object_list))
 
-    print(querySet)
-    return TemplateResponse(request, 'index.html', {"data": querySet})
+    json_data = serializers.serialize('json', data)
+    return HttpResponse(json_data, content_type="application/json")
+    #return TemplateResponse(request, 'index.html', {"data": json_data})
 
 # Dictionary assigns numeric value to ratings
 ratings = {"Passed": 0, "Approved": 0, "Unrated": 0, "Not Rated": 0, "": 0,"TV-Y": 0, "TV-G": 1,
@@ -86,15 +89,17 @@ class Movie:
 # Parameters:
 #   fileName: The name of the TSV file
 def reader(fileName):
+    global flag
     movies = []
 
     count = 0
     with open(fileName, 'r', encoding="utf8") as csvfile:
         TSVreader = csv.reader(csvfile, delimiter='\t', quotechar='"', skipinitialspace=True)
         for row in TSVreader:
+            temp = Movie()
             if not count <= 1:  # Makes sure the headers aren't stored in an object
 
-                temp = Movie()  # Creates a temp object
+                #temp = Movie()  # Creates a temp object
                 temp.title = row[11][:-1].lower()  # Converts all titles to lower and strips off end char
 
                 # Puts any non-common title words into a list
@@ -119,17 +124,19 @@ def reader(fileName):
                 temp.score = float(row[25])
                 temp.ID = row[28].lower()
                 
-                #uncomment if you want to repopulate the database from scratch for some reason. Or, load the fixture like a reasonable human.
-                #global flag
-                #if flag == True:
-                    #makeMovieObj(temp, count)
-                
+
+
                 movies.append(temp)
+            #if(flag):
+                #makeMovieObj(temp)
+                #print(temp)
+                # uncomment if you want to repopulate the database from scratch for some reason. Or, load the fixture like a reasonable human.
             count += 1
+    #flag = False
     return(movies)
 
 #makes movie object from models.py for saving into sqlite database out of Movie() class.
-def makeMovieObj(temp, count):
+def makeMovieObj(temp):
     movie = MovieObj()
     
     movie.title = temp.title
@@ -146,13 +153,10 @@ def makeMovieObj(temp, count):
     movie.rating = temp.rating
     movie.score = temp.score
     movie.movieID = temp.ID
-    
+    #if count <= 4920:
+        #global flag
+        #flag = False
     movie.save()
-    print(movie)
-    print(count)
-    if count == 4920:
-        global flag
-        flag = False
 
 # Function Name: Related
 # Function Purpose: Takes an input string of IMDB ID's and returns the top 15 most related films
@@ -248,21 +252,22 @@ def related(num_results, ID_string):
 
             # IMDB Score
             i.relevance += 3*i.score
-            #bisect.insort_right(top, i.relevance)            
-            #add relevance to string, need to pass that forward so we can apply it to the movie ID's
-            bisect.insort_right(top, i.ID + ":" + str(i.relevance))
 
 
-            #bisect.insort_right(top, i.ID)
-    
-    topString = " ".join(top[:15])
+        bisect.insort_right(top, i)
 
+    #for i in range(0, num_results):
+    #   print(top[i].title, "%.2f" % top[i].relevance, top[i].criteria)
+    topN = []
+    for i in range(0, num_results):
+        topN.append("" + top[i].ID + "|" + str(top[i].relevance) + "")
+    topString = " ".join(topN[:15])
     return topString
 
 # Temp function. Use to make generate input strings for now. Enter names into array.
 def stringBuilder():
     movies = reader("movieDB.txt")
-    inputs = ["Saving Private Ryan", "Fury"]
+    inputs = ["Law Abiding Citizen"]
     IDs = []
     for j in inputs:
         for i in movies:

@@ -166,11 +166,14 @@ def related(num_results, ID_string):
             # IMDB Score
             i.relevance += 3*i.score
 
-            bisect.insort_right(top, i.ID)
+        bisect.insort_right(top, i)
 
-    # for i in range(0, num_results):
-        # print(top[i].title, "%.2f" %top[i].relevance, top[i].criteria)
-    topString = " ".join(top[:15])
+    for i in range(0, num_results):
+        print(top[i].title, "%.2f" %top[i].relevance, top[i].criteria)
+    topN = []
+    for i in range(0, num_results):
+        topN.append("" + top[i].ID + "|" + str(top[i].relevance) + "")
+    topString = " ".join(topN[:15])
     return topString
 
 # Temp function. Use to make generate input strings for now. Enter names into array.
