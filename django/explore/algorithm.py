@@ -1,6 +1,6 @@
 import csv
 import bisect
-
+from explore.models import MovieObj
 
 ratings = {"Passed": 0, "Approved": 0, "Unrated": 0, "Not Rated": 0, "": 0, "TV-Y": 0, "TV-G": 1,
            "G": 1, "TV-Y7": 2, "GP": 2, "TV-PG": 2, "PG": 2, "TV-14": 3, "PG-13": 3, "TV-MA": 4,
@@ -74,11 +74,12 @@ def reader(fileName):
                 temp.ID = row[28].lower()
 
                 movies.append(temp)
-                # if(flag):
-                # makeMovieObj(temp)
-                # print(temp)
+                if(flag):
+                    makeMovieObj(temp)
+                    print(temp)
                 # uncomment if you want to repopulate the database from scratch for some reason. Or, load the fixture like a reasonable human.
             count += 1
+            print(count)
     # flag = False
     return (movies)
 
@@ -190,9 +191,9 @@ def related(num_results, ID_string):
 
 
 # Temp function. Use to make generate input strings for now. Enter names into array.
-def stringBuilder():
+def stringBuilder(name):
     movies = reader("movieDB.txt")
-    inputs = ["Law Abiding Citizen"]
+    inputs = [name]
     IDs = []
     for j in inputs:
         for i in movies:
@@ -272,7 +273,7 @@ def reader(fileName):
                 #print(temp)
                 # uncomment if you want to repopulate the database from scratch for some reason. Or, load the fixture like a reasonable human.
             count += 1
-    #flag = False
+    flag = False
     return(movies)
 
 
@@ -383,9 +384,9 @@ def related(num_results, ID_string):
     return topString
 
 # Temp function. Use to make generate input strings for now. Enter names into array.
-def stringBuilder():
+def stringBuilder(name):
     movies = reader("movieDB.txt")
-    inputs = ["Law Abiding Citizen"]
+    inputs = [name]
     IDs = []
     for j in inputs:
         for i in movies:
@@ -393,3 +394,26 @@ def stringBuilder():
                 IDs.append(i.ID)
     print(IDs)
     return " ".join(IDs)
+
+# makes movie object from models.py for saving into sqlite database out of Movie() class.
+def makeMovieObj(temp):
+    movie = MovieObj()
+
+    movie.title = temp.title
+    # movie.titleWords = temp.titleWords
+    movie.year = temp.year
+    movie.actor1 = temp.actor1
+    movie.actor2 = temp.actor2
+    movie.actor3 = temp.actor3
+    movie.director = temp.director
+    # movie.keywords = row[16].split('|')
+    # movie.genres = row[9].split('|')
+    movie.country = temp.country
+    movie.language = temp.language
+    movie.rating = temp.rating
+    movie.score = temp.score
+    movie.movieID = temp.ID
+    #if count <= 4920:
+    #    global flag
+    #    flag = False
+    movie.save()

@@ -1,13 +1,46 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Search</title>
+
+    <script type="text/javascript" src="http://code.jquery.com/jquery-2.0.0.min.js"></script>
+
 </head>
 <body>
-<form>
-  <br>
-  <input type="text" name="Choice"><br>
-</form>
+<h3>Search</h3>
+				
+                {% csrf_token %}
+                <input type ='text' id="search" name="search"/>
+                <ul id="search-results">
+				<button class btn id=submitsearch>Search</button>
+                </ul>
+				
+
+
 </body>
 </html>
+
+<script type="text/javascript">
+	$(function(){
+
+	    $('#submitsearch').click(function(){
+    	$.ajax({
+      	type:"POST",
+      	url:"/explore/search/",
+   		data:{
+        	'search_text': $('#search').val(),
+        	'csrfmiddlewaretoken' : $(						"input[name=csrfmiddlewaretoken]").val()
+      	},
+      	success: searchSuccess(),
+      	dataType: 'html'
+    	});
+  		});
+	});
+
+	function searchSuccess(data, textStatus,jqXHR)
+	{
+		location.reload(true);
+		//document.write(data);
+  		//$('#search-results').html(data);
+	}
+</script>
