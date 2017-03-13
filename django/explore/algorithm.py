@@ -1,3 +1,18 @@
+from django.shortcuts import render, render_to_response, get_object_or_404
+from django.template.loader import render_to_string
+import random
+
+
+# Create your views here.
+from django.http import HttpResponse
+from django.http import JsonResponse
+from explore.models import MovieObj
+from django.template.response import TemplateResponse
+import json
+from django.core import serializers
+from itertools import chain
+
+
 import csv
 import bisect
 
@@ -47,8 +62,6 @@ def reader(fileName):
         for row in TSVreader:
             temp = Movie()
             if not count <= 1:  # Makes sure the headers aren't stored in an object
-
-                # temp = Movie()  # Creates a temp object
                 temp.title = row[11][:-1].lower()  # Converts all titles to lower and strips off end char
 
                 # Puts any non-common title words into a list
@@ -75,11 +88,10 @@ def reader(fileName):
 
                 movies.append(temp)
                 # if(flag):
-                # makeMovieObj(temp)
-                # print(temp)
-                # uncomment if you want to repopulate the database from scratch for some reason. Or, load the fixture like a reasonable human.
+                    # makeMovieObj(temp, count)
+                    # print(temp)
             count += 1
-    # flag = False
+    #flag = False
     return (movies)
 
 
@@ -239,7 +251,7 @@ def reader(fileName):
             temp = Movie()
             if not count <= 1:  # Makes sure the headers aren't stored in an object
 
-                #temp = Movie()  # Creates a temp object
+                temp = Movie()  # Creates a temp object
                 temp.title = row[11][:-1].lower()  # Converts all titles to lower and strips off end char
 
                 # Puts any non-common title words into a list
@@ -264,13 +276,7 @@ def reader(fileName):
                 temp.score = float(row[25])
                 temp.ID = row[28].lower()
 
-
-
                 movies.append(temp)
-            #if(flag):
-                #makeMovieObj(temp)
-                #print(temp)
-                # uncomment if you want to repopulate the database from scratch for some reason. Or, load the fixture like a reasonable human.
             count += 1
     #flag = False
     return(movies)
@@ -284,7 +290,7 @@ def reader(fileName):
 def related(num_results, ID_string):
 
     listIDs = ID_string.split(" ")  # Splits inFilm string into list of IDs
-    movies = reader("movieDB.txt")
+    movies = reader("explore\movieDB.txt")
 
     # Populates
     inputs = []
@@ -384,7 +390,7 @@ def related(num_results, ID_string):
 
 # Temp function. Use to make generate input strings for now. Enter names into array.
 def stringBuilder():
-    movies = reader("movieDB.txt")
+    movies = reader("explore\movieDB.txt")
     inputs = ["Law Abiding Citizen"]
     IDs = []
     for j in inputs:
@@ -393,3 +399,11 @@ def stringBuilder():
                 IDs.append(i.ID)
     print(IDs)
     return " ".join(IDs)
+
+def duplicate():
+    movies = reader("movieDB.txt")
+    for i in movies:
+        for j in movies:
+            if i.title == j.title and i.year != j.year:
+                print(i.title+str(i.year)+str(j.year))
+

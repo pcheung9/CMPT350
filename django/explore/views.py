@@ -39,8 +39,8 @@ def explore(request):
         temp = get_object_or_404(MovieObj, movieID=str(split[0]))
         temp.relevance = split[1]
 
-        #print(temp.movieID + ' ' + temp.title + ' ' + temp.relevance)
-        #print(pairs)
+        print(temp.movieID + ' ' + temp.title + ' ' + temp.relevance)
+        print(pairs)
         pairs.append(temp)
 
 
@@ -54,29 +54,7 @@ def explore(request):
     data = list(chain(nonetype_querySet, object_list))
 
     json_data = serializers.serialize('json', data)
-    return TemplateResponse(request, 'explore.html', {"data": json_data})
+    return TemplateResponse(request, 'search.html')
 
 
-# makes movie object from models.py for saving into sqlite database out of Movie() class.
-def makeMovieObj(temp):
-    movie = MovieObj()
-
-    movie.title = temp.title
-    # movie.titleWords = temp.titleWords
-    movie.year = temp.year
-    movie.actor1 = temp.actor1
-    movie.actor2 = temp.actor2
-    movie.actor3 = temp.actor3
-    movie.director = temp.director
-    # movie.keywords = row[16].split('|')
-    # movie.genres = row[9].split('|')
-    movie.country = temp.country
-    movie.language = temp.language
-    movie.rating = temp.rating
-    movie.score = temp.score
-    movie.movieID = temp.ID
-    # if count <= 4920:
-    # global flag
-    # flag = False
-    movie.save()
 
