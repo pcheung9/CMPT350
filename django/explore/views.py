@@ -22,11 +22,26 @@ def load(request):
 
 def indexView(request):
     return TemplateResponse(request, 'search.html')
+    
 
+def search(request):
 
+    #search = request['search']
+    data = {}
+    if request.method == 'POST':
+        if(request.POST['search_text'] != ''):
+            print(request.POST['search_text'])
+            object_list = list(request.POST)
+            return explore(request, request.POST['search_text'])
+        else:       
+            print("Empty Search")
+            print(request.POST['csrfmiddlewaretoken'])
+            return explore(request, request.POST['search_text'])            
 
-def explore(request):
-    IDs = stringBuilder()
+    #return TemplateResponse(request, 'search.html')
+
+def explore(request, name):
+    IDs = stringBuilder(name)
     results = related(15, IDs)
     pairs = []
     idList = []
@@ -55,28 +70,3 @@ def explore(request):
 
     json_data = serializers.serialize('json', data)
     return TemplateResponse(request, 'explore.html', {"data": json_data})
-
-
-# makes movie object from models.py for saving into sqlite database out of Movie() class.
-def makeMovieObj(temp):
-    movie = MovieObj()
-
-    movie.title = temp.title
-    # movie.titleWords = temp.titleWords
-    movie.year = temp.year
-    movie.actor1 = temp.actor1
-    movie.actor2 = temp.actor2
-    movie.actor3 = temp.actor3
-    movie.director = temp.director
-    # movie.keywords = row[16].split('|')
-    # movie.genres = row[9].split('|')
-    movie.country = temp.country
-    movie.language = temp.language
-    movie.rating = temp.rating
-    movie.score = temp.score
-    movie.movieID = temp.ID
-    # if count <= 4920:
-    # global flag
-    # flag = False
-    movie.save()
-
