@@ -22,14 +22,14 @@
 
 <script type="text/javascript">
 	$(function(){
-
 	    $('#submitsearch').click(function(){
+    	console.log('fuck');
     	$.ajax({
       	type:"POST",
-      	url:"/explore/search/",
+      	url:"/explore/",
    		data:{
         	'search_text': $('#search').val(),
-        	'csrfmiddlewaretoken' : $(						"input[name=csrfmiddlewaretoken]").val()
+        	'csrfmiddlewaretoken' : $("input[name=csrfmiddlewaretoken]").val()
       	},
       	success: searchSuccess(),
       	dataType: 'html'
@@ -37,10 +37,12 @@
   		});
 	});
 
-	function searchSuccess(data, textStatus,jqXHR)
+	function searchSuccess()
 	{
-		location.reload(true);
+	    $('body').html();
+		//location.reload(true);
 		//document.write(data);
   		//$('#search-results').html(data);
 	}
+
 </script>
