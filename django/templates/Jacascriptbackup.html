@@ -1,0 +1,52 @@
+I pulled this javascript out of the templates but I'm leaving it here because I don't know what it does
+
+from search.html
+<script type="text/javascript">
+	$(function(){
+	    $('#submitsearch').click(function(){
+    	console.log('fuck');
+    	$.ajax({
+      	type:"POST",
+      	url:"/explore/",
+   		data:{
+        	'search_text': $('#search').val(),
+        	'csrfmiddlewaretoken' : $("input[name=csrfmiddlewaretoken]").val()
+      	},
+      	success: searchSuccess(),
+      	dataType: 'html'
+    	});
+  		});
+	});
+
+	function searchSuccess()
+	{
+	    $('body').html();
+		//location.reload(true);
+		//document.write(data);
+  		//$('#search-results').html(data);
+	}
+
+from view.html
+
+</script>
+
+  <script type="text/javascript">
+    /*$(document).ready(function() {
+    $.ajax({
+    type: "GET",
+    url: "/explore/view/",
+    dataType: "json",
+    cache: "false",
+    data: {},
+    success:function(data)
+    {
+    var test = data;
+
+    document.write(test);
+
+    }
+    });
+    });*/
+  </script>
+
+</html>
