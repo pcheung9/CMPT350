@@ -25,7 +25,7 @@ def search(request):
     return TemplateResponse(request, 'search.html')
 
 def results(request):
-    name = request.GET['search']
+    name = request.POST['search']
     IDs = stringBuilder(name)
     results = related(15, IDs, 1, 1, 1, 1, 1)
     pairs = []
@@ -45,9 +45,9 @@ def results(request):
 
     data = list(chain(nonetype_querySet, object_list))
 
-    json_data = serializers.serialize('json', data)
-    print(json_data)
-    return TemplateResponse(request, 'results.html', {"data": json_data})
+    data = serializers.serialize('json', data)
+    #return HttpResponse(dump, mimetype='application/json')
+    return TemplateResponse(request, 'results.html', ({"data": data}))
 
 def test(request, json_data):
     return TemplateResponse(request, 'results.html')
