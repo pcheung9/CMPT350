@@ -22,21 +22,10 @@ def load(request):
 
 
 def search(request):
-    # search = request['search']
-    data = {}
-    if request.method == 'POST':
-        if(request.POST['search_text'] != ''):
-            print(request.POST['search_text'])
-            object_list = list(request.POST)
-            return view(request, request.POST['search_text'])
-        else:
-            print("Empty Search")
-            print(request.POST['csrfmiddlewaretoken'])
-            return search(request, request.POST['search_text'])
-    else:
-        return TemplateResponse(request, 'search.html')
+    return TemplateResponse(request, 'search.html')
 
-def view(request, name):
+def results(request):
+    name = request.GET['search']
     IDs = stringBuilder(name)
     results = related(15, IDs, 1, 1, 1, 1, 1)
     pairs = []
@@ -48,26 +37,17 @@ def view(request, name):
         split = pair.split('|')
         temp = get_object_or_404(MovieObj, movieID=str(split[0]))
         temp.relevance = split[1]
-
-        #print(temp.movieID + ' ' + temp.title + ' ' + temp.relevance)
-        #print(pairs)
         pairs.append(temp)
-
 
     print(pairs)
     object_list = list(pairs)
     nonetype_querySet = MovieObj.objects.none()
-    
-    #generate queryset somehow?
-    data = {}
+
     data = list(chain(nonetype_querySet, object_list))
 
     json_data = serializers.serialize('json', data)
     print(json_data)
-    #return render_to_response('view.html', )
-    #return render_to_string(request, 'view.html', {"data": json_data})
-    #return TemplateResponse(request, 'view.html', {"data": json_data})
-    return test(request, request.POST['search_text'])
+    return TemplateResponse(request, 'results.html', {"data": json_data})
 
 def test(request, json_data):
-    return TemplateResponse(request, 'view.html')
+    return TemplateResponse(request, 'results.html')
