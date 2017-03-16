@@ -9,7 +9,7 @@
 <body>
 <h3>Search</h3>
 
-<form action="/explore/view/" method="get">
+<form action="/explore/view/" method="post">
     {% csrf_token %}
     <input type ='text' id="search" name="search"/>
     <ul id="search-results">
@@ -19,4 +19,6 @@
 
 
 </body>
+
+
 </html>
