@@ -20,31 +20,15 @@ def load(request):
     print("Test console output")
     return HttpResponse(json_data, content_type="application/json")
 
-def indexView(request):
-    return TemplateResponse(request, 'search.html')
-    
 
 def search(request):
+    return TemplateResponse(request, 'search.html')
 
-    #search = request['search']
-    data = {}
-    if request.method == 'POST':
-        if(request.POST['search_text'] != ''):
-            print(request.POST['search_text'])
-            object_list = list(request.POST)
-            return explore(request, request.POST['search_text'])
-        else:       
-            print("Empty Search")
-            print(request.POST['csrfmiddlewaretoken'])
-            return explore(request, request.POST['search_text'])            
-
-    #return TemplateResponse(request, 'search.html')
-
-def explore(request, name):
+def results(request):
+    name = request.GET['search']
     IDs = stringBuilder(name)
-    results = related(15, IDs)
+    results = related(15, IDs, 1, 1, 1, 1, 1)
     pairs = []
-    idList = []
     
     resultsList = results.split()
 
@@ -53,20 +37,17 @@ def explore(request, name):
         split = pair.split('|')
         temp = get_object_or_404(MovieObj, movieID=str(split[0]))
         temp.relevance = split[1]
-
-        #print(temp.movieID + ' ' + temp.title + ' ' + temp.relevance)
-        #print(pairs)
         pairs.append(temp)
 
-
     print(pairs)
-
     object_list = list(pairs)
     nonetype_querySet = MovieObj.objects.none()
-    
-    #generate queryset somehow?
-    data = {}
+
     data = list(chain(nonetype_querySet, object_list))
 
     json_data = serializers.serialize('json', data)
-    return TemplateResponse(request, 'explore.html', {"data": json_data})
+    print(json_data)
+    return TemplateResponse(request, 'results.html', {"data": json_data})
+
+def test(request, json_data):
+    return TemplateResponse(request, 'results.html')

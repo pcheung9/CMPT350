@@ -282,7 +282,7 @@ def reader(fileName):
 # Parameters:
 #   num_results: The number of results to be returned
 #   ID_string: The string containing IMDB IDs
-def related(num_results, ID_string):
+def related(num_results, ID_string, genreWeight, actorWeight, directorWeight, yearWeight, scoreWeight):
 
     listIDs = ID_string.split(" ")  # Splits inFilm string into list of IDs
     movies = reader("movieDB.txt")
@@ -296,24 +296,25 @@ def related(num_results, ID_string):
                 print(i.titleWords)
                 print(i.genres)
                 print(i.keywords)
+                print()
 
     top = []
     for i in movies:
         for inFilm in inputs:
             # Actor Check
             if i.actor1 == inFilm.actor1 or i.actor1 == inFilm.actor2 or i.actor1 == inFilm.actor3:
-                i.relevance += 35
+                i.relevance += (35 * actorWeight)
                 i.criteria.append("Actor: "+i.actor1)
             if i.actor2 == inFilm.actor1 or i.actor2 == inFilm.actor2 or i.actor2 == inFilm.actor3:
-                i.relevance += 35
+                i.relevance += (35 * actorWeight)
                 i.criteria.append("Actor: "+i.actor2)
             if i.actor3 == inFilm.actor1 or i.actor3 == inFilm.actor2 or i.actor3 == inFilm.actor3:
-                i.relevance += 35
+                i.relevance += (35 * actorWeight)
                 i.criteria.append("Actor: "+i.actor3)
 
             # Director Check
             if i.director == inFilm.director:
-                i.relevance = 35
+                i.relevance += (35 * directorWeight)
                 i.criteria.append("Director: "+i.director)
 
             # Country Check
@@ -347,7 +348,7 @@ def related(num_results, ID_string):
             for j in i.genres:
                 for k in inFilm.genres:
                     if j == k:
-                        i.relevance += 30
+                        i.relevance += (30 * genreWeight)
                         i.criteria.append("genre: "+j)
 
             # Title Check
@@ -363,20 +364,16 @@ def related(num_results, ID_string):
 
             # Year Check
             if (inFilm.year - 5) <= i.year <= (inFilm.year + 5):
-                i.relevance += 10
+                i.relevance += (10 * yearWeight)
                 i.criteria.append("Year: 10")
             elif (inFilm.year - 5) <= i.year <= (inFilm.year + 5):
-                i.relevance += 5
+                i.relevance += (5 * yearWeight)
                 i.criteria.append("Year: 5")
 
             # IMDB Score
-            i.relevance += 3*i.score
+            i.relevance += ((3*i.score) * scoreWeight)
 
-
-        bisect.insort_right(top, i)
-
-    #for i in range(0, num_results):
-    #   print(top[i].title, "%.2f" % top[i].relevance, top[i].criteria)
+            bisect.insort_right(top, i)
     topN = []
     for i in range(0, num_results):
         topN.append("" + top[i].ID + "|" + str(top[i].relevance) + "")

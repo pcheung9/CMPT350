@@ -8,39 +8,15 @@
 </head>
 <body>
 <h3>Search</h3>
-				
-                {% csrf_token %}
-                <input type ='text' id="search" name="search"/>
-                <ul id="search-results">
-				<button class btn id=submitsearch>Search</button>
-                </ul>
-				
+
+<form action="/explore/view/" method="get">
+    {% csrf_token %}
+    <input type ='text' id="search" name="search"/>
+    <ul id="search-results">
+        <button class btn id=submitsearch>Search</button>
+    </ul>
+</form>
 
 
 </body>
 </html>
-
-<script type="text/javascript">
-	$(function(){
-
-	    $('#submitsearch').click(function(){
-    	$.ajax({
-      	type:"POST",
-      	url:"/explore/search/",
-   		data:{
-        	'search_text': $('#search').val(),
-        	'csrfmiddlewaretoken' : $(						"input[name=csrfmiddlewaretoken]").val()
-      	},
-      	success: searchSuccess(),
-      	dataType: 'html'
-    	});
-  		});
-	});
-
-	function searchSuccess(data, textStatus,jqXHR)
-	{
-		location.reload(true);
-		//document.write(data);
-  		//$('#search-results').html(data);
-	}
-</script>
