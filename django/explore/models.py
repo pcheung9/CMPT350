@@ -18,4 +18,6 @@ class MovieObj(models.Model):
     rating = models.IntegerField(null=True) 
     score = models.IntegerField(null=True)     
     movieID = models.CharField(max_length=50,null=True)
-    relevance = models.IntegerField(null=True)
+    poster = models.CharField(max_length=500,null=True)
+    plot = models.CharField(max_length=9999,null=True)
+    runtime = models.IntegerField(null=True)
