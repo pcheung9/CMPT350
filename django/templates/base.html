@@ -5,7 +5,9 @@
 		<meta charset="utf-8">
 
         <!--src for D3 library-->
-        <script src="https://d3js.org/d3.v4.min.js"></script>
+        <!--<script src="https://d3js.org/d3.v4.min.js"></script>-->
+        <!--<script src="https://d3js.org/d3.v4.min.js"></script>-->
+        <script src="http://cdnjs.cloudflare.com/ajax/libs/Colors.js/1.2.3/colors.min.js"></script>
 
         <!--Bootstrap-->
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -25,11 +27,12 @@
 
         <!--{% block stylesheets %}
         {% endblock %}-->
+        <div class="navbar-brand navbar-logo">
+            <!--<a href="/explore"><img src="{% static "logopic.jpg" %}" alt="CHLN Movie Explorer"></a>-->
+        </div>
 	</head>
 	<body>
-        <div class="navbar-brand navbar-logo">
-            <a href="/explore"><img src="{% static "logopic.jpg" %}" alt="CHLN Movie Explorer"></a>
-        </div>
+
 
         {% block content %}
         {% endblock %}

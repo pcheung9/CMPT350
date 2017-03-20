@@ -2,7 +2,6 @@ from django.shortcuts import render, render_to_response, get_object_or_404
 from django.template.loader import render_to_string
 import random
 
-
 # Create your views here.
 from django.http import HttpResponse
 from django.http import JsonResponse
@@ -12,6 +11,8 @@ import json
 from django.core import serializers
 from itertools import chain
 from explore.algorithm import *
+from django.utils.safestring import mark_safe
+from django.template import RequestContext
 
 def load(request):
     data = {}
@@ -47,7 +48,10 @@ def results(request):
 
     data = serializers.serialize('json', data)
     #return HttpResponse(dump, mimetype='application/json')
-    return TemplateResponse(request, 'results.html', ({"data": data}))
+    #return TemplateResponse(request, 'results.html', ({"data": data}))
+    return render_to_response("results.html", {'data':mark_safe(data)}, RequestContext(request))
 
 def test(request, json_data):
     return TemplateResponse(request, 'results.html')
+
+
