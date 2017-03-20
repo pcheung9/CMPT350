@@ -14,10 +14,12 @@
 </div>-->
 <form action="/explore/view/" method="get">
     {% csrf_token %}
+
     <h3>Search</h3>
-    <input type ='text' id="search" name="search"/>
+    <input type ="text" id="search" name="search"/>
+
     <ul id="search-results">
-        <button class btn id=submitsearch>Search</button>
+        <button class btn id="submitsearch">Search</button>
     </ul>
 </form>
 
