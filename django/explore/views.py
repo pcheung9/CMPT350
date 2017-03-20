@@ -1,6 +1,8 @@
 from django.shortcuts import render, render_to_response, get_object_or_404
+import requests
 from django.template.loader import render_to_string
 import random
+import time
 
 # Create your views here.
 from django.http import HttpResponse
@@ -14,6 +16,7 @@ from explore.algorithm import *
 from django.utils.safestring import mark_safe
 from django.template import RequestContext
 
+
 def load(request):
     data = {}
     data = MovieObj.objects.all()
@@ -26,7 +29,7 @@ def search(request):
     return TemplateResponse(request, 'search.html')
 
 def results(request):
-    name = request.POST['search']
+    name = request.GET['search']
     IDs = stringBuilder(name)
     results = related(15, IDs, 1, 1, 1, 1, 1)
     pairs = []
@@ -38,6 +41,14 @@ def results(request):
         split = pair.split('|')
         temp = get_object_or_404(MovieObj, movieID=str(split[0]))
         temp.relevance = split[1]
+        response = requests.post(str("http://www.omdbapi.com/?i=" + split[0])) #OMDB API call
+        while response.status_code != 200:
+            response = requests.post(str("http://www.omdbapi.com/?i=" + split[0]))  # OMDB API call
+        print(str(split[0] + str(response)))
+
+        temp.poster = response.json()["Poster"]
+        temp.plot = response.json()["Plot"]
+        temp.runtime = response.json()["Runtime"]
         pairs.append(temp)
 
     print(pairs)
@@ -47,11 +58,8 @@ def results(request):
     data = list(chain(nonetype_querySet, object_list))
 
     data = serializers.serialize('json', data)
+
     #return HttpResponse(dump, mimetype='application/json')
     #return TemplateResponse(request, 'results.html', ({"data": data}))
     return render_to_response("results.html", {'data':mark_safe(data)}, RequestContext(request))
-
-def test(request, json_data):
-    return TemplateResponse(request, 'results.html')
-
 

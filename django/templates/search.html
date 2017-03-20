@@ -1,19 +1,23 @@
 <!DOCTYPE html>
-{% extends 'base.html' %}
-{% block content %}
+{% load static %}
+{% load staticfiles %}
 <html>
 <head>
     <title>Search</title>
-
     <script type="text/javascript" src="http://code.jquery.com/jquery-2.0.0.min.js"></script>
 
 </head>
 <body>
-<h3>Search</h3>
-
-<form action="/explore/view/" method="post">
+<link rel="stylesheet" href="{% static "/css/search.css" %}">
+<!--<div id="bg">
+    <img src="{% static "logopic.jpg" %}" id="bg" alt="">
+</div>-->
+<form action="/explore/view/" method="get">
     {% csrf_token %}
+
+    <h3>Search</h3>
     <input type ="text" id="search" name="search"/>
+
     <ul id="search-results">
         <button class btn id="submitsearch">Search</button>
     </ul>
@@ -21,6 +25,5 @@
 
 
 </body>
-{% endblock %}
 
 </html>
