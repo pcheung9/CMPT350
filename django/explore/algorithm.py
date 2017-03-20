@@ -392,6 +392,7 @@ def stringBuilder(name):
     print(IDs)
     return " ".join(IDs)
 
+
 # makes movie object from models.py for saving into sqlite database out of Movie() class.
 def makeMovieObj(temp):
     movie = MovieObj()
