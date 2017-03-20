@@ -28,7 +28,7 @@ def search(request):
     return TemplateResponse(request, 'search.html')
 
 def results(request):
-    name = request.POST['search']
+    name = request.GET['search']
     IDs = stringBuilder(name)
     results = related(15, IDs, 1, 1, 1, 1, 1)
     pairs = []
