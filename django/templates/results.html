@@ -20,112 +20,39 @@
   <div id="treemap"></div>
   
    <script type="text/javascript">	
+   
+		//cleaned data from backend data dictionary
+        var cleanedData = JSON.parse("{{ data|escapejs }}");
+
+		//create new movieList object to represent all of the movies
+		var movieObjList = new Object(); 
+		movieObjList.name = "movies";
+		movieObjList.children = [];
+		
+		//build up objects with cleaned data from views.py
+        for ( i = 0; i < cleanedData.length ; i++) {
+			var movieObj = new Object();
+			var movieData = new Object();
 			
-		var data = {{ data }};
-		//console.log(data[0]);
-
-        var data = JSON.parse("{{ data|escapejs }}");
-        //var data = JSON.parse("{{ data|escapejs }}");
-        for ( i = 0; i < data.length ; i++) {
-            document.write(data[i].fields.title + " " + data[i].fields.relevance + "<br>");
+			movieData.name = cleanedData[i].fields.title;
+			movieData.size = parseInt(cleanedData[i].fields.relevance);
+			
+			movieObj.name = cleanedData[i].fields.title;
+			movieObj.children = [];
+			movieObj.children.push(movieData);
+			
+			movieObjList.children.push(movieObj);
+            //document.write(data[i].fields.title + " " + data[i].fields.relevance + "<br>");
         }
+		
+   		//stringify objects to JSON
+		var movieJSON = JSON.stringify(movieObjList);
+		console.log(movieJSON); //log to console for debugging
 
-		var data =  {
-					 "name": "movies",
-					 	"children": [
-										{
-											"name": "Shrek", 
-											"children": [
-												{"name": "shrek 2", "size": 573.7},
-											]
-										},
-										{
-											"name": "shrek 2", 
-											"children": [
-												{"name": "shrek 2", "size": 306.6},
-											]
-										},
-										{									
-											"name": "shrek the third", 
-											"children": [
-												{"name": "shrek the third", "size": 298.3},
-											]
-										},
-										{									
-											"name": "shrek forever after", 
-											"children": [
-												{"name": "shrek forever after", "size": 259.2},
-											]
-										},			
-										{									
-											"name": "brave", 
-											"children": [
-												{"name": "brave", "size": 241.6},
-											]
-										},
-										{									
-											"name": "aladdin", 
-											"children": [
-												{"name": "aladdin", "size": 234.0},
-											]
-										},
-										{									
-											"name": "the princess bride", 
-											"children": [
-												{"name": "the princess bride", "size": 224.3},
-											]
-										},
-										{									
-											"name": "antz", 
-											"children": [
-												{"name": "antz", "size": 219.8},
-											]
-										},	
-										{									
-											"name": "the tale of despereaux", 
-											"children": [
-												{"name": "the tale of despereaux", "size": 218.3},
-											]
-										},
-										{									
-											"name": "lilo & stitch", 
-											"children": [
-												{"name": "lilo & stitch", "size": 211.6},
-											]
-										},
-										{									
-											"name": "enchanted", 
-											"children": [
-												{"name": "enchanted", "size": 211.3},
-											]
-										},
-										{									
-											"name": "the spongebob squarepants movie", 
-											"children": [
-												{"name": "the spongebob squarepants movie", "size": 211.0},
-											]
-										},
-										{									
-											"name": "ice age: the meltdown", 
-											"children": [
-												{"name": "ice age: the meltdown", "size": 210.7},
-											]
-										},
-										{									
-											"name": "sinbad: legend of the seven seas", 
-											"children": [
-												{"name": "sinbad: legend of the seven seas", "size": 210.1},
-											]
-										},
-										{									
-											"name": "space jam", 
-											"children": [
-												{"name": "space jam", "size": 208.9},
-											]
-										},																	
-									]
-					}
-					
+		//bind stringified data to variable we pass into d3 functions
+		var data = movieJSON;
+		var data = movieObjList;
+	
 		var svg = d3.select("svg"),
 			width = +svg.attr("width"),
 			height = +svg.attr("height");
