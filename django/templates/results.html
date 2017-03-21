@@ -16,127 +16,162 @@
 		<script src="https://d3js.org/d3.v4.min.js"></script>
   </head>
   <body>
-  <svg width="1000" height="500"></svg>
+  <svg width="1024" height="720"></svg>
   <div id="treemap"></div>
   
    <script type="text/javascript">	
    
-   		//keeping dirty data from backend in client memory for debug purposes
-   		var dirtyData = {{ data }};
+		var globalResizeTimer = null;
    
-		//cleaned data from backend data dictionary
-        var cleanedData = JSON.parse("{{ data|escapejs }}");
+		function drawd3() {
+			
+			//keeping dirty data from backend in client memory for debug purposes
+			var dirtyData = {{ data }};
+	   
+			//cleaned data from backend data dictionary
+			var cleanedData = JSON.parse("{{ data|escapejs }}");
 
-		//create new movieList object to represent all of the movies
-		var movieObjList = new Object(); 
-		movieObjList.name = "movies";
-		movieObjList.children = [];
-		
-		//build up objects with cleaned data from views.py
-        for ( i = 0; i < cleanedData.length ; i++) {
-			var movieObj = new Object();
-			var movieData = new Object();
+			//create new movieList object to represent all of the movies
+			var movieObjList = new Object(); 
+			movieObjList.name = "movies";
+			movieObjList.children = [];
 			
-			movieData.name = cleanedData[i].fields.title;
-			movieData.poster = cleanedData[i].fields.poster;
-			movieData.size = parseInt(cleanedData[i].fields.relevance);
-			
-			movieObj.name = cleanedData[i].fields.title;
-			movieObj.poster = cleanedData[i].fields.poster;
-			//console.log(movieObj.poster);
-			movieObj.children = [];
-			movieObj.children.push(movieData);
-			
-			movieObjList.children.push(movieObj);
-            //document.write(data[i].fields.title + " " + data[i].fields.relevance + "<br>");
-        }
-		
-   		//stringify objects to JSON This seems to be counter productive
-		//d3 knows how to intrepret javascript Objects - ie they are in JSON already
-		//stringifying them anyways to log to console for debugging
-		var movieJSON = JSON.stringify(movieObjList);
-		console.log(movieJSON); 
-
-		//bind stringified data to variable we pass into d3 functions - redundant - see above
-		//var data = movieJSON;
-		
-		//bind javascript Objects to data variable for pass into d3 functions
-		var data = movieObjList;
-	
-		var svg = d3.select("svg"),
-			width = +svg.attr("width"),
-			height = +svg.attr("height");
-			
-		var fader = function(color) { return d3.interpolateRgb(color, "#fff")(0.2); },
-			color = d3.scaleOrdinal(d3.schemeCategory20.map(fader)),
-			format = d3.format(",d");
+			//build up objects with cleaned data from views.py
+			for ( i = 1; i < cleanedData.length ; i++) {
+				var movieObj = new Object();
+				var movieData = new Object();
 				
-		var treemap = d3.treemap()
-			.tile(d3.treemapResquarify)
-			.size([width, height])
-			.round(true)
-			.paddingInner(1);
+				movieData.name = cleanedData[i].fields.title;
+				movieData.poster = cleanedData[i].fields.poster;
+				movieData.size = parseInt(cleanedData[i].fields.relevance);
+				
+				movieObj.name = cleanedData[i].fields.title;
+				movieObj.poster = cleanedData[i].fields.poster;
+				//console.log(movieObj.poster);
+				movieObj.children = [];
+				movieObj.children.push(movieData);
+				
+				movieObjList.children.push(movieObj);
+				//document.write(data[i].fields.title + " " + data[i].fields.relevance + "<br>");
+			}
+			
+			//stringify objects to JSON This seems to be counter productive
+			//d3 knows how to intrepret javascript Objects - ie they are in JSON already
+			//stringifying them anyways to log to console for debugging
+			var movieJSON = JSON.stringify(movieObjList);
+			console.log(movieJSON); 
+
+			//bind stringified data to variable we pass into d3 functions - redundant - see above
+			//var data = movieJSON;
 		
-		//d3.json(data, function(data) {
+			//bind javascript Objects to data variable for pass into d3 functions
+			var data = movieObjList;
 		
-		  var root = d3.hierarchy(data)
-			  .eachBefore(function(d) { d.data.id = (d.parent ? d.parent.data.id + "." : "") + d.data.name; })
-			  .sum(sumBySize)
-			  .sort(function(a, b) { return b.height - a.height || b.value - a.value; });
-		
-		  treemap(root);
-		  
-		  var cell = svg.selectAll("g")
-			.data(root.leaves())
-			.enter().append("g")
-			.attr("transform", function(d) { return "translate(" + d.x0 + "," + d.y0 + ")"; });
-		
-		  cell.append("rect")
-			  .attr("id", function(d) { return d.data.id; })
-			  .attr("width", function(d) { return d.x1 - d.x0; })
-			  .attr("height", function(d) { return d.y1 - d.y0; })
-			  .attr("fill", function(d) { return color(d.parent.data.id); });
-		
-		  cell.append("defs")
+			var svg = d3.select("svg"),
+				width = +svg.attr("width"),
+				height = +svg.attr("height");
+
+			var fader = function(color) { return d3.interpolateRgb(color, "#fff")(0.2); },
+				color = d3.scaleOrdinal(d3.schemeCategory20.map(fader)),
+				format = d3.format(",d");
+					
+			var treemap = d3.treemap()
+				.size([width, height])
+				.round(true)
+				.paddingInner(1)
+				.tile(d3.treemapSquarify.ratio(1 * (1 + Math.sqrt(5)*.4)));
+				
+			
+			//d3.json(data, function(data) {
+			
+			var root = d3.hierarchy(data)
+				.eachBefore(function(d) { d.data.id = (d.parent ? d.parent.data.id + "." : "") + d.data.name; })
+				.sum(sumBySize)
+				.sort(function(a, b) { return b.height - a.height || b.value - a.value; });
+			
+			treemap(root);
+			  
+			var cell = svg.selectAll("g")
+				.data(root.leaves())
+				.enter().append("g")
+				.attr("preserveAspectRatio", "xMinYMin meet")
+				.attr("viewBox", "0 0 1000 500")
+				.classed("svg-content", true)
+				.attr("transform", function(d) { return "translate(" + d.x0 + "," + d.y0 + ")"; });
+
+			
+			cell.append("rect")
+				.attr("id", function(d) { return d.data.id; })
+				.attr("width", function(d) { return d.x1 - d.x0; })
+				.attr("height", function(d) { return d.y1 - d.y0; })
+				.attr("fill", function(d) { return color(d.parent.data.id); });
+			
+			
+			
+			cell.append("defs")
 				.append("pattern")
 				.attr("id", "images")
 				.attr('patternUnits', 'userSpaceOnUse')
+				.attr('x', function(d) { return d.x; })
+				.attr('y', function(d) { return d.y; })
 				.attr("width", function(d) { return d.x1 - d.x0; })
 				.attr("height", function(d) { return d.y1 - d.y0; })
 				.append("image")
 				.attr("xlink:href", function(d) { return imageUrl(d); })
-				.attr("width", function(d) { return d.x1 - d.x0; })
-				.attr("height", function(d) { return d.y1 - d.y0; })
+				.attr('x', function(d) { return d.x; })
+				.attr('y', function(d) { return d.y; });
+				//.attr("width", function(d) { return d.width; })
+				//.attr("height", function(d) { return d.height; });
+				//.attr("height", function(d) { return d.y1; });
+				//.attr("width", function(d) { return d.x1; })
 				//.attr("xlink:href", function(d) { return imageUrl(d); })
-			
-		cell.append("rect")
-				.attr("x", "0")
-				.attr("y", "0")
-				.attr("width", function(d) { return d.x1 - d.x0; })
-				.attr("height", function(d) { return d.y1 - d.y0; })
-				.attr("fill", "url(#images)");
+					
+				
+			cell.append("rect")
+					.attr('x', function(d) { return d.x; })
+					.attr('y', function(d) { return d.y; })
+					.attr("width", function(d) { return d.x1; })
+					.attr("height", function(d) { return d.y1; })
+					.attr("fill", "url(#images)");
 
-		cell.append("text")
-			  .attr("clip-path", function(d) { return "url(#clip-" + d.data.id + ")"; })
-			  .selectAll("tspan")
-			  .data(function(d) { return d.data.name.split(/(?=[A-Z][^A-Z])/g); })
-			  .enter().append("tspan")
-			  .attr("x", 4)
-			  .attr("y", function(d, i) { return 13 + i * 10; })
-			  .text(function(d) { return d; });
-	
-		//script tag _~_ don't remove.
-
-		function sumBySize(d) {
-		  return d.size;
-		}
+			cell.append("text")
+				  .attr("clip-path", function(d) { return "url(#clip-" + d.data.id + ")"; })
+				  .selectAll("tspan")
+				  .data(function(d) { return d.data.name.split(/(?=[A-Z][^A-Z])/g); })
+				  .enter().append("tspan")
+				  .attr("x", 4)
+				  .attr("y", function(d, i) { return 13 + i * 10; })
+				  .text(function(d) { return d; });
 		
-		function imageUrl(d) {
-			//printing URL to console to debug data fetching from JSON
-			//console.log(d.data.poster);
-			console.log(d.data.name);
-			return d.data.poster;
+			//script tag _~_ don't remove.
+
+			function sumBySize(d) {
+			  return d.size;
+			}
+			
+			function imageUrl(d) {
+				//printing URL to console to debug data fetching from JSON
+				//console.log(d.data.poster);
+				console.log(d.data.name);
+				return d.data.poster;
+			}
+		
 		}
+
+		
+
+		
+
+		$(window).resize(function() {
+			if(globalResizeTimer != null) window.clearTimeout(globalResizeTimer);
+			globalResizeTimer = window.setTimeout(function() {
+				$("svg g").remove();
+				//$("svg").remove();
+				drawd3();
+			}, 200);
+		});
+		
+		drawd3();
 		
 		</script>
 
