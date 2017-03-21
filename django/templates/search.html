@@ -5,7 +5,7 @@
 <head>
     <title>Search</title>
     <script type="text/javascript" src="http://code.jquery.com/jquery-2.0.0.min.js"></script>
-
+    <link rel="shortcut icon" href="{% static "favicon.png" %}">
 </head>
 <body>
 <link rel="stylesheet" href="{% static "/css/search.css" %}">
@@ -14,13 +14,9 @@
 </div>-->
 <form action="/explore/view/" method="get">
     {% csrf_token %}
-
     <h3>Search</h3>
-    <input type ="text" id="search" name="search"/>
-
-    <ul id="search-results">
-        <button class btn id="submitsearch">Search</button>
-    </ul>
+    <input type ='text' id="search" name="search"/>
+    <button class btn id=submitsearch>Search</button>
 </form>
 
 
