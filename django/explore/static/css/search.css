@@ -1,16 +1,18 @@
 body {
-    background-image: url("../searchBackground.jpg");
+    background-image: url("../movieCollageBlur.jpg");
     background-size: cover;
     padding: 250px;
+    background-attachment: scroll;
+    background-repeat: no-repeat;
 }
 
 form {
-    padding: auto;
+    padding: 5%;
     margin: auto;
     width: 25%;
-    border: 3px solid green;
     background-color: whitesmoke;
     text-align: center;
-    padding: 10px;
-    background
+    border-radius: 25px;
+    font-size: 30px;
+    font-family: Helvetica;
 }
