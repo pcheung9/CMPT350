@@ -1,9 +1,8 @@
 body {
-    background-image: url("../movieCollageBlur.jpg");
+    background: url("../movieCollageBlur.jpg") no-repeat scroll;
     background-size: cover;
     padding: 250px;
-    background-attachment: scroll;
-    background-repeat: no-repeat;
+
 }
 
 form {
@@ -14,5 +13,6 @@ form {
     text-align: center;
     border-radius: 25px;
     font-size: 30px;
-    font-family: Helvetica;
+    font-family: Impact, sans-serif;
+    box-shadow: black;
 }
