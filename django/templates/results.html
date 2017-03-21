@@ -20,112 +20,49 @@
   <div id="treemap"></div>
   
    <script type="text/javascript">	
+   
+   		//keeping dirty data from backend in client memory for debug purposes
+   		var dirtyData = {{ data }};
+   
+		//cleaned data from backend data dictionary
+        var cleanedData = JSON.parse("{{ data|escapejs }}");
+
+		//create new movieList object to represent all of the movies
+		var movieObjList = new Object(); 
+		movieObjList.name = "movies";
+		movieObjList.children = [];
+		
+		//build up objects with cleaned data from views.py
+        for ( i = 0; i < cleanedData.length ; i++) {
+			var movieObj = new Object();
+			var movieData = new Object();
 			
-		var data = {{ data }};
-		//console.log(data[0]);
-
-        var data = JSON.parse("{{ data|escapejs }}");
-        //var data = JSON.parse("{{ data|escapejs }}");
-        for ( i = 0; i < data.length ; i++) {
-            document.write(data[i].fields.title + " " + data[i].fields.relevance + "<br>");
+			movieData.name = cleanedData[i].fields.title;
+			movieData.poster = cleanedData[i].fields.poster;
+			movieData.size = parseInt(cleanedData[i].fields.relevance);
+			
+			movieObj.name = cleanedData[i].fields.title;
+			movieObj.poster = cleanedData[i].fields.poster;
+			//console.log(movieObj.poster);
+			movieObj.children = [];
+			movieObj.children.push(movieData);
+			
+			movieObjList.children.push(movieObj);
+            //document.write(data[i].fields.title + " " + data[i].fields.relevance + "<br>");
         }
+		
+   		//stringify objects to JSON This seems to be counter productive
+		//d3 knows how to intrepret javascript Objects - ie they are in JSON already
+		//stringifying them anyways to log to console for debugging
+		var movieJSON = JSON.stringify(movieObjList);
+		console.log(movieJSON); 
 
-		var data =  {
-					 "name": "movies",
-					 	"children": [
-										{
-											"name": "Shrek", 
-											"children": [
-												{"name": "shrek 2", "size": 573.7},
-											]
-										},
-										{
-											"name": "shrek 2", 
-											"children": [
-												{"name": "shrek 2", "size": 306.6},
-											]
-										},
-										{									
-											"name": "shrek the third", 
-											"children": [
-												{"name": "shrek the third", "size": 298.3},
-											]
-										},
-										{									
-											"name": "shrek forever after", 
-											"children": [
-												{"name": "shrek forever after", "size": 259.2},
-											]
-										},			
-										{									
-											"name": "brave", 
-											"children": [
-												{"name": "brave", "size": 241.6},
-											]
-										},
-										{									
-											"name": "aladdin", 
-											"children": [
-												{"name": "aladdin", "size": 234.0},
-											]
-										},
-										{									
-											"name": "the princess bride", 
-											"children": [
-												{"name": "the princess bride", "size": 224.3},
-											]
-										},
-										{									
-											"name": "antz", 
-											"children": [
-												{"name": "antz", "size": 219.8},
-											]
-										},	
-										{									
-											"name": "the tale of despereaux", 
-											"children": [
-												{"name": "the tale of despereaux", "size": 218.3},
-											]
-										},
-										{									
-											"name": "lilo & stitch", 
-											"children": [
-												{"name": "lilo & stitch", "size": 211.6},
-											]
-										},
-										{									
-											"name": "enchanted", 
-											"children": [
-												{"name": "enchanted", "size": 211.3},
-											]
-										},
-										{									
-											"name": "the spongebob squarepants movie", 
-											"children": [
-												{"name": "the spongebob squarepants movie", "size": 211.0},
-											]
-										},
-										{									
-											"name": "ice age: the meltdown", 
-											"children": [
-												{"name": "ice age: the meltdown", "size": 210.7},
-											]
-										},
-										{									
-											"name": "sinbad: legend of the seven seas", 
-											"children": [
-												{"name": "sinbad: legend of the seven seas", "size": 210.1},
-											]
-										},
-										{									
-											"name": "space jam", 
-											"children": [
-												{"name": "space jam", "size": 208.9},
-											]
-										},																	
-									]
-					}
-					
+		//bind stringified data to variable we pass into d3 functions - redundant - see above
+		//var data = movieJSON;
+		
+		//bind javascript Objects to data variable for pass into d3 functions
+		var data = movieObjList;
+	
 		var svg = d3.select("svg"),
 			width = +svg.attr("width"),
 			height = +svg.attr("height");
@@ -148,11 +85,11 @@
 			  .sort(function(a, b) { return b.height - a.height || b.value - a.value; });
 		
 		  treemap(root);
-		
+		  
 		  var cell = svg.selectAll("g")
 			.data(root.leaves())
 			.enter().append("g")
-			  .attr("transform", function(d) { return "translate(" + d.x0 + "," + d.y0 + ")"; });
+			.attr("transform", function(d) { return "translate(" + d.x0 + "," + d.y0 + ")"; });
 		
 		  cell.append("rect")
 			  .attr("id", function(d) { return d.data.id; })
@@ -160,12 +97,26 @@
 			  .attr("height", function(d) { return d.y1 - d.y0; })
 			  .attr("fill", function(d) { return color(d.parent.data.id); });
 		
-		  cell.append("clipPath")
-			  .attr("id", function(d) { return "clip-" + d.data.id; })
-			  .append("use")
-			  .attr("xlink:href", function(d) { return "#" + d.data.id; });
-			  
-		  cell.append("text")
+		  cell.append("defs")
+				.append("pattern")
+				.attr("id", "images")
+				.attr('patternUnits', 'userSpaceOnUse')
+				.attr("width", function(d) { return d.x1 - d.x0; })
+				.attr("height", function(d) { return d.y1 - d.y0; })
+				.append("image")
+				.attr("xlink:href", function(d) { return imageUrl(d); })
+				.attr("width", function(d) { return d.x1 - d.x0; })
+				.attr("height", function(d) { return d.y1 - d.y0; })
+				//.attr("xlink:href", function(d) { return imageUrl(d); })
+			
+		cell.append("rect")
+				.attr("x", "0")
+				.attr("y", "0")
+				.attr("width", function(d) { return d.x1 - d.x0; })
+				.attr("height", function(d) { return d.y1 - d.y0; })
+				.attr("fill", "url(#images)");
+
+		cell.append("text")
 			  .attr("clip-path", function(d) { return "url(#clip-" + d.data.id + ")"; })
 			  .selectAll("tspan")
 			  .data(function(d) { return d.data.name.split(/(?=[A-Z][^A-Z])/g); })
@@ -173,39 +124,18 @@
 			  .attr("x", 4)
 			  .attr("y", function(d, i) { return 13 + i * 10; })
 			  .text(function(d) { return d; });
+	
+		//script tag _~_ don't remove.
 
-		  cell.append("title")
-			  .text(function(d) { return d.data.id + "\n" + format(d.value); });
-		
-		  d3.selectAll("input")
-			  .data([sumBySize, sumByCount], function(d) { return d ? d.name : this.value; })
-			  .on("change", changed);
-		
-		  var timeout = d3.timeout(function() {
-			d3.select("input[value=\"sumByCount\"]")
-				.property("checked", true)
-				.dispatch("change");
-		  }, 2000);
-		
-		  function changed(sum) {
-			timeout.stop();
-		
-			treemap(root.sum(sum));
-		
-			cell.transition()
-				.duration(750)
-				.attr("transform", function(d) { return "translate(" + d.x0 + "," + d.y0 + ")"; })
-			  .select("rect")
-				.attr("width", function(d) { return d.x1 - d.x0; })
-				.attr("height", function(d) { return d.y1 - d.y0; });
-		  }
-		
-		function sumByCount(d) {
-		  return d.children ? 0 : 1;
-		}
-		
 		function sumBySize(d) {
 		  return d.size;
+		}
+		
+		function imageUrl(d) {
+			//printing URL to console to debug data fetching from JSON
+			//console.log(d.data.poster);
+			console.log(d.data.name);
+			return d.data.poster;
 		}
 		
 		</script>
