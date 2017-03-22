@@ -20,6 +20,9 @@ def load(request):
     print("Test console output")
     return HttpResponse(json_data, content_type="application/json")
 
+def test(request):
+    return TemplateResponse(request, 'test.html')
+
 
 def search(request):
     titles = getTitles()
