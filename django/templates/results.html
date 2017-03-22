@@ -100,10 +100,17 @@
 			//array for preload caching
 			images = [];
 			
+			barData = [];
+			
 			//build up objects with cleaned data from views.py
 			for ( i = 1; i < cleanedData.length ; i++) {
 				var movieObj = new Object();
 				var movieData = new Object();
+				
+				var barDataObj = new Object()
+				
+				barDataObj.name = cleanedData[i].fields.title;
+				barDataObj.size = parseInt(cleanedData[i].fields.relevance);
 				
 				movieData.name = cleanedData[i].fields.title;
 				movieData.poster = cleanedData[i].fields.poster;
@@ -116,6 +123,7 @@
 				movieObj.children.push(movieData);
 				
 				movieObjList.children.push(movieObj);
+				barData.push(barDataObj);
 				
 				//push image url into array for pre-cache by loader()
 				images.push(cleanedData[i].fields.poster);
@@ -129,7 +137,7 @@
 			//d3 knows how to intrepret javascript Objects - ie they are in JSON already
 			//stringifying them anyways to log to console for debugging
 			var movieJSON = JSON.stringify(movieObjList);
-			console.log(movieJSON); 
+			//console.log(movieJSON); 
 
 			//bind stringified data to variable we pass into d3 functions - redundant - see above
 			//var data = movieJSON;
@@ -178,7 +186,7 @@
 				.classed("svg-content", true)
 				.attr("transform", function(d) { return "translate(" + d.x0 + "," + d.y0 + ")"; })
 				.on("mouseover", mouseover)
-				.on("mousemove", function (d) { return mousemove(d); })
+				.on("mousemove", function (d) { return mousemove(d,d.data.id); })
 				.on("mouseout", mouseout);
 				
 				//.on("mouseover", function(d) {      
@@ -243,7 +251,7 @@
 			function imageUrl(d) {
 				//printing URL to console to debug data fetching from JSON
 				//console.log(d.data.poster);
-				console.log(d.data.name);
+				//console.log(d.data.name);
 				return d.data.poster;
 			}
 			
@@ -256,9 +264,7 @@
 				.duration(200)
 				.style("opacity", 1);
 			}
-			function mousemove(d) {
-			//<span style='color:red'><h1>Tombouctou Region</h1><br>
-			//<span style='color:blue'><h2>Mali !!!!!!! </h2></span>
+			function mousemove(d, ID) {
 				div
 					.attr("id", "container")
 					.html("<h1>" + d.data.name.split(/(?=[A-Z][^A-Z])/g) + "</h1><br><ahref='imageURL()'><img height='75%' src='" + imageUrl(d) + ")'></ahref></span>")
@@ -269,30 +275,8 @@
 					.attr("id", "graphContainer")
 					.style("right", (d3.event.pageX - 10) + "px")
 					.style("top", (d3.event.pageY - 10) + "px");
-					
-				data = [
-							{
-								"Letter": "A",
-								"Freq": 20	
-							},
-							{
-								"Letter" : "B",
-								"Freq": 12
-							},
-							{
-								"Letter" : "C",
-								"Freq": 47
-							},
-							{
-								"Letter" : "D",
-								"Freq": 34
-							},
-						];
-					
-				dataTest = d3.csvFormat([{foo: "1", bar: "2"}]); // "foo,bar\n1,2"
-				console.log(dataTest);
-
-				//barData = d3.csvFormat(barData);
+						
+				data = barData;
 				//console.log(barData);
 				
 				// set the dimensions and margins of the graph
@@ -302,31 +286,20 @@
 				// set the ranges
 				var yScale = d3.scaleLinear()
 					.domain([0, d3.max(data)])
-					.range([0, height])
+					.range([height, 0])
 
 				var xScale = d3.scaleBand()
 					.domain(d3.range(0, data.length))
-					.range([0, width])
-
-				// define the axis
-				//var xAxis = d3.svg.axis()
-				//	.scale(x)
-				//	.orient("bottom")
-
-
-				//var yAxis = d3.svg.axis()
-				//	.scale(y)
-				//	.orient("left")
-				//	.ticks(10);
+					.range([0, width]);
+				var color = d3.scaleOrdinal(d3.schemeCategory20b);
 
 				var xAxis = d3.axisBottom()
 					.scale(xScale);
 
 				var yAxis = d3.axisLeft()
 					.scale(yScale);
-					
-					//.append("svg:svg")
-				// add the SVG element
+
+				//add SVG 
 				var svg = d3.select("#graphContainer").append("svg:svg")
 					.attr("width", width + margin.left + margin.right)
 					.attr("height", height + margin.top + margin.bottom)
@@ -334,53 +307,60 @@
 					.attr("transform", 
 						  "translate(" + margin.left + "," + margin.top + ")");
 
+				data.forEach(function(d) {
+					d.name = d.name;
+					console.log(d.name);
+					d.size = +d.size;
+				});
 
-				// load the data
-				//d3.json(data, function(error, data) {
-					console.log(data);
-					data.forEach(function(d) {
-						d.Letter = d.Letter;
-						d.Freq = +d.Freq;
-					});
-					
-				  // scale the range of the data
-				  xScale.domain(data.map(function(d) { return d.Letter; }));
-				  yScale.domain([0, d3.max(data, function(d) { return d.Freq; })]);
+				//scale
+				xScale.domain(data.map(function(d) { return d.name; }));
+				yScale.domain([0, d3.max(data, function(d) { return d.size; })]);
 
-				  // add axis
-				  svg.append("g")
-					  .attr("class", "x axis")
-					  .attr("transform", "translate(0," + height + ")")
-					  .call(xAxis)
+				//axis
+				svg.append("g")
+					.attr("class", "x axis")
+					.attr("transform", "translate(0," + height + ")")
+					.call(xAxis)
 					.selectAll("text")
-					  .style("text-anchor", "end")
-					  .attr("dx", "-.8em")
-					  .attr("dy", "-.55em")
-					  .attr("transform", "rotate(-90)" );
+					.style("text-anchor", "end")
+					.attr("dx", "-.8em")
+					.attr("dy", "-.55em")
+					.attr("transform", "rotate(-90)" );
 
-				  svg.append("g")
-					  .attr("class", "y axis")
-					  .call(yAxis)
+				svg.append("g")
+					.attr("class", "y axis")
+					.call(yAxis)
 					.append("text")
-					  .attr("transform", "rotate(-90)")
-					  .attr("y", 5)
-					  .attr("dy", ".71em")
-					  .style("text-anchor", "end")
-					  .text("Frequency");
+					.attr("transform", "rotate(-90)")
+					.attr("y", 5)
+					.attr("dy", ".71em")
+					.style("text-anchor", "end")
+					.text("Frequency");
 
-
-				  // Add bar chart
-				  svg.selectAll("bar")
-					  .data(data)
+				//chart
+				svg.selectAll("bar")
+					.data(data)
+					.attr("class", "bar")
 					.enter().append("rect")
-					  .attr("class", "bar")
-					  .attr("x", function(d) { return xScale(d.Letter); })
-					  .attr("width", xScale.bandwidth())
-					  .attr("height", function(d) { return height - yScale(d.Freq); })
-					  .attr("y", function(d) { return yScale(d.Freq); });
-			
-			
-				//barChart(div);
+					.attr("x", function(d) { return xScale(d.name); })
+					.attr("width", xScale.bandwidth())
+					.attr("height", function(d) { return height - yScale(d.size); })
+					.attr("y", function(d) { return yScale(d.size); })
+					.style("fill", function(d) { return colorizer(d,ID); });
+
+				//coloring function (black)
+				function colorizer(d,ID) {
+					name = d.name.split(/(?=[A-Z][^A-Z])/g);
+					namearr = name.split(".");
+					idarr = ID.split(".");
+					idarr = idarr[1];
+					if(namearr[0] == idarr){
+						return "brown"
+					}else{
+						return "steelblue"
+					}
+				}
 			}
 			
 			function mouseout() {
@@ -393,7 +373,7 @@
 		}
 		
 		function loader(images) {
-			console.log('Loader');
+			//console.log('Loader');
 			if (!loader.list) {
 				loader.list = [];
 			}
@@ -636,7 +616,7 @@
 						];
 					
 				dataTest = d3.csvFormat([{foo: "1", bar: "2"}]); // "foo,bar\n1,2"
-				console.log(dataTest);
+				//console.log(dataTest);
 
 				//barData = d3.csvFormat(barData);
 				//console.log(barData);
@@ -683,15 +663,15 @@
 
 				// load the data
 				//d3.json(data, function(error, data) {
-					console.log(data);
+					//console.log(data);
 					data.forEach(function(d) {
 						d.Letter = d.Letter;
-						d.Freq = +d.Freq;
+						d.size = +d.size;
 					});
 					
 				  // scale the range of the data
 				  xScale.domain(data.map(function(d) { return d.Letter; }));
-				  yScale.domain([0, d3.max(data, function(d) { return d.Freq; })]);
+				  yScale.domain([0, d3.max(data, function(d) { return d.size; })]);
 
 				  // add axis
 				  svg.append("g")
@@ -712,7 +692,7 @@
 					  .attr("y", 5)
 					  .attr("dy", ".71em")
 					  .style("text-anchor", "end")
-					  .text("Frequency");
+					  .text("Score");
 
 
 				  // Add bar chart
@@ -722,8 +702,8 @@
 					  .attr("class", "bar")
 					  .attr("x", function(d) { return xScale(d.Letter); })
 					  .attr("width", xScale.bandwidth())
-					  .attr("height", function(d) { return height - yScale(d.Freq); })
-					  .attr("y", function(d) { return yScale(d.Freq); });
+					  .attr("height", function(d) { return height - yScale(d.size); })
+					  .attr("y", function(d) { return yScale(d.size); });
 
 				//});
 				}
