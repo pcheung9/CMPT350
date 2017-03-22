@@ -238,7 +238,7 @@ def reader(fileName):
         TSVreader = csv.reader(csvfile, delimiter='\t', quotechar='"', skipinitialspace=True)
         for row in TSVreader:
             temp = Movie()
-            if not count <= 1:  # Makes sure the headers aren't stored in an object
+            if count > 0:  # Makes sure the headers aren't stored in an object
 
                 #temp = Movie()  # Creates a temp object
                 temp.title = row[11][:-1].lower()  # Converts all titles to lower and strips off end char
@@ -392,6 +392,17 @@ def stringBuilder(name):
     print(IDs)
     return " ".join(IDs)
 
+def getTitles():
+    count = 0
+    titles = []
+    with open("movieDB.txt", 'r', encoding="utf8") as csvfile:
+        TSVreader = csv.reader(csvfile, delimiter='\t', quotechar='"', skipinitialspace=True)
+        for row in TSVreader:
+            temp = Movie()
+            if count > 0:  # Makes sure the headers aren't stored in an object
+                titles.append([row[11][:-1], row[23]])
+            count += 1
+    return titles
 
 # makes movie object from models.py for saving into sqlite database out of Movie() class.
 def makeMovieObj(temp):

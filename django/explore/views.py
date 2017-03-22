@@ -1,15 +1,11 @@
 from django.shortcuts import render, render_to_response, get_object_or_404
 import requests
-from django.template.loader import render_to_string
-import random
-import time
+
 
 # Create your views here.
 from django.http import HttpResponse
-from django.http import JsonResponse
 from explore.models import MovieObj
 from django.template.response import TemplateResponse
-import json
 from django.core import serializers
 from itertools import chain
 from explore.algorithm import *
@@ -26,7 +22,9 @@ def load(request):
 
 
 def search(request):
-    return TemplateResponse(request, 'search.html')
+    titles = getTitles()
+    print(titles)
+    return TemplateResponse(request, 'search.html', {'titles':titles})
 
 def results(request):
     name = request.GET['search']

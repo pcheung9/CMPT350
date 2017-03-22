@@ -6,6 +6,8 @@
     <title>Search</title>
     <script type="text/javascript" src="http://code.jquery.com/jquery-2.0.0.min.js"></script>
     <link rel="shortcut icon" href="{% static "favicon.png" %}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
 </head>
 <body>
 <link rel="stylesheet" href="{% static "/css/search.css" %}">
@@ -17,14 +19,13 @@
     <h3>MOVIE EXPLORER</h3>
     <!--<input type ='text' id="search" name="search"/>-->
     <input list="movies" id="search" name="search" autocomplete="off">
-    <datalist id="movies">
-        <option value="Fury">
-        <option value="The Matrix">
-        <option value="Shrek">
-        <option value="Space Jam">
-        <option value="The Big Lebowski">
-    </datalist>
     <input type="submit" value="Submit">
+
+    <datalist id="movies">
+        {% for title in titles %}
+            <option value="{{ title.0 }}" /> {{ title.1 }}
+        {% endfor %}
+    </datalist>
 </form>
 
 
@@ -39,17 +40,17 @@
         console.log(list);
         console.log(list.length);
         if (input == "") {
-            alert("Name must be filled out");
+            toastr.error('Please enter a movie name');
             return false;
         }
         else {
             for (var i = 0; i < list.length; i++) {
                 console.log(list[i]);
-                if (list[i].value == input) {
+                if (list[i].value.toLowerCase() == input.toLowerCase()) {
                     return true;
                 }
             }
-            alert("That film is not in the database, please use the dropdown as a guide.")
+            toastr.error('Selected movie not in database. Use the dropdown as a guide.');
             return false;
         }
     }
