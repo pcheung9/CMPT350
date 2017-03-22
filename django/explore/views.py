@@ -63,3 +63,53 @@ def results(request):
     #return TemplateResponse(request, 'results.html', ({"data": data}))
     return render_to_response("results.html", {'data':mark_safe(data)}, RequestContext(request))
 
+def weight(request):
+    name = request.GET['update']
+    print(name)
+    weightArgs = name.split(",")
+    name = weightArgs[0]
+    
+    #convert to decimal
+    for i in range(1,6):
+        weightArgs[i] = int(weightArgs[i])/50
+        print(weightArgs[i])
+    
+    #shrek,50,50,69,88,74,88
+    #A,R,G,D,Y,S
+    #1,2,3,4,5,6
+    
+    IDs = stringBuilder(name)
+    results = related(15, IDs, weightArgs[1], weightArgs[3], weightArgs[4], weightArgs[5], weightArgs[6]) 
+    
+    #placeholder for rating right now
+    #actorWeight, RATING PLACEHOLDER, genreWeight, directorWeight, yearWeight, scoreWeight (args)
+    pairs = []
+    
+    resultsList = results.split()
+
+    for pair in resultsList:
+        movie = MovieObj()
+        split = pair.split('|')
+        temp = get_object_or_404(MovieObj, movieID=str(split[0]))
+        temp.relevance = split[1]
+        response = requests.post(str("http://www.omdbapi.com/?i=" + split[0])) #OMDB API call
+        while response.status_code != 200:
+            response = requests.post(str("http://www.omdbapi.com/?i=" + split[0]))  # OMDB API call
+        print(str(split[0] + str(response)))
+
+        temp.poster = response.json()["Poster"]
+        temp.plot = response.json()["Plot"]
+        temp.runtime = response.json()["Runtime"]
+        pairs.append(temp)
+
+    print(pairs)
+    object_list = list(pairs)
+    nonetype_querySet = MovieObj.objects.none()
+
+    data = list(chain(nonetype_querySet, object_list))
+
+    data = serializers.serialize('json', data)
+
+    #return HttpResponse(dump, mimetype='application/json')
+    #return TemplateResponse(request, 'results.html', ({"data": data}))
+    return render_to_response("results.html", {'data':mark_safe(data)}, RequestContext(request))
