@@ -46,7 +46,7 @@
         else {
             for (var i = 0; i < list.length; i++) {
                 console.log(list[i]);
-                if (list[i].value == input) {
+                if (list[i].value.toLowerCase() == input.toLowerCase()) {
                     return true;
                 }
             }
