@@ -5,7 +5,7 @@
     var size = [256, 256],
         extent, // the actual region occupied by the pictures
         url = cloudUrl,
-        aspectRatio = 0.6, // FIXME remove fixed aspect ratio
+        aspectRatio = 1.4, // FIXME remove fixed aspect ratio
         width = cloudWidth,
         height = cloudHeight,
         padding = cloudPadding,
@@ -42,7 +42,6 @@
           d = data[i];
           d.x = ((size[0] * (Math.random() + .5)) >> 1) - size[0]/2;
           d.y = ((size[1] * (Math.random() + .5)) >> 1) - size[1]/2;
-          // console.log({x:d.x,y:d.y});
           if (place(data, d, i, bounds)) {
             images.push(d);
 
@@ -193,8 +192,8 @@
   }
 
   function rectangularSpiral(size) {
-    var dy = 1, //originall 4
-        dx = 1, //dy * size[0] / size[1],
+    var dy = 4,
+        dx = dy * size[0] / size[1],
         x = 0,
         y = 0;
     return function(t) {

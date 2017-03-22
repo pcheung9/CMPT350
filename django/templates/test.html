@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 {% load static %}
 {% load staticfiles %}
+<style>
+</style>
 <meta charset="utf-8">
 <style>body,html {background: #222; width: 100%; height:100%; padding:0; margin:0; overflow:hidden;}</style>
 <body>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox='-10 -10 20 20' width='1500' height='900px'>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox='-10 -10 20 20' width='100%' height='100%'>
 </svg>
 <script src="http://d3js.org/d3.v3.min.js"></script>
 <script src="{% static "picturecloud.js" %}"></script>
@@ -13,26 +15,26 @@
 var pictures = []; // pictures that are already displaced by the layout are pushed into this array
 var svg = d3.select('svg') // obtain a d3 reference to the SVG
 
-d3.layout.picturecloud().size([25, 20])
+d3.layout.picturecloud().size([20, 20])
     .pictures([ // define weight and URL for each of the pictures that have to be displaced
-        {weight: 50, url: 'https://upload.wikimedia.org/wikipedia/en/thumb/5/5b/Topdogposter.jpg/220px-Topdogposter.jpg'},
+        {weight: 100, url: 'https://upload.wikimedia.org/wikipedia/en/thumb/5/5b/Topdogposter.jpg/220px-Topdogposter.jpg'},
+        {weight: 95,  url: 'https://upload.wikimedia.org/wikipedia/en/thumb/5/5b/Topdogposter.jpg/220px-Topdogposter.jpg'},
+        {weight: 90,  url: 'https://upload.wikimedia.org/wikipedia/en/thumb/5/5b/Topdogposter.jpg/220px-Topdogposter.jpg'},
+        {weight: 85,  url: 'https://upload.wikimedia.org/wikipedia/en/thumb/5/5b/Topdogposter.jpg/220px-Topdogposter.jpg'},
+        {weight: 80,  url: 'https://upload.wikimedia.org/wikipedia/en/thumb/5/5b/Topdogposter.jpg/220px-Topdogposter.jpg'},
+        {weight: 75,  url: 'https://upload.wikimedia.org/wikipedia/en/thumb/5/5b/Topdogposter.jpg/220px-Topdogposter.jpg'},
+        {weight: 70,  url: 'https://upload.wikimedia.org/wikipedia/en/thumb/5/5b/Topdogposter.jpg/220px-Topdogposter.jpg'},
+        {weight: 65,  url: 'https://upload.wikimedia.org/wikipedia/en/thumb/5/5b/Topdogposter.jpg/220px-Topdogposter.jpg'},
+        {weight: 60,  url: 'https://upload.wikimedia.org/wikipedia/en/thumb/5/5b/Topdogposter.jpg/220px-Topdogposter.jpg'},
+        {weight: 55,  url: 'https://upload.wikimedia.org/wikipedia/en/thumb/5/5b/Topdogposter.jpg/220px-Topdogposter.jpg'},
+        {weight: 50,   url: 'https://upload.wikimedia.org/wikipedia/en/thumb/5/5b/Topdogposter.jpg/220px-Topdogposter.jpg'},
+        {weight: 45,   url: 'https://upload.wikimedia.org/wikipedia/en/thumb/5/5b/Topdogposter.jpg/220px-Topdogposter.jpg'},
+        {weight: 40,  url: 'https://upload.wikimedia.org/wikipedia/en/thumb/5/5b/Topdogposter.jpg/220px-Topdogposter.jpg'},
         {weight: 35,  url: 'https://upload.wikimedia.org/wikipedia/en/thumb/5/5b/Topdogposter.jpg/220px-Topdogposter.jpg'},
         {weight: 30,  url: 'https://upload.wikimedia.org/wikipedia/en/thumb/5/5b/Topdogposter.jpg/220px-Topdogposter.jpg'},
         {weight: 25,  url: 'https://upload.wikimedia.org/wikipedia/en/thumb/5/5b/Topdogposter.jpg/220px-Topdogposter.jpg'},
-        {weight: 20,  url: 'https://upload.wikimedia.org/wikipedia/en/thumb/5/5b/Topdogposter.jpg/220px-Topdogposter.jpg'},
-        {weight: 15,  url: 'https://upload.wikimedia.org/wikipedia/en/thumb/5/5b/Topdogposter.jpg/220px-Topdogposter.jpg'},
-        {weight: 10,  url: 'https://upload.wikimedia.org/wikipedia/en/thumb/5/5b/Topdogposter.jpg/220px-Topdogposter.jpg'},
-        {weight: 10,  url: 'https://upload.wikimedia.org/wikipedia/en/thumb/5/5b/Topdogposter.jpg/220px-Topdogposter.jpg'},
-        {weight: 30,  url: 'https://upload.wikimedia.org/wikipedia/en/thumb/5/5b/Topdogposter.jpg/220px-Topdogposter.jpg'},
-        {weight: 15,  url: 'https://upload.wikimedia.org/wikipedia/en/thumb/5/5b/Topdogposter.jpg/220px-Topdogposter.jpg'},
-        {weight: 7,   url: 'https://upload.wikimedia.org/wikipedia/en/thumb/5/5b/Topdogposter.jpg/220px-Topdogposter.jpg'},
-        {weight: 8,   url: 'https://upload.wikimedia.org/wikipedia/en/thumb/5/5b/Topdogposter.jpg/220px-Topdogposter.jpg'},
-        {weight: 20,  url: 'https://upload.wikimedia.org/wikipedia/en/thumb/5/5b/Topdogposter.jpg/220px-Topdogposter.jpg'},
-        {weight: 64,  url: 'https://upload.wikimedia.org/wikipedia/en/thumb/5/5b/Topdogposter.jpg/220px-Topdogposter.jpg'},
-        {weight: 24,  url: 'https://upload.wikimedia.org/wikipedia/en/thumb/5/5b/Topdogposter.jpg/220px-Topdogposter.jpg'},
-        {weight: 38,  url: 'https://upload.wikimedia.org/wikipedia/en/thumb/5/5b/Topdogposter.jpg/220px-Topdogposter.jpg'},
     ])
-    .padding(0.05) // define the minimum distance between pictures
+    .padding(0) // define the minimum distance between pictures
     .on('picture', function(picture, extent) { // whenever a picture is displaced, call this callback
         pictures.push(picture); // store the picture into the global array
         draw(pictures, extent); // call the function that actually draws the picture (more on that below)
