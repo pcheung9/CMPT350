@@ -282,7 +282,7 @@ def reader(fileName):
 # Parameters:
 #   num_results: The number of results to be returned
 #   ID_string: The string containing IMDB IDs
-def related(num_results, ID_string, genreWeight, actorWeight, directorWeight, yearWeight, scoreWeight):
+def related(num_results, ID_string, actorWeight, genreWeight, directorWeight, yearWeight, scoreWeight):
 
     listIDs = ID_string.split(" ")  # Splits inFilm string into list of IDs
     movies = reader("movieDB.txt")
@@ -371,7 +371,7 @@ def related(num_results, ID_string, genreWeight, actorWeight, directorWeight, ye
                 i.criteria.append("Year: 5")
 
             # IMDB Score
-            i.relevance += ((3*i.score) * scoreWeight)
+            i.relevance += ((3*i.score) * int(scoreWeight))
 
             bisect.insort_right(top, i)
     topN = []

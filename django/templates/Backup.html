@@ -50,3 +50,136 @@
 		function sumBySize(d) {
 		  return d.size;
 		}
+		
+		
+		
+		
+		
+		///////////////////////////
+		
+					<label for="rating" 
+				style="display: inline-block; width: 240px; text-align: right">
+				rating = <span id="rating-value">…</span>
+			</label>
+			
+			<label for="genre" 
+				style="display: inline-block; width: 240px; text-align: right">
+				genre = <span id="genre-value">…</span>
+			</label>
+			
+			<label for="director" 
+				style="display: inline-block; width: 240px; text-align: right">
+				director = <span id="director-value">…</span>
+			</label>
+			
+			<label for="year" 
+				style="display: inline-block; width: 240px; text-align: right">
+				year = <span id="year-value">…</span>
+			</label>
+			
+			<label for="score" 
+				style="display: inline-block; width: 240px; text-align: right">
+				score = <span id="score-value">…</span>
+			</label>
+			
+			////////////////////////////////
+			
+			
+						<input type="range" min="1" max="150" id="rating">
+			<input type="range" min="1" max="150" id="genre">
+			<input type="range" min="1" max="150" id="director">
+			<input type="range" min="1" max="150" id="year">
+			<input type="range" min="1" max="150" id="score">	
+			
+			
+			/////////////////////////////
+				// when the input range changes update the circle 
+				d3.selectRating("#rating").on("input", function() {
+				  update(+this.value);
+				});
+				
+				// when the input range changes update the circle 
+				d3.selectGenre("#genre").on("input", function() {
+				  update(+this.value);
+				});
+				
+				// when the input range changes update the circle 
+				d3.selectDirector("#director").on("input", function() {
+				  update(+this.value);
+				});
+				
+				// when the input range changes update the circle 
+				d3.selectYear("#year").on("input", function() {
+				  update(+this.value);
+				});
+				
+				// when the input range changes update the circle 
+				d3.selectScore("#score").on("input", function() {
+				  update(+this.value);
+				});
+
+				// Initial starting radius of the circle 
+				//update(75);
+				
+	//////////////////////////////////
+
+				// update the rating element
+				function updateRating(rating) {
+
+				  // adjust the text on the range slider
+				  d3.select("#rating-value").text(rating);
+				  d3.select("#rating").property("value", rating);
+
+				  // update the rircle radius
+				  //holder.selectAll("circle") 
+					//.attr("r", actor);
+				}
+				
+				// update the genre element
+				function updateGenre(genre) {
+
+				  // adjust the text on the range slider
+				  d3.select("#genre-value").text(genre);
+				  d3.select("#genre").property("value", genre);
+
+				  // update the rircle radius
+				  //holder.selectAll("circle") 
+					//.attr("r", actor);
+				}
+				
+				// update the director
+				function updateDirector(director) {
+
+				  // adjust the text on the range slider
+				  d3.select("#director-value").text(director);
+				  d3.select("#director").property("value", director);
+
+				  // update the rircle radius
+				  //holder.selectAll("circle") 
+					//.attr("r", actor);
+				}
+				
+				// update the year element
+				function updateYear(year) {
+
+				  // adjust the text on the range slider
+				  d3.select("#year-value").text(year);
+				  d3.select("#year").property("value", year);
+
+				  // update the rircle radius
+				  //holder.selectAll("circle") 
+					//.attr("r", actor);
+				}
+				
+				// update the score element
+				function updateScore(score) {
+
+				  // adjust the text on the range slider
+				  d3.select("#score-value").text(score);
+				  d3.select("#score").property("value", score);
+
+				  // update the rircle radius
+				  //holder.selectAll("circle") 
+					//.attr("r", actor);
+				}
+	
