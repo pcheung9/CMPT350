@@ -12,14 +12,45 @@
 <!--<div id="bg">
     <img src="{% static "logopic.jpg" %}" id="bg" alt="">
 </div>-->
-<form action="/explore/view/" method="get">
+<form name = "movieInput" action="/explore/view/" onsubmit="return valid()" method="get">
     {% csrf_token %}
-    <h3>Search</h3>
-    <input type ='text' id="search" name="search"/>
-    <button class btn id=submitsearch>Search</button>
+    <h3>MOVIE EXPLORER</h3>
+    <!--<input type ='text' id="search" name="search"/>-->
+    <input list="movies" id="search" name="search" autocomplete="off">
+    <datalist id="movies">
+        <option value="Fury">
+        <option value="The Matrix">
+        <option value="Shrek">
+        <option value="Space Jam">
+        <option value="The Big Lebowski">
+    </datalist>
+    <input type="submit" value="Submit">
 </form>
 
 
 </body>
 
 </html>
+<script type="text/javascript">
+    function valid() {
+        var input = document.forms["movieInput"]["search"].value;
+        var list = document.forms["movieInput"]["search"].list.options;
+        console.log(input);
+        console.log(list);
+        console.log(list.length);
+        if (input == "") {
+            alert("Name must be filled out");
+            return false;
+        }
+        else {
+            for (var i = 0; i < list.length; i++) {
+                console.log(list[i]);
+                if (list[i].value == input) {
+                    return true;
+                }
+            }
+            alert("That film is not in the database, please use the dropdown as a guide.")
+            return false;
+        }
+    }
+</script>
