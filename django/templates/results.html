@@ -12,9 +12,9 @@
 
 	div.tooltip {
 		position: absolute;
-		text-align: center;
-		width: 120px;
-		height: 33px;
+		text-align: left;
+		width: 500px;
+		height: 500px;
 		padding: 8px;
 		font: 10px sans-serif;
 		background: #ddd;
@@ -48,6 +48,8 @@
 			var movieObjList = new Object(); 
 			movieObjList.name = "movies";
 			movieObjList.children = [];
+			//array for preload caching
+			images = [];
 			
 			//build up objects with cleaned data from views.py
 			for ( i = 1; i < cleanedData.length ; i++) {
@@ -65,8 +67,14 @@
 				movieObj.children.push(movieData);
 				
 				movieObjList.children.push(movieObj);
+				
+				//push image url into array for pre-cache by loader()
+				images.push(cleanedData[i].fields.poster);
 				//document.write(data[i].fields.title + " " + data[i].fields.relevance + "<br>");
 			}
+			
+			//pass image urls to loader to cache the images
+			loader(images);
 			
 			//stringify objects to JSON This seems to be counter productive
 			//d3 knows how to intrepret javascript Objects - ie they are in JSON already
@@ -182,16 +190,16 @@
 				  .text(function(d) { return d; });
 		
 			//script tag _~_ don't remove.
-
-			function sumBySize(d) {
-			  return d.size;
-			}
-			
+	
 			function imageUrl(d) {
 				//printing URL to console to debug data fetching from JSON
 				//console.log(d.data.poster);
 				console.log(d.data.name);
 				return d.data.poster;
+			}
+			
+			function sumBySize(d) {
+			  return d.size;
 			}
 			
 			function mouseover() {
@@ -203,16 +211,38 @@
 			//<span style='color:red'><h1>Tombouctou Region</h1><br>
 			//<span style='color:blue'><h2>Mali !!!!!!! </h2></span>
 				div
-					.html("<ahref='imageURL()'><img src='https://images-na.ssl-images-amazon.com/images/M/MV5BNThlOTFhOGEtZjE2NC00MzMzLThkYWItZjlkNWNlMDAzMGZkXkEyXkFqcGdeQXVyMTQxNzMzNDI@._V1_SX300.jpg)'></ahref></span> ")
-					.style("left", (d3.event.pageX - 34) + "px")
-					.style("top", (d3.event.pageY - 12) + "px");
+					.html("<h1>" + d.data.name.split(/(?=[A-Z][^A-Z])/g) + "</h1><br><ahref='imageURL()'><img height='75%' src='" + imageUrl(d) + ")'></ahref></span>")
+					.style("left", (d3.event.pageX - 10) + "px")
+					.style("top", (d3.event.pageY - 10) + "px");
 			}
 			function mouseout() {
 				div.transition()
 					.duration(200)
 					.style("opacity", 1e-6);
 			}
+
 		
+		}
+		
+		function loader(images) {
+			console.log('Loader');
+			if (!loader.list) {
+				loader.list = [];
+			}
+			var list = loader.list;
+			for (var i = 0; i < images.length; i++) {
+				var img = new Image();
+				img.onload = function() {
+					var index = list.indexOf(this);
+					if (index !== -1) {
+						// remove image from the array once it's loaded
+						// for memory consumption reasons
+						list.splice(index, 1);
+					}
+				}
+				list.push(img);
+				img.src = images[i];
+			}
 		}
 
 		$(window).resize(function() {
