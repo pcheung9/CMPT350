@@ -12,8 +12,9 @@
 
 	div.tooltip {
 		position: absolute;
+		float: left;
 		text-align: left;
-		width: 500px;
+		width: 550px;
 		height: 500px;
 		padding: 8px;
 		font: 10px sans-serif;
@@ -21,7 +22,55 @@
 		border: solid 1px #aaa;
 		border-radius: 8px;
 		pointer-events: none;
-}
+	}
+	
+	container{
+		float: left;
+		position: absolute;
+		text-align: left;
+		width: 45%px;
+		height: 500px;
+		padding: 8px;
+		font: 10px sans-serif;
+		background: #ddd;
+		border: solid 1px #aaa;
+		border-radius: 8px;
+		pointer-events: none;
+	}
+	
+	graphContainer{
+		float: right;
+		position: absolute;
+		text-align: right;
+		width: 45%px;
+		height: 500px;
+		padding: 8px;
+		font: 10px sans-serif;
+		background: #ddd;
+		border: solid 1px #aaa;
+		border-radius: 8px;
+		pointer-events: none;
+	}
+	
+	.bar{
+		fill: steelblue;
+	}
+
+	.bar:hover{
+		fill: brown;
+	}
+
+	.axis {
+		font: 10px sans-serif;
+	}
+
+	.axis path,
+	.axis line {
+		fill: none;
+		stroke: #000;
+		shape-rendering: crispEdges;
+	}
+
 </style>
 
 <html lang="en">
@@ -180,14 +229,14 @@
 					.attr("height", function(d) { return d.y1; })
 					.attr("fill", "url(#images)");
 
-			cell.append("text")
-				  .attr("clip-path", function(d) { return "url(#clip-" + d.data.id + ")"; })
-				  .selectAll("tspan")
-				  .data(function(d) { return d.data.name.split(/(?=[A-Z][^A-Z])/g); })
-				  .enter().append("tspan")
-				  .attr("x", 4)
-				  .attr("y", function(d, i) { return 13 + i * 10; })
-				  .text(function(d) { return d; });
+			//cell.append("text")
+			//	  .attr("clip-path", function(d) { return "url(#clip-" + d.data.id + ")"; })
+			//	  .selectAll("tspan")
+			//	  .data(function(d) { return d.data.name.split(/(?=[A-Z][^A-Z])/g); })
+			//	  .enter().append("tspan")
+			//	  .attr("x", 4)
+			//	  .attr("y", function(d, i) { return 13 + i * 10; })
+			//	  .text(function(d) { return d; });
 		
 			//script tag _~_ don't remove.
 	
@@ -211,10 +260,129 @@
 			//<span style='color:red'><h1>Tombouctou Region</h1><br>
 			//<span style='color:blue'><h2>Mali !!!!!!! </h2></span>
 				div
+					.attr("id", "container")
 					.html("<h1>" + d.data.name.split(/(?=[A-Z][^A-Z])/g) + "</h1><br><ahref='imageURL()'><img height='75%' src='" + imageUrl(d) + ")'></ahref></span>")
 					.style("left", (d3.event.pageX - 10) + "px")
 					.style("top", (d3.event.pageY - 10) + "px");
+				
+				div.append("div")
+					.attr("id", "graphContainer")
+					.style("right", (d3.event.pageX - 10) + "px")
+					.style("top", (d3.event.pageY - 10) + "px");
+					
+				data = [
+							{
+								"Letter": "A",
+								"Freq": 20	
+							},
+							{
+								"Letter" : "B",
+								"Freq": 12
+							},
+							{
+								"Letter" : "C",
+								"Freq": 47
+							},
+							{
+								"Letter" : "D",
+								"Freq": 34
+							},
+						];
+					
+				dataTest = d3.csvFormat([{foo: "1", bar: "2"}]); // "foo,bar\n1,2"
+				console.log(dataTest);
+
+				//barData = d3.csvFormat(barData);
+				//console.log(barData);
+				
+				// set the dimensions and margins of the graph
+				var margin = {top: 20, right: 20, bottom: 30, left: 40},
+					width = 200 - margin.left - margin.right,
+					height = 300 - margin.top - margin.bottom;
+				// set the ranges
+				var yScale = d3.scaleLinear()
+					.domain([0, d3.max(data)])
+					.range([0, height])
+
+				var xScale = d3.scaleBand()
+					.domain(d3.range(0, data.length))
+					.range([0, width])
+
+				// define the axis
+				//var xAxis = d3.svg.axis()
+				//	.scale(x)
+				//	.orient("bottom")
+
+
+				//var yAxis = d3.svg.axis()
+				//	.scale(y)
+				//	.orient("left")
+				//	.ticks(10);
+
+				var xAxis = d3.axisBottom()
+					.scale(xScale);
+
+				var yAxis = d3.axisLeft()
+					.scale(yScale);
+					
+					//.append("svg:svg")
+				// add the SVG element
+				var svg = d3.select("#graphContainer").append("svg:svg")
+					.attr("width", width + margin.left + margin.right)
+					.attr("height", height + margin.top + margin.bottom)
+					.append("g")
+					.attr("transform", 
+						  "translate(" + margin.left + "," + margin.top + ")");
+
+
+				// load the data
+				//d3.json(data, function(error, data) {
+					console.log(data);
+					data.forEach(function(d) {
+						d.Letter = d.Letter;
+						d.Freq = +d.Freq;
+					});
+					
+				  // scale the range of the data
+				  xScale.domain(data.map(function(d) { return d.Letter; }));
+				  yScale.domain([0, d3.max(data, function(d) { return d.Freq; })]);
+
+				  // add axis
+				  svg.append("g")
+					  .attr("class", "x axis")
+					  .attr("transform", "translate(0," + height + ")")
+					  .call(xAxis)
+					.selectAll("text")
+					  .style("text-anchor", "end")
+					  .attr("dx", "-.8em")
+					  .attr("dy", "-.55em")
+					  .attr("transform", "rotate(-90)" );
+
+				  svg.append("g")
+					  .attr("class", "y axis")
+					  .call(yAxis)
+					.append("text")
+					  .attr("transform", "rotate(-90)")
+					  .attr("y", 5)
+					  .attr("dy", ".71em")
+					  .style("text-anchor", "end")
+					  .text("Frequency");
+
+
+				  // Add bar chart
+				  svg.selectAll("bar")
+					  .data(data)
+					.enter().append("rect")
+					  .attr("class", "bar")
+					  .attr("x", function(d) { return xScale(d.Letter); })
+					  .attr("width", xScale.bandwidth())
+					  .attr("height", function(d) { return height - yScale(d.Freq); })
+					  .attr("y", function(d) { return yScale(d.Freq); });
+			
+			
+				//barChart(div);
 			}
+			
 			function mouseout() {
 				div.transition()
 					.duration(200)
@@ -435,9 +603,132 @@
 					document.getElementById("update").value = newWeights;
 				}
 				
+				
 			</script>
 		</div>
 
+		<div>
+		
+		<svg width="200" height="300"></svg>
+		<script>
+
+			function barChart(divx){
+				divx.append("svg");
+
+					
+				data = [
+							{
+								"Letter": "A",
+								"Freq": 20	
+							},
+							{
+								"Letter" : "B",
+								"Freq": 12
+							},
+							{
+								"Letter" : "C",
+								"Freq": 47
+							},
+							{
+								"Letter" : "D",
+								"Freq": 34
+							},
+						];
+					
+				dataTest = d3.csvFormat([{foo: "1", bar: "2"}]); // "foo,bar\n1,2"
+				console.log(dataTest);
+
+				//barData = d3.csvFormat(barData);
+				//console.log(barData);
+				
+				// set the dimensions and margins of the graph
+				var margin = {top: 20, right: 20, bottom: 30, left: 40},
+					width = 960 - margin.left - margin.right,
+					height = 500 - margin.top - margin.bottom;
+				// set the ranges
+				var yScale = d3.scaleLinear()
+					.domain([0, d3.max(data)])
+					.range([0, height])
+
+				var xScale = d3.scaleBand()
+					.domain(d3.range(0, data.length))
+					.range([0, width])
+
+				// define the axis
+				//var xAxis = d3.svg.axis()
+				//	.scale(x)
+				//	.orient("bottom")
+
+
+				//var yAxis = d3.svg.axis()
+				//	.scale(y)
+				//	.orient("left")
+				//	.ticks(10);
+
+				var xAxis = d3.axisBottom()
+					.scale(xScale);
+
+				var yAxis = d3.axisLeft()
+					.scale(yScale);
+					
+					//.append("svg:svg")
+				// add the SVG element
+				var svg = d3.select("divx")
+					.attr("width", width + margin.left + margin.right)
+					.attr("height", height + margin.top + margin.bottom)
+					.append("g")
+					.attr("transform", 
+						  "translate(" + margin.left + "," + margin.top + ")");
+
+
+				// load the data
+				//d3.json(data, function(error, data) {
+					console.log(data);
+					data.forEach(function(d) {
+						d.Letter = d.Letter;
+						d.Freq = +d.Freq;
+					});
+					
+				  // scale the range of the data
+				  xScale.domain(data.map(function(d) { return d.Letter; }));
+				  yScale.domain([0, d3.max(data, function(d) { return d.Freq; })]);
+
+				  // add axis
+				  svg.append("g")
+					  .attr("class", "x axis")
+					  .attr("transform", "translate(0," + height + ")")
+					  .call(xAxis)
+					.selectAll("text")
+					  .style("text-anchor", "end")
+					  .attr("dx", "-.8em")
+					  .attr("dy", "-.55em")
+					  .attr("transform", "rotate(-90)" );
+
+				  svg.append("g")
+					  .attr("class", "y axis")
+					  .call(yAxis)
+					.append("text")
+					  .attr("transform", "rotate(-90)")
+					  .attr("y", 5)
+					  .attr("dy", ".71em")
+					  .style("text-anchor", "end")
+					  .text("Frequency");
+
+
+				  // Add bar chart
+				  svg.selectAll("bar")
+					  .data(data)
+					.enter().append("rect")
+					  .attr("class", "bar")
+					  .attr("x", function(d) { return xScale(d.Letter); })
+					  .attr("width", xScale.bandwidth())
+					  .attr("height", function(d) { return height - yScale(d.Freq); })
+					  .attr("y", function(d) { return yScale(d.Freq); });
+
+				//});
+				}
+			</script>
+		</div>
   </body>
 {% endblock %}
 </html>
