@@ -2,13 +2,26 @@
 {% extends 'base.html' %}
 {% block content %}
 <style>
-  form {
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  }
-  
-  svg {
-  font: 10px sans-serif;
-  }
+	form {
+		font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+	}
+
+	svg {
+		font: 10px sans-serif;
+	}
+
+	div.tooltip {
+		position: absolute;
+		text-align: left;
+		width: 500px;
+		height: 500px;
+		padding: 8px;
+		font: 10px sans-serif;
+		background: #ddd;
+		border: solid 1px #aaa;
+		border-radius: 8px;
+		pointer-events: none;
+}
 </style>
 
 <html lang="en">
@@ -22,19 +35,21 @@
    <script type="text/javascript">	
    
 		var globalResizeTimer = null;
+		
+		//keeping dirty data from backend in client memory for debug purposes
+		var dirtyData = {{ data }};
+
+		//cleaned data from backend data dictionary
+		var cleanedData = JSON.parse("{{ data|escapejs }}");
    
 		function drawd3() {
-			
-			//keeping dirty data from backend in client memory for debug purposes
-			var dirtyData = {{ data }};
-	   
-			//cleaned data from backend data dictionary
-			var cleanedData = JSON.parse("{{ data|escapejs }}");
 
 			//create new movieList object to represent all of the movies
 			var movieObjList = new Object(); 
 			movieObjList.name = "movies";
 			movieObjList.children = [];
+			//array for preload caching
+			images = [];
 			
 			//build up objects with cleaned data from views.py
 			for ( i = 1; i < cleanedData.length ; i++) {
@@ -52,8 +67,14 @@
 				movieObj.children.push(movieData);
 				
 				movieObjList.children.push(movieObj);
+				
+				//push image url into array for pre-cache by loader()
+				images.push(cleanedData[i].fields.poster);
 				//document.write(data[i].fields.title + " " + data[i].fields.relevance + "<br>");
 			}
+			
+			//pass image urls to loader to cache the images
+			loader(images);
 			
 			//stringify objects to JSON This seems to be counter productive
 			//d3 knows how to intrepret javascript Objects - ie they are in JSON already
@@ -81,6 +102,15 @@
 				.paddingInner(1)
 				.tile(d3.treemapSquarify.ratio(1 * (1 + Math.sqrt(5)*.4)));
 				
+			var formatTime = "TOOLTIP"
+			
+			//var div = d3.select("body").append("div")   
+				//.attr("class", "tooltip")               
+				//.style("opacity", 0);
+			
+			var div = d3.select("body").append("div")
+				.attr("class", "tooltip")
+				.style("opacity", 1e-6);
 			
 			//d3.json(data, function(data) {
 			
@@ -97,9 +127,25 @@
 				.attr("preserveAspectRatio", "xMinYMin meet")
 				.attr("viewBox", "0 0 1000 500")
 				.classed("svg-content", true)
-				.attr("transform", function(d) { return "translate(" + d.x0 + "," + d.y0 + ")"; });
+				.attr("transform", function(d) { return "translate(" + d.x0 + "," + d.y0 + ")"; })
+				.on("mouseover", mouseover)
+				.on("mousemove", function (d) { return mousemove(d); })
+				.on("mouseout", mouseout);
+				
+				//.on("mouseover", function(d) {      
+					//div.transition()        
+					//.duration(200)      
+					//.style("opacity", .9);      
+				//div .html("xlink:href", imageUrl(d) + "<br/>"  + d.close)  
+					//.style("left", (d3.event.pageX) + "px")     
+					//.style("top", (d3.event.pageY - 28) + "px");    
+				//})                  
+				//.on("mouseout", function(d) {       
+					//div.transition()        
+					//.duration(500)      
+					//.style("opacity", 0);   
+				//});
 
-			
 			cell.append("rect")
 				.attr("id", function(d) { return d.data.id; })
 				.attr("width", function(d) { return d.x1 - d.x0; })
@@ -144,18 +190,59 @@
 				  .text(function(d) { return d; });
 		
 			//script tag _~_ don't remove.
-
-			function sumBySize(d) {
-			  return d.size;
-			}
-			
+	
 			function imageUrl(d) {
 				//printing URL to console to debug data fetching from JSON
 				//console.log(d.data.poster);
 				console.log(d.data.name);
 				return d.data.poster;
 			}
+			
+			function sumBySize(d) {
+			  return d.size;
+			}
+			
+			function mouseover() {
+				div.transition()
+				.duration(200)
+				.style("opacity", 1);
+			}
+			function mousemove(d) {
+			//<span style='color:red'><h1>Tombouctou Region</h1><br>
+			//<span style='color:blue'><h2>Mali !!!!!!! </h2></span>
+				div
+					.html("<h1>" + d.data.name.split(/(?=[A-Z][^A-Z])/g) + "</h1><br><ahref='imageURL()'><img height='75%' src='" + imageUrl(d) + ")'></ahref></span>")
+					.style("left", (d3.event.pageX - 10) + "px")
+					.style("top", (d3.event.pageY - 10) + "px");
+			}
+			function mouseout() {
+				div.transition()
+					.duration(200)
+					.style("opacity", 1e-6);
+			}
+
 		
+		}
+		
+		function loader(images) {
+			console.log('Loader');
+			if (!loader.list) {
+				loader.list = [];
+			}
+			var list = loader.list;
+			for (var i = 0; i < images.length; i++) {
+				var img = new Image();
+				img.onload = function() {
+					var index = list.indexOf(this);
+					if (index !== -1) {
+						// remove image from the array once it's loaded
+						// for memory consumption reasons
+						list.splice(index, 1);
+					}
+				}
+				list.push(img);
+				img.src = images[i];
+			}
 		}
 
 		$(window).resize(function() {
@@ -168,6 +255,7 @@
 		});
 		
 		drawd3();
+		//DEAL WITH RESIZE ON INITIAL LOAD PROBLEM LATER
 		
 		</script>
 		
@@ -202,13 +290,44 @@
 			<input type="range" min="1" max="100" id="genre">
 			<input type="range" min="1" max="100" id="director">
 			<input type="range" min="1" max="100" id="year">
-			<input type="range" min="1" max="100" id="score">	
+			<input type="range" min="1" max="100" id="score">
+			
+			<!--Update Weights!! Re-runs algorithm-->
+			<form name = "movieWeight" action="/explore/weight/" onsubmit="return valid()" method="get">
+				{% csrf_token %}
+				<input type="hidden" id="update" name="update" autocomplete="off">
+				<input type="submit" value="Update Criteria Weight" onclick="weight()")></input>
+			</form>
+			
+			<!--New search!! Redirects home-->
+			<form name = "movieInput" action="/explore" onsubmit="return valid()" method="get">
+				<input type="submit" value="New Search"></input>
+			</form>
 		
+			<!--<input type="submit" value="Submit">-->
+			
 			<script>
 
 				var width = 600;
 				var height = 300;
+								
+				//get original search value for repeat search
+				var originalMovie = cleanedData[0].fields.title;
+				//document.getElementById("update").value = originalMovie;
 				
+				//on click 'update'
+				//prepare weights for processing by algorithm on backend
+				//function weight(){
+
+					//document.getElementById("update").value = newWeights;
+				//}
+				
+				var newWeights = [];
+				newWeights.push(originalMovie);
+				for (var i = 0; i < 6; i++){
+					newWeights.push(50);				
+				}
+			
 				var holder = d3.select("body")
 					  .append("svg")
 					  .attr("width", width)    
@@ -226,6 +345,8 @@
 					d3.select("#actor-value").text(actor);
 					d3.select("#actor").property("value", actor);
 					actorVar = parseInt(d3.select("#actor-value").text(actor)._groups[0][0].textContent);
+					newWeights[1] = actorVar;
+					updateWeightArr();
 				}
 				
 				// update the rating element
@@ -240,6 +361,8 @@
 					d3.select("#rating-value").text(rating);
 					d3.select("#rating").property("value", rating);
 					ratingVar = parseInt(d3.select("#rating-value").text(rating)._groups[0][0].textContent);
+					newWeights[2] = ratingVar;
+					updateWeightArr();
 				}
 				
 				// update the genre element
@@ -254,6 +377,8 @@
 					d3.select("#genre-value").text(genre);
 					d3.select("#genre").property("value", genre);
 					genreVar = parseInt(d3.select("#genre-value").text(genre)._groups[0][0].textContent);
+					newWeights[3] = genreVar;
+					updateWeightArr();
 				}
 
 				// update the director element
@@ -268,6 +393,8 @@
 					d3.select("#director-value").text(director);
 					d3.select("#director").property("value", director);
 					directorVar = parseInt(d3.select("#director-value").text(director)._groups[0][0].textContent);
+					newWeights[4] = directorVar;
+					updateWeightArr();
 				}
 
 				// update the year element
@@ -276,13 +403,15 @@
 				});
 				updateYear(50);
 				
-				var updateVar = 50;
+				var yearVar = 50;
 				function updateYear(year) {
 					// adjust the text on the range slider
 					d3.select("#year-value").text(year);
 					d3.select("#year").property("value", year);
 					//updateVar._groups[0][0].textContent
-					updateVar = parseInt(d3.select("#year-value").text(year)._groups[0][0].textContent);
+					yearVar = parseInt(d3.select("#year-value").text(year)._groups[0][0].textContent);
+					newWeights[5] = yearVar;
+					updateWeightArr();
 				}
 
 				// update the score element
@@ -298,6 +427,12 @@
 					d3.select("#score").property("value", score);
 					//scoreVar._groups[0][0].textContent
 					scoreVar = parseInt(d3.select("#score-value").text(score)._groups[0][0].textContent);
+					newWeights[6] = scoreVar;
+					updateWeightArr();
+				}
+				
+				function updateWeightArr(){
+					document.getElementById("update").value = newWeights;
 				}
 				
 			</script>
