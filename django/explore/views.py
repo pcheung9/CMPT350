@@ -11,7 +11,7 @@ from itertools import chain
 from explore.algorithm import *
 from django.utils.safestring import mark_safe
 from django.template import RequestContext
-
+from titlecase import titlecase
 
 def load(request):
     data = {}
@@ -21,7 +21,7 @@ def load(request):
     return HttpResponse(json_data, content_type="application/json")
 
 def test(request):
-    return TemplateResponse(request, 'test.html')
+    return TemplateResponse(request, 'cloudResults.html')
 
 
 def search(request):
@@ -85,9 +85,13 @@ def response(request, results):
     nonetype_querySet = MovieObj.objects.none()
     
     data = list(chain(nonetype_querySet, object_list))
-    
+
+    for obj in data:
+        obj.title = titlecase(obj.title)
+        obj.title.replace(" ,", "")
+
     data = serializers.serialize('json', data)
     
     #return HttpResponse(dump, mimetype='application/json')
-    #return TemplateResponse(request, 'results.html', ({"data": data}))
-    return render_to_response("results.html", {'data':mark_safe(data)}, RequestContext(request))
+    #return TemplateResponse(request, 'treeResults.html', ({"data": data}))
+    return render_to_response("cloudResults.html", {'data':mark_safe(data)}, RequestContext(request))
