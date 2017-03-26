@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+{% load static %}
+{% load staticfiles %}
+<style>
+	form {
+		font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+	}
+
+	svg {
+		font: 10px sans-serif;
+	}
+
+	div.tooltip {
+		position: absolute;
+		float: left;
+		text-align: left;
+		width: 550px;
+		height: 500px;
+		padding: 8px;
+		font: 10px sans-serif;
+		background: #ddd;
+		border: solid 1px #aaa;
+		border-radius: 8px;
+		pointer-events: none;
+	}
+
+
+	imageContainer{
+        flex-direction: row;
+        display: -webkit-flex;
+        display: flex;
+		#float: left;
+		position: absolute;
+		text-align: left;
+		width: 45%;
+		height: 500px;
+		padding: 8px;
+		font: 10px sans-serif;
+		background: #ddd;
+		border: solid 1px #aaa;
+		border-radius: 8px;
+		pointer-events: none;
+	}
+
+	graphContainer{
+        flex-direction: row;
+        display: -webkit-flex;
+        display: flex;
+		#float: right;
+		position: absolute;
+		text-align: right;
+		width: 45%;
+		height: 500px;
+		padding: 8px;
+		font: 10px sans-serif;
+		background: #ddd;
+		border: solid 1px #aaa;
+		border-radius: 8px;
+		pointer-events: none;
+	}
+
+	.bar{
+		fill: steelblue;
+	}
+
+	.bar:hover{
+		fill: brown;
+	}
+
+	.axis {
+		font: 10px sans-serif;
+	}
+
+	.axis path,
+	.axis line {
+		fill: none;
+		stroke: #000;
+		shape-rendering: crispEdges;
+	}
+
+</style>
+<meta charset="utf-8">
+<style>body,html {background: #222; width: 100%; height:100%; padding:0; margin:0; overflow:hidden;}</style>
+<body>
+<div id="treemap"></div>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox='-10 -10 20 20' width='100%' height='100%'>
+</svg>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<!--<script src="https://d3js.org/d3.v4.min.js"></script>-->
+<script src="{% static "picturecloud.js" %}"></script>
+<script src="http://davidbau.com/encode/seedrandom-min.js"></script>
+<script>
+    var globalResizeTimer = null;
+
+    //keeping dirty data from backend in client memory for debug purposes
+    var dirtyData = {{ data }};
+
+    //cleaned data from backend data dictionary
+    var cleanedData = JSON.parse("{{ data|escapejs }}");
+
+    //create new movieList object to represent all of the movies
+    var movieObjList = new Object();
+    movieObjList.name = "movies";
+    movieObjList.children = [];
+    //array for preload caching
+    //images = [];
+    moviePictures = [];
+    barData = [];
+
+    //build up objects with cleaned data from views.py
+    for ( var i = 1; i < cleanedData.length ; i++) {
+
+        moviePictureObj = new Object();
+        barDataObj = new Object();
+
+        moviePictureObj.weight = parseInt(cleanedData[i].fields.relevance);
+        moviePictureObj.name = cleanedData[i].fields.title;
+        moviePictureObj.url = cleanedData[i].fields.poster;
+
+        barDataObj.name = cleanedData[i].fields.title;
+        barDataObj.size = parseInt(cleanedData[i].fields.relevance);
+
+        //push image url into array for pre-cache by loader()
+        moviePictures.push(moviePictureObj);
+        barData.push(barDataObj);
+        //document.write(data[i].fields.title + " " + data[i].fields.relevance + "<br>");
+    }
+    var pictures = []; // pictures that are already displaced by the layout are pushed into this array
+    var svg = d3.select('svg') // obtain a d3 reference to the SVG
+
+    var div = d3.select("body").append("div")
+        .attr("class", "tooltip")
+        .style("opacity", 1e-6);
+
+    d3.layout.picturecloud().size([20, 20])
+        .pictures(moviePictures)
+        .padding(0) // define the minimum distance between pictures
+        .on('picture', function(picture, extent) { // whenever a picture is displaced, call this callback
+            pictures.push(picture); // store the picture into the global array
+            draw(pictures, extent); // call the function that actually draws the picture (more on that below)
+        } )
+        .start(); // execute the layout
+
+    function draw(pictures, extent) {
+        svg.selectAll('.picture') // select all elements having the class 'picture'
+            .data(pictures) // bind those elements to the global array containing all the pictures that have already been displaced
+          .enter().append('image') // for each new picture found, create an SVG image element
+            .attr('class', 'picture') // assign the class 'picture' to it
+            .attr('xlink:href', function(d) { return d.url; }) // set the source URL for the image
+            .attr('width', function(d) { return d.width; }) // set width and height (that have been computed by the layout)
+            .attr('height', function(d) { return d.height; })
+            .attr('transform', function(d) {
+                return 'translate(' + [d.x-d.width/2, d.y-d.height/2] + ')'; // center the image in d.x and d.y (also computed by the layout)
+            })
+            .on("mouseover", mouseover)
+            .on("mouseenter", function (d) { return mouseenter(d, d.name); })
+            .on("mouseout", mouseout)
+            .attr('opacity','0') // fade in animation
+          .transition()
+            .duration(600)
+            .attr('opacity','1')
+
+        // update the SVG viewBox using extent data (provided by the layout)
+        svg.transition()
+            .duration(600) // animate the update
+            .attr('viewBox', extent.left+' '+extent.top+' '+(extent.right-extent.left)+' '+(extent.bottom-extent.top));
+
+        function mouseover() {
+				div.transition()
+				.duration(200)
+				.style("opacity", 1);
+			}
+        function mouseenter(d, ID) {
+            div
+                .attr("id", "imageContainer")
+                .html("<h1>" + d.name.split(/(?=[A-Z][^A-Z])/g) + "</h1><br><ahref='imageURL()'><img height='75%' src='" + imageUrl(d) + ")'></ahref></span>")
+                .style("left", (d3.event.pageX - 10) + "px")
+                .style("top", (d3.event.pageY - 10) + "px");
+
+            div
+                .attr("id", "graphContainer")
+                .style("right", (d3.event.pageX - 10) + "px")
+                .style("top", (d3.event.pageY - 10) + "px");
+
+            data = barData;
+            //console.log(barData);
+
+            // set the dimensions and margins of the graph
+            var margin = {top: 20, right: 20, bottom: 30, left: 40},
+                width = 200 - margin.left - margin.right,
+                height = 300 - margin.top - margin.bottom;
+            // set the ranges
+
+            //var yScale = d3.scale.linear()
+            //    .domain([0, d3.max(data)])
+            //    .range([height, 0])
+
+            //var xScale = d3.scale.linear()
+            //    .domain(d3.range(0, data.length))
+            //    .range([0, width]);
+
+            var x = d3.scale.ordinal()
+                .rangeRoundBands([0, width], .1);
+
+            var y = d3.scale.linear()
+                .range([height, 0]);
+
+            var color = d3.scale.ordinal(d3.schemeCategory20b);
+
+            //var xAxis = d3.axisBottom()
+            //    .scale(xScale);
+
+            //var yAxis = d3.axisLeft()
+            //    .scale(yScale);
+
+            var xAxis = d3.svg.axis().scale(x);
+            var yAxis = d3.svg.axis().scale(y).orient("left");
+
+            //add SVG
+            var svg = d3.select('#graphContainer').append("svg:svg")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom)
+                .append("g")
+                .attr("transform",
+                      "translate(" + margin.left + "," + margin.top + ")");
+
+            data.forEach(function(d) {
+                d.name = d.name;
+                //console.log(d.name);
+                d.size = +d.size;
+            });
+
+            //scale
+            x.domain(data.map(function(d) { return d.name; }));
+            y.domain([0, d3.max(data, function(d) { return d.size; })]);
+
+            //axis
+            svg.append("g")
+                .attr("class", "x axis")
+                .attr("transform", "translate(0," + height + ")")
+                .call(xAxis)
+                .selectAll("text")
+                .style("text-anchor", "end")
+                .attr("dx", "-.8em")
+                .attr("dy", "-.55em")
+                .attr("transform", "rotate(-90)" );
+
+            svg.append("g")
+                .attr("class", "y axis")
+                .call(yAxis)
+                .append("text")
+                .attr("transform", "rotate(-90)")
+                .attr("y", 5)
+                .attr("dy", ".71em")
+                .style("text-anchor", "end")
+                .text("Frequency");
+
+            svg.selectAll(".bar")
+                .data(data)
+                .enter().append("rect")
+                .attr("class", "bar")
+                .attr("x", function(d) { return x(d.name); })
+                .attr("y", function(d) { return y(d.size); })
+                .attr("height", function(d) { return height - y(d.size); })
+                .attr("width", x.rangeBand())
+                .style("fill", function(d) { return colorizer(d, ID); });
+
+            //coloring function (black)
+            function colorizer(d, ID) {
+                console.log(d.name);
+                console.log(ID);
+                if(d.name == ID){
+                    return "brown"
+                }else{
+                    return "steelblue"
+                }
+            }
+        }
+
+        function mouseout() {
+            div.transition()
+                .duration(200)
+                .style("opacity", 1e-6);
+        }
+
+        function imageUrl(d) {
+            return d.url;
+        }
+    }
+</script>
