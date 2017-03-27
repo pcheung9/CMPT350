@@ -15,7 +15,7 @@
 		float: left;
 		text-align: left;
 		width: 550px;
-		height: 500px;
+		height: 400px;
 		padding: 8px;
 		font: 10px sans-serif;
 		background: #ddd;
@@ -29,7 +29,7 @@
         flex-direction: row;
         display: -webkit-flex;
         display: flex;
-		#float: left;
+		float: left;
 		position: absolute;
 		text-align: left;
 		width: 45%;
@@ -46,7 +46,7 @@
         flex-direction: row;
         display: -webkit-flex;
         display: flex;
-		#float: right;
+		float: right;
 		position: absolute;
 		text-align: right;
 		width: 45%;
@@ -59,6 +59,85 @@
 		pointer-events: none;
 	}
 
+	div#svgcontainer{
+		float: left;
+		text-align: center;
+		width: 74%;
+		height: 80%
+		padding: 0px;
+		font: 10px sans-serif;
+		border: solid 1px #aaa;
+		background: #aaa;
+	}
+
+	div#graphbar{
+		float: right;
+		text-align: left;
+		width: 24%;
+		height: 100%;
+		padding: 0px;
+		font: 10px sans-serif;
+		background: #ddd;
+		border: solid 1px #aaa;
+	}
+
+	div#sliderbar{
+		float: right;
+		text-align: left;
+		width: 24%;
+		height: 50%;
+		padding: 0px;
+		font: 10px sans-serif;
+		background: #ddd;
+		border: solid 1px #aaa;
+	}
+
+	div#movieInfoContainer{
+		float: right;
+		text-align: left;
+		width: 45%;
+		height: 80%;
+		padding: 0px;
+		font: 10px sans-serif;
+		background: #ddd;
+	}
+
+	div#sliderWidth{
+		width: 100%;
+		padding: 0px;
+		font: 17px sans-serif;
+		background: #ddd;
+	}
+
+	input#actor{
+		width: 100%;
+		fill: brown;
+	}
+
+	input#rating{
+		width: 100%;
+	}
+
+	input#genre{
+		width: 100%;
+	}
+
+	input#director{
+		width: 100%;
+	}
+
+	input#year{
+		width: 100%;
+	}
+
+	input#score{
+		width: 100%;
+	}
+
+	.slider-selection {
+	background: #BABABA;
+}
+	
 	.bar{
 		fill: steelblue;
 	}
@@ -77,14 +156,92 @@
 		stroke: #000;
 		shape-rendering: crispEdges;
 	}
+	
+	input[type="range"]{
+		-webkit-appearance: none;
+		-moz-apperance: none;
+		border-radius: 6px;
+		height: 6px;
+		background-image: -webkit-gradient(
+			linear,
+			left top,
+			right top,
+			color-stop(0.15, #94A14E),
+			color-stop(0.15, #C5C5C5)
+		);
+	}
+
+	input[type='range']::-webkit-slider-thumb {
+		-webkit-appearance: none !important;
+		background-color: #E9E9E9;
+		border: 1px solid #CECECE;
+		height: 15px;
+		width: 15px;
+	}
 
 </style>
 <meta charset="utf-8">
 <style>body,html {background: #222; width: 100%; height:100%; padding:0; margin:0; overflow:hidden;}</style>
+<head>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+</head>
 <body>
 <div id="treemap"></div>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox='-10 -10 20 20' width='100%' height='100%'>
-</svg>
+<div id="graphbar"><!--</div>-->
+<!--<div id="sliderbar">-->
+
+	<div id="sliderWidth" >
+		<label for="actor"
+			style="display: inline-block; width: 240px; text-align: right">
+			actor = <span id="actor-value">…</span>
+		</label>
+		<input type="range" min="1" max="100" id="actor"><br>
+		<label for="rating"
+			style="display: inline-block; width: 240px; text-align: right">
+			rating = <span id="rating-value">…</span>
+		</label>
+		<input type="range" min="1" max="100" id="rating"><br>
+		<label for="genre"
+			style="display: inline-block; width: 240px; text-align: right">
+			genre = <span id="genre-value">…</span>
+		</label>
+		<input type="range" min="1" max="100" id="genre"><br>
+			<label for="director"
+				style="display: inline-block; width: 240px; text-align: right">
+				director = <span id="director-value">…</span>
+			</label>
+		<input type="range" min="1" max="100" id="director"><br>
+		<label for="year"
+			style="display: inline-block; width: 240px; text-align: right">
+			year = <span id="year-value">…</span>
+		</label>
+		<input type="range" min="1" max="100" id="year"><br>
+			<label for="score"
+				style="display: inline-block; width: 240px; text-align: right">
+				score = <span id="score-value">…</span>
+			</label>
+		<input type="range" min="1" max="100" id="score"><br>
+	</div>
+
+	<!--Update Weights!! Re-runs algorithm-->
+	<form name = "movieWeight" action="/explore/weight/" onsubmit="return valid()" method="get">
+		{% csrf_token %}
+		<input type="hidden" id="update" name="update" autocomplete="off">
+		<input type="submit" value="Update Criteria Weight" onclick="weight()")></input>
+	</form>
+
+	<!--New search!! Redirects home-->
+	<form name = "movieInput" action="/explore" onsubmit="return valid()" method="get">
+		<input type="submit" value="New Search"></input>
+	</form>
+
+
+</div>
+
+<div id = "svgcontainer">
+	<svg xmlns="http://www.w3.org/2000/svg" viewBox='-10 -10 20 20'  width='70%' height='85%'>
+	</svg>
+</div>
 <script src="http://d3js.org/d3.v3.min.js"></script>
 <!--<script src="https://d3js.org/d3.v4.min.js"></script>-->
 <script src="{% static "picturecloud.js" %}"></script>
@@ -105,15 +262,26 @@
     //array for preload caching
     //images = [];
     moviePictures = [];
+
     barData = [];
 
-    //build up objects with cleaned data from views.py
-    for ( var i = 1; i < cleanedData.length ; i++) {
+		scores = [];
 
-        moviePictureObj = new Object();
-        barDataObj = new Object();
 
-        moviePictureObj.weight = parseInt(cleanedData[i].fields.relevance);
+		for ( var i = 1; i < cleanedData.length ; i++) {
+		    scores.push(parseInt(cleanedData[i].fields.relevance));
+		}
+		var scale = d3.scale.linear();
+		scale.range([400, 1000]);
+		scale.domain([d3.min(scores), d3.max(scores)])
+
+		//build up objects with cleaned data from views.py
+		for ( var i = 1; i < cleanedData.length ; i++) {
+
+		    moviePictureObj = new Object();
+		    barDataObj = new Object();
+
+		    moviePictureObj.weight = scale(parseInt(cleanedData[i].fields.relevance));
         moviePictureObj.name = cleanedData[i].fields.title;
         moviePictureObj.url = cleanedData[i].fields.poster;
 
@@ -173,14 +341,21 @@
         function mouseenter(d, ID) {
             div
                 .attr("id", "imageContainer")
-                .html("<h1>" + d.name.split(/(?=[A-Z][^A-Z])/g) + "</h1><br><ahref='imageURL()'><img height='75%' src='" + imageUrl(d) + ")'></ahref></span>")
-                .style("left", (d3.event.pageX - 10) + "px")
-                .style("top", (d3.event.pageY - 10) + "px");
-
+                .html("<span><h1>" + d.name.split(/(?=[A-Z][^A-Z])/g) + "</h1><br><ahref='imageURL()'><img height='75%' src='" + imageUrl(d) + ")'></ahref></span>")
+				.style("left", ((d3.event.pageX + 600) > d3.select("#svgcontainer").node().getBoundingClientRect().width) ? (d3.event.pageX - ((d3.event.pageX + 600)- d3.select("#svgcontainer").node().getBoundingClientRect().width)) + "px" : (d3.event.pageX) + "px")
+                .style("top", ((d3.event.pageY + 500) > d3.select("#svgcontainer").node().getBoundingClientRect().height) ? (d3.event.pageY - ((d3.event.pageY + 500)- d3.select("#svgcontainer").node().getBoundingClientRect().height)) + "px" : (d3.event.pageY) + "px");
+                //.style("left", (d3.event.pageX) + "px")
+				//.style("top", (d3.event.pageY) + "px");
+			//$("#svgcontainer").height()
+				
             div
-                .attr("id", "graphContainer")
+				.attr("id", "graphContainer")
+				.append("div")
+				.attr("id", "movieInfoContainer")
+				.html("<h1>" + "ADD STUFF HERE JEFF" + "</h1><br>")
                 .style("right", (d3.event.pageX - 10) + "px")
                 .style("top", (d3.event.pageY - 10) + "px");
+
 
             data = barData;
             //console.log(barData);
@@ -217,7 +392,8 @@
             var yAxis = d3.svg.axis().scale(y).orient("left");
 
             //add SVG
-            var svg = d3.select('#graphContainer').append("svg:svg")
+            var svg = d3.select('#graphbar').append("svg:svg")
+								.attr("id", "chartsvg")
                 .attr("width", width + margin.left + margin.right)
                 .attr("height", height + margin.top + margin.bottom)
                 .append("g")
@@ -281,10 +457,167 @@
             div.transition()
                 .duration(200)
                 .style("opacity", 1e-6);
-        }
+
+						d3.select("#chartsvg").remove();
+      	}
 
         function imageUrl(d) {
             return d.url;
         }
     }
 </script>
+
+<script>
+
+	var width = 600;
+	var height = 300;
+
+	//get original search value for repeat search
+	var originalMovie = cleanedData[0].fields.title;
+	//document.getElementById("update").value = originalMovie;
+
+	//on click 'update'
+	//prepare weights for processing by algorithm on backend
+	//function weight(){
+
+		//document.getElementById("update").value = newWeights;
+	//}
+
+	var newWeights = [];
+	newWeights.push(originalMovie);
+	for (var i = 0; i < 6; i++){
+		newWeights.push(50);
+	}
+
+	var holder = d3.select("body")
+			.append("svg")
+			.attr("width", width)
+			.attr("height", height);
+
+	// update the actor element
+	d3.select("#actor").on("input", function() {
+		updateActor(+this.value);
+	});
+	updateActor(15);
+
+	var actorVar = 50;
+	function updateActor(actor) {
+		// adjust the text on the range slider
+		d3.select("#actor-value").text(actor);
+		d3.select("#actor").property("value", actor);
+		actorVar = parseInt(d3.select("#actor-value")[0][0].textContent);
+		//actorVar = parseInt(d3.select("#actor-value").text(actor)._groups[0][0].textContent);
+		newWeights[1] = actorVar;
+		updateWeightArr();
+	}
+
+	// update the rating element
+	d3.select("#rating").on("input", function() {
+		updateRating(+this.value);
+	});
+	updateRating(15);
+
+	var ratingVar = 50;
+	function updateRating(rating) {
+		// adjust the text on the range slider
+		d3.select("#rating-value").text(rating);
+		d3.select("#rating").property("value", rating);
+		ratingVar = parseInt(d3.select("#rating-value")[0][0].textContent);
+		newWeights[2] = ratingVar;
+		updateWeightArr();
+	}
+
+	// update the genre element
+	d3.select("#genre").on("input", function() {
+		updateGenre(+this.value);
+	});
+	updateGenre(15);
+
+	var genreVar = 50;
+	function updateGenre(genre) {
+		// adjust the text on the range slider
+		d3.select("#genre-value").text(genre);
+		d3.select("#genre").property("value", genre);
+		genreVar = parseInt(d3.select("#genre-value")[0][0].textContent);
+		newWeights[3] = genreVar;
+		updateWeightArr();
+	}
+
+	// update the director element
+	d3.select("#director").on("input", function() {
+		updateDirector(+this.value);
+	});
+	updateDirector(15);
+
+	var directorVar = 50;
+	function updateDirector(director) {
+		// adjust the text on the range slider
+		d3.select("#director-value").text(director);
+		d3.select("#director").property("value", director);
+		directorVar = parseInt(d3.select("#director-value")[0][0].textContent);
+		newWeights[4] = directorVar;
+		updateWeightArr();
+	}
+
+	// update the year element
+	d3.select("#year").on("input", function() {
+		updateYear(+this.value);
+	});
+	updateYear(15);
+
+	var yearVar = 50;
+	function updateYear(year) {
+		// adjust the text on the range slider
+		d3.select("#year-value").text(year);
+		d3.select("#year").property("value", year);
+		//updateVar._groups[0][0].textContent
+		yearVar = parseInt(d3.select("#year-value")[0][0].textContent);
+		newWeights[5] = yearVar;
+		updateWeightArr();
+	}
+
+	// update the score element
+	d3.select("#score").on("input", function() {
+		updateScore(+this.value);
+	});
+	updateScore(15);
+
+	var scoreVar = 50;
+	function updateScore(score) {
+		// adjust the text on the range slider
+		d3.select("#score-value").text(score);
+		d3.select("#score").property("value", score);
+		//scoreVar._groups[0][0].textContent
+		scoreVar = parseInt(d3.select("#score-value")[0][0].textContent);
+		newWeights[6] = scoreVar;
+		updateWeightArr();
+	}
+
+	function updateWeightArr(){
+		document.getElementById("update").value = newWeights;
+	}
+	
+	
+</script>
+</body>
+<script>
+	$('input[type="range"]').change(function () {
+		var val = ($(this).val() - $(this).attr('min')) / ($(this).attr('max') - $(this).attr('min'));
+		//$('input[type="range"]').foundation('slider', 'set_value', 50);
+		//$("input#actor").change('value',51);
+		
+		$(this).css('background-image',
+					'-webkit-gradient(linear, left top, right top, '
+					+ 'color-stop(' + val + ', #94A14E), '
+					+ 'color-stop(' + val + ', #C5C5C5)'
+					+ ')'
+		);
+					
+		//$('input[type="range"]').foundation('slider', 'set_value', 50);
+		//$("input#actor").change('value',51);
+		
+	});
+</script>
+</html>
+
+
