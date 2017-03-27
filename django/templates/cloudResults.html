@@ -277,22 +277,21 @@
 
 		//build up objects with cleaned data from views.py
 		for ( var i = 1; i < cleanedData.length ; i++) {
-
 		    moviePictureObj = new Object();
 		    barDataObj = new Object();
-
 		    moviePictureObj.weight = scale(parseInt(cleanedData[i].fields.relevance));
-        moviePictureObj.name = cleanedData[i].fields.title;
-        moviePictureObj.url = cleanedData[i].fields.poster;
-
-        barDataObj.name = cleanedData[i].fields.title;
-        barDataObj.size = parseInt(cleanedData[i].fields.relevance);
-
-        //push image url into array for pre-cache by loader()
-        moviePictures.push(moviePictureObj);
-        barData.push(barDataObj);
-        //document.write(data[i].fields.title + " " + data[i].fields.relevance + "<br>");
-    }
+            moviePictureObj.name = cleanedData[i].fields.title;
+            moviePictureObj.year = cleanedData[i].fields.year;
+            moviePictureObj.plot = cleanedData[i].fields.plot;
+            moviePictureObj.criteria = cleanedData[i].fields.criteria;
+            moviePictureObj.url = cleanedData[i].fields.poster;
+            barDataObj.name = cleanedData[i].fields.title;
+            barDataObj.size = parseInt(cleanedData[i].fields.relevance);
+            //push image url into array for pre-cache by loader()
+            moviePictures.push(moviePictureObj);
+            barData.push(barDataObj);
+            //document.write(data[i].fields.title + " " + data[i].fields.relevance + "<br>");
+        }
     var pictures = []; // pictures that are already displaced by the layout are pushed into this array
     var svg = d3.select('svg') // obtain a d3 reference to the SVG
 
@@ -341,7 +340,7 @@
         function mouseenter(d, ID) {
             div
                 .attr("id", "imageContainer")
-                .html("<span><h1>" + d.name.split(/(?=[A-Z][^A-Z])/g) + "</h1><br><ahref='imageURL()'><img height='75%' src='" + imageUrl(d) + ")'></ahref></span>")
+                .html("<span><h1>" + d.name + " [" + d.year +"]</h1><br><ahref='imageURL()'><img height='75%' src='" + imageUrl(d) + ")'></ahref></span>")
 				.style("left", ((d3.event.pageX + 600) > d3.select("#svgcontainer").node().getBoundingClientRect().width) ? (d3.event.pageX - ((d3.event.pageX + 600)- d3.select("#svgcontainer").node().getBoundingClientRect().width)) + "px" : (d3.event.pageX) + "px")
                 .style("top", ((d3.event.pageY + 500) > d3.select("#svgcontainer").node().getBoundingClientRect().height) ? (d3.event.pageY - ((d3.event.pageY + 500)- d3.select("#svgcontainer").node().getBoundingClientRect().height)) + "px" : (d3.event.pageY) + "px");
                 //.style("left", (d3.event.pageX) + "px")
@@ -349,10 +348,9 @@
 			//$("#svgcontainer").height()
 				
             div
-				.attr("id", "graphContainer")
 				.append("div")
 				.attr("id", "movieInfoContainer")
-				.html("<h1>" + "ADD STUFF HERE JEFF" + "</h1><br>")
+				.html("<h3>" + d.plot + "</h3><br><h3>" + d.criteria + "</h3><br>")
                 .style("right", (d3.event.pageX - 10) + "px")
                 .style("top", (d3.event.pageY - 10) + "px");
 
@@ -402,6 +400,7 @@
 
             data.forEach(function(d) {
                 d.name = d.name;
+                d.yearm
                 //console.log(d.name);
                 d.size = +d.size;
             });
