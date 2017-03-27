@@ -58,24 +58,21 @@ def weight(request):
     return response(request, results)
    
 def response(request, results):
-
     pairs = []
-    
-    resultsList = results.split()
-    
-    for pair in resultsList:
+    for i in results:
         movie = MovieObj()
-        split = pair.split('|')
-        temp = get_object_or_404(MovieObj, movieID=str(split[0]))
-        temp.relevance = split[1]
-        response = requests.post(str("http://www.omdbapi.com/?i=" + split[0])) #OMDB API call
+
+        temp = get_object_or_404(MovieObj, movieID=str(i[0]))
+        temp.relevance = i[1]
+        response = requests.post(str("http://www.omdbapi.com/?i=" + i[0])) #OMDB API call
         while response.status_code != 200:
-            response = requests.post(str("http://www.omdbapi.com/?i=" + split[0]))  # OMDB API call
-        print(str(split[0] + str(response)))
+            response = requests.post(str("http://www.omdbapi.com/?i=" + i[0]))  # OMDB API call
+        print(str(i[0] + str(response)))
     
         temp.poster = response.json()["Poster"]
         temp.plot = response.json()["Plot"]
         temp.runtime = response.json()["Runtime"]
+        temp.criteria = i[2]
         pairs.append(temp)
     
     print(pairs)
