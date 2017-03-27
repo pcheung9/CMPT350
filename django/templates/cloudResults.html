@@ -1,191 +1,13 @@
 <!DOCTYPE html>
 {% load static %}
 {% load staticfiles %}
-<style>
-	form {
-		font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-	}
-
-	svg {
-		font: 10px sans-serif;
-	}
-
-	div.tooltip {
-		position: absolute;
-		float: left;
-		text-align: left;
-		width: 550px;
-		height: 400px;
-		padding: 8px;
-		font: 10px sans-serif;
-		background: #ddd;
-		border: solid 1px #aaa;
-		border-radius: 8px;
-		pointer-events: none;
-	}
-
-
-	imageContainer{
-        flex-direction: row;
-        display: -webkit-flex;
-        display: flex;
-		float: left;
-		position: absolute;
-		text-align: left;
-		width: 45%;
-		height: 500px;
-		padding: 8px;
-		font: 10px sans-serif;
-		background: #ddd;
-		border: solid 1px #aaa;
-		border-radius: 8px;
-		pointer-events: none;
-	}
-
-	graphContainer{
-        flex-direction: row;
-        display: -webkit-flex;
-        display: flex;
-		float: right;
-		position: absolute;
-		text-align: right;
-		width: 45%;
-		height: 500px;
-		padding: 8px;
-		font: 10px sans-serif;
-		background: #ddd;
-		border: solid 1px #aaa;
-		border-radius: 8px;
-		pointer-events: none;
-	}
-
-	div#svgcontainer{
-		float: left;
-		text-align: center;
-		width: 74%;
-		height: 80%
-		padding: 0px;
-		font: 10px sans-serif;
-		border: solid 1px #aaa;
-		background: #aaa;
-	}
-
-	div#graphbar{
-		float: right;
-		text-align: left;
-		width: 24%;
-		height: 100%;
-		padding: 0px;
-		font: 10px sans-serif;
-		background: #ddd;
-		border: solid 1px #aaa;
-	}
-
-	div#sliderbar{
-		float: right;
-		text-align: left;
-		width: 24%;
-		height: 50%;
-		padding: 0px;
-		font: 10px sans-serif;
-		background: #ddd;
-		border: solid 1px #aaa;
-	}
-
-	div#movieInfoContainer{
-		float: right;
-		text-align: left;
-		width: 45%;
-		height: 80%;
-		padding: 0px;
-		font: 10px sans-serif;
-		background: #ddd;
-	}
-
-	div#sliderWidth{
-		width: 100%;
-		padding: 0px;
-		font: 17px sans-serif;
-		background: #ddd;
-	}
-
-	input#actor{
-		width: 100%;
-		fill: brown;
-	}
-
-	input#rating{
-		width: 100%;
-	}
-
-	input#genre{
-		width: 100%;
-	}
-
-	input#director{
-		width: 100%;
-	}
-
-	input#year{
-		width: 100%;
-	}
-
-	input#score{
-		width: 100%;
-	}
-
-	.slider-selection {
-	background: #BABABA;
-}
-	
-	.bar{
-		fill: steelblue;
-	}
-
-	.bar:hover{
-		fill: brown;
-	}
-
-	.axis {
-		font: 10px sans-serif;
-	}
-
-	.axis path,
-	.axis line {
-		fill: none;
-		stroke: #000;
-		shape-rendering: crispEdges;
-	}
-	
-	input[type="range"]{
-		-webkit-appearance: none;
-		-moz-apperance: none;
-		border-radius: 6px;
-		height: 6px;
-		background-image: -webkit-gradient(
-			linear,
-			left top,
-			right top,
-			color-stop(0.15, #94A14E),
-			color-stop(0.15, #C5C5C5)
-		);
-	}
-
-	input[type='range']::-webkit-slider-thumb {
-		-webkit-appearance: none !important;
-		background-color: #E9E9E9;
-		border: 1px solid #CECECE;
-		height: 15px;
-		width: 15px;
-	}
-
-</style>
 <meta charset="utf-8">
-<style>body,html {background: #222; width: 100%; height:100%; padding:0; margin:0; overflow:hidden;}</style>
+<style></style>
 <head>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 </head>
 <body>
+<link rel="stylesheet" href="{% static "/css/cloudResults.css" %}">
 <div id="treemap"></div>
 <div id="graphbar"><!--</div>-->
 <!--<div id="sliderbar">-->
@@ -283,7 +105,12 @@
             moviePictureObj.name = cleanedData[i].fields.title;
             moviePictureObj.year = cleanedData[i].fields.year;
             moviePictureObj.plot = cleanedData[i].fields.plot;
+            moviePictureObj.actor1 = cleanedData[i].fields.actor1;
+            moviePictureObj.actor2 = cleanedData[i].fields.actor2;
+            moviePictureObj.actor3 = cleanedData[i].fields.actor3;
+            moviePictureObj.director = cleanedData[i].fields.director;
             moviePictureObj.criteria = cleanedData[i].fields.criteria;
+            moviePictureObj.runtime = cleanedData[i].fields.runtime;
             moviePictureObj.url = cleanedData[i].fields.poster;
             barDataObj.name = cleanedData[i].fields.title;
             barDataObj.size = parseInt(cleanedData[i].fields.relevance);
@@ -341,17 +168,16 @@
             div
                 .attr("id", "imageContainer")
                 .html("<span><h1>" + d.name + " [" + d.year +"]</h1><br><ahref='imageURL()'><img height='75%' src='" + imageUrl(d) + ")'></ahref></span>")
-				.style("left", ((d3.event.pageX + 600) > d3.select("#svgcontainer").node().getBoundingClientRect().width) ? (d3.event.pageX - ((d3.event.pageX + 600)- d3.select("#svgcontainer").node().getBoundingClientRect().width)) + "px" : (d3.event.pageX) + "px")
                 .style("top", ((d3.event.pageY + 500) > d3.select("#svgcontainer").node().getBoundingClientRect().height) ? (d3.event.pageY - ((d3.event.pageY + 500)- d3.select("#svgcontainer").node().getBoundingClientRect().height)) + "px" : (d3.event.pageY) + "px");
-                //.style("left", (d3.event.pageX) + "px")
-				//.style("top", (d3.event.pageY) + "px");
-			//$("#svgcontainer").height()
-				
+
             div
 				.append("div")
 				.attr("id", "movieInfoContainer")
-				.html("<h3>" + d.plot + "</h3><br><h3>" + d.criteria + "</h3><br>")
-                .style("right", (d3.event.pageX - 10) + "px")
+				.html("<h3>" + d.plot + "</h3><br>" +
+				    "<h3> Directed by:" + d.director + "</h3><br>" +
+				    "<h3> Featuring: " + d.actor1 + ", " + d.actor2 + ", " +  d.actor3 +  "</h3><br>" +
+                    "<h3> Runtime: " + d.runtime + "</h3><br>"+
+                    "<h3>" + d.criteria + "</h3><br>")
                 .style("top", (d3.event.pageY - 10) + "px");
 
 
