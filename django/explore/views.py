@@ -42,7 +42,7 @@ def weight(request):
     
     #convert to int
     for i in range(1,6):
-        weightArgs[i] = int(weightArgs[i])/50
+        weightArgs[i] = int(weightArgs[i])/10
         print(weightArgs[i])
     
     #ex

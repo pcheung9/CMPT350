@@ -154,9 +154,9 @@ def related(num_results, ID_string, actorWeight, genreWeight, directorWeight, ye
                 if i.rating == (inFilm.rating + 1) or i.rating == (inFilm.rating - 1):
                     i.relevance += 10
                 if i.rating == (inFilm.rating + 3) or i.rating == (inFilm.rating - 3):
-                    i.relevance -= 100
-                if i.rating == (inFilm.rating + 4) or i.rating == (inFilm.rating - 4):
                     i.relevance -= 200
+                if i.rating == (inFilm.rating + 4) or i.rating == (inFilm.rating - 4):
+                    i.relevance -= 400
 
             # Keyword Check
             for j in i.keywords:

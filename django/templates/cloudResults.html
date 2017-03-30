@@ -17,32 +17,32 @@
 			style="display: inline-block; width: 240px; text-align: right">
 			actor = <span id="actor-value">…</span>
 		</label>
-		<input type="range" min="1" max="100" id="actor"><br>
+		<input type="range" min="5" max="20" step="1" id="actor"><br>
 		<label for="rating"
 			style="display: inline-block; width: 240px; text-align: right">
 			rating = <span id="rating-value">…</span>
 		</label>
-		<input type="range" min="1" max="100" id="rating"><br>
+		<input type="range" min="5" max="20" step="1" id="rating"><br>
 		<label for="genre"
 			style="display: inline-block; width: 240px; text-align: right">
 			genre = <span id="genre-value">…</span>
 		</label>
-		<input type="range" min="1" max="100" id="genre"><br>
+		<input type="range" min="5" max="20" step="1" id="genre"><br>
 			<label for="director"
 				style="display: inline-block; width: 240px; text-align: right">
 				director = <span id="director-value">…</span>
 			</label>
-		<input type="range" min="1" max="100" id="director"><br>
+		<input type="range" min="5" max="20" step="1" id="director"><br>
 		<label for="year"
 			style="display: inline-block; width: 240px; text-align: right">
 			year = <span id="year-value">…</span>
 		</label>
-		<input type="range" min="1" max="100" id="year"><br>
+		<input type="range" min="5" max="20" step="1" id="year"><br>
 			<label for="score"
 				style="display: inline-block; width: 240px; text-align: right">
 				score = <span id="score-value">…</span>
 			</label>
-		<input type="range" min="1" max="100" id="score"><br>
+		<input type="range" min="5" max="20" step="1" id="score"><br>
 	</div>
 
 	<!--Update Weights!! Re-runs algorithm-->
@@ -294,8 +294,8 @@
 
 <script>
 
-	var width = 600;
-	var height = 300;
+	var width = 900;
+	var height = 600;
 
 	//get original search value for repeat search
 	var originalMovie = cleanedData[0].fields.title;
@@ -311,7 +311,7 @@
 	var newWeights = [];
 	newWeights.push(originalMovie);
 	for (var i = 0; i < 6; i++){
-		newWeights.push(50);
+		newWeights.push(10);
 	}
 
 	var holder = d3.select("body")
@@ -323,9 +323,9 @@
 	d3.select("#actor").on("input", function() {
 		updateActor(+this.value);
 	});
-	updateActor(15);
+	updateActor(10);
 
-	var actorVar = 50;
+	var actorVar = 1;
 	function updateActor(actor) {
 		// adjust the text on the range slider
 		d3.select("#actor-value").text(actor);
@@ -340,9 +340,9 @@
 	d3.select("#rating").on("input", function() {
 		updateRating(+this.value);
 	});
-	updateRating(15);
+	updateRating(10);
 
-	var ratingVar = 50;
+	var ratingVar = 1;
 	function updateRating(rating) {
 		// adjust the text on the range slider
 		d3.select("#rating-value").text(rating);
@@ -356,9 +356,9 @@
 	d3.select("#genre").on("input", function() {
 		updateGenre(+this.value);
 	});
-	updateGenre(15);
+	updateGenre(10);
 
-	var genreVar = 50;
+	var genreVar = 1;
 	function updateGenre(genre) {
 		// adjust the text on the range slider
 		d3.select("#genre-value").text(genre);
@@ -372,9 +372,9 @@
 	d3.select("#director").on("input", function() {
 		updateDirector(+this.value);
 	});
-	updateDirector(15);
+	updateDirector(10);
 
-	var directorVar = 50;
+	var directorVar = 1;
 	function updateDirector(director) {
 		// adjust the text on the range slider
 		d3.select("#director-value").text(director);
@@ -388,9 +388,9 @@
 	d3.select("#year").on("input", function() {
 		updateYear(+this.value);
 	});
-	updateYear(15);
+	updateYear(10);
 
-	var yearVar = 50;
+	var yearVar = 1;
 	function updateYear(year) {
 		// adjust the text on the range slider
 		d3.select("#year-value").text(year);
@@ -405,9 +405,9 @@
 	d3.select("#score").on("input", function() {
 		updateScore(+this.value);
 	});
-	updateScore(15);
+	updateScore(10);
 
-	var scoreVar = 50;
+	var scoreVar = 1;
 	function updateScore(score) {
 		// adjust the text on the range slider
 		d3.select("#score-value").text(score);
