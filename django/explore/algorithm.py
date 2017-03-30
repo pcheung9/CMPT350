@@ -197,7 +197,7 @@ def related(num_results, ID_string, actorWeight, genreWeight, directorWeight, ye
             bisect.insort_right(top, i)
     topN = []
     for i in range(0, num_results):
-        topN.append([top[i].ID, str(top[i].relevance), top[i].criteria])
+        topN.append([top[i].ID, str(top[i].relevance), top[i].criteria, ", ".join(top[i].genres)])
     return topN
 
 def getTitles():

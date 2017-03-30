@@ -73,6 +73,7 @@ def response(request, results):
         temp.plot = response.json()["Plot"]
         temp.runtime = response.json()["Runtime"]
         temp.criteria = i[2]
+        temp.genres = i[3]
         pairs.append(temp)
     
     print(pairs)
