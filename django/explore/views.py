@@ -21,7 +21,6 @@ def load(request):
     print("Test console output")
     return HttpResponse(json_data, content_type="application/json")
 
-
 def search(request):
     titles = getTitles()
     print(titles)
@@ -56,7 +55,48 @@ def weight(request):
     #actorWeight, RATING PLACEHOLDER, genreWeight, directorWeight, yearWeight, scoreWeight (args)    
     
     return response(request, results)
-   
+
+def details(request):
+    node_ID = request.GET['node_ID']
+    print(request.GET['node_ID'])
+    
+    pairs = []
+    temp = get_object_or_404(MovieObj, movieID=str(node_ID))
+    
+    response = requests.post(str("http://www.omdbapi.com/?i=" + node_ID)) #OMDB API call
+    while response.status_code != 200:
+        response = requests.post(str("http://www.omdbapi.com/?i=" + node_ID)) #OMDB API call
+    
+    print(str(node_ID + str(response)))
+    temp.poster = response.json()["Poster"]
+    temp.plot = response.json()["Plot"]
+    temp.runtime = response.json()["Runtime"]    
+    
+    temp.awards = response.json()["Awards"]
+    temp.IMDBScore = response.json()["imdbRating"]
+    temp.tomatoes = response.json()["Ratings"][1]["Value"]
+    temp.metascore = response.json()["Metascore"]
+    temp.production = response.json()["Production"]
+    temp.boxOffice = response.json()["BoxOffice"]
+    
+    pairs.append(temp)
+    
+    print(temp.awards, temp.tomatoes, temp.metascore, temp.production, temp.boxOffice)
+    
+    print(pairs)
+    object_list = list(pairs)
+    nonetype_querySet = MovieObj.objects.none()
+    
+    data = list(chain(nonetype_querySet, object_list))
+
+    #for obj in data:
+        #obj.title = titlecase(obj.title)
+        #obj.title.replace(" ,", "")
+    
+    data = serializers.serialize('json', data)
+    print(data)
+    return render_to_response("details.html", {'data': mark_safe(data)}, RequestContext(request))    
+
 def response(request, results):
     pairs = []
     for i in results:
@@ -66,7 +106,7 @@ def response(request, results):
         temp.relevance = i[1]
         response = requests.post(str("http://www.omdbapi.com/?i=" + i[0])) #OMDB API call
         while response.status_code != 200:
-            response = requests.post(str("http://www.omdbapi.com/?i=" + i[0]))  # OMDB API call
+            response = requests.post(str("http://www.omdbapi.com/?i=" + i[0])) # OMDB API call
         print(str(i[0] + str(response)))
     
         temp.poster = response.json()["Poster"]
@@ -91,5 +131,7 @@ def response(request, results):
     
     #return HttpResponse(dump, mimetype='application/json')
     #return TemplateResponse(request, 'treeResults.html', ({"data": data}))
-    return render_to_response("cloudResults.html", {'data': mark_safe(data)}, RequestContext(request))
     #return render_to_response("treeResults.html", {'data':mark_safe(data)}, RequestContext(request))
+    
+    return render_to_response("cloudResults.html", {'data': mark_safe(data)}, RequestContext(request))
+    #return render_to_response("test.html", {'data': mark_safe(data)}, RequestContext(request))

@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+{% load static %}
+{% load staticfiles %}
+<meta charset="utf-8">
+<style> 
+
+div#svgcontainer{
+    float: left;
+    text-align: center;
+    height: 100%;
+    padding: 0px;
+    font: 10px sans-serif;
+	overflow: auto;
+}
+
+div#svgcontainer > div#first-div, div#second-div, div#third-div{
+    float: left;
+    width: 30%;
+}
+
+div#textbar{
+    float: right;
+    text-align: left;
+    width: 24%;
+    height: 50%;
+    padding: 0px;
+    font: 10px sans-serif;
+    background: #ddd;
+    border: solid 1px #aaa;
+}
+
+div#infobar{
+    float: right;
+    text-align: left;
+    width: 24%;
+    height: 50%;
+    padding: 0px;
+    font: 10px sans-serif;
+    background: #ddd;
+    border: solid 1px #aaa;
+}
+
+div#first-div {
+  width:29%;
+  height:50%;
+  float:left;
+}
+
+div#second-div {
+  width:29%;
+  height:50%;
+  float:left;
+}
+
+div#third-div {
+  padding: 3% 0;
+  width:39%;
+  height:50%;
+  float:left;
+}
+
+#canvas {
+}
+
+#canvas-svg {
+}
+
+
+.land {
+  fill: #222;
+}
+
+.boundary {
+  fill: none;
+  stroke: #fff;
+  stroke-width: 1px;
+}
+
+#tooltip-container {
+  position: absolute;
+  background-color: #fff;
+  color: #000;
+  padding: 10px;
+  border: 1px solid;
+  display: none;
+}
+
+.tooltip_key {
+  font-weight: bold;
+}
+
+.tooltip_value {
+  margin-left: 20px;
+  float: right;
+}
+
+</style>
+
+<head>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+</head>
+
+<div id="tooltip-container"></div>
+
+<div id="canvas-svg"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/topojson/1.1.0/topojson.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+
+<body>
+
+<!--<link rel="stylesheet" href="{% static "/css/cloudResults.css" %}">-->
+
+<body>
+
+
+    <div id="first-div"></div>
+	<div id="second-div">
+		<div id="innertop"></div>
+		<div id="innermiddle"></div>
+		<div id="innerbottom">
+			<h1>"A BUNCH OF TEXT FOR YA BOY"</h1>
+		</div>
+	</div>
+	<div id="third-div"></div>
+	
+
+
+</body>
+</html>
+
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<!--<script src="https://d3js.org/d3.v4.min.js"></script>-->
+<script src="{% static "picturecloud.js" %}"></script>
+<script src="http://davidbau.com/encode/seedrandom-min.js"></script>
+
+<script>
+    var globalResizeTimer = null;
+
+    //keeping dirty data from backend in client memory for debug purposes
+    var dirtyData = {{ data }};
+	
+    //cleaned data from backend data dictionary
+    var cleanedData = JSON.parse("{{ data|escapejs }}");
+
+    //create new movieList object to represent all of the movies
+    var movieObjList = new Object();
+    movieObjList.name = "movies";
+    movieObjList.children = [];
+    //array for preload caching
+    //images = [];
+    moviePictures = [];
+
+    barData = [];
+
+	scores = [];
+
+	for ( var i = 1; i < cleanedData.length ; i++) {
+		scores.push(parseInt(cleanedData[i].fields.relevance));
+	}
+	var scale = d3.scale.linear();
+	scale.range([400, 1000]);
+	scale.domain([d3.min(scores), d3.max(scores)])
+
+	movieDetailsObj = new Object();
+	//build up objects with cleaned data from views.py
+	for ( var i = 0; i < cleanedData.length ; i++) {
+		//moviePictureObj = new Object();
+		//barDataObj = new Object();
+		//moviePictureObj.weight = scale(parseInt(cleanedData[i].fields.relevance));
+		
+		movieDetailsObj.name = cleanedData[i].fields.title;
+		movieDetailsObj.year = cleanedData[i].fields.year;
+		movieDetailsObj.plot = cleanedData[i].fields.plot;
+		movieDetailsObj.actor1 = cleanedData[i].fields.actor1;
+		movieDetailsObj.actor2 = cleanedData[i].fields.actor2;
+		movieDetailsObj.actor3 = cleanedData[i].fields.actor3;
+		movieDetailsObj.director = cleanedData[i].fields.director;
+		movieDetailsObj.production = cleanedData[i].fields.production;
+		movieDetailsObj.criteria = cleanedData[i].fields.criteria;
+		movieDetailsObj.runtime = cleanedData[i].fields.runtime;
+		movieDetailsObj.url = cleanedData[i].fields.poster;
+		movieDetailsObj.country = cleanedData[i].fields.country;
+		movieDetailsObj.tomatoes = parseInt(cleanedData[i].fields.tomatoes);
+		movieDetailsObj.metascore = parseInt(cleanedData[i].fields.metascore);
+		movieDetailsObj.IMDBScore = parseFloat(cleanedData[i].fields.IMDBScore);
+	}
+	console.log(movieDetailsObj.IMDBScore)
+	console.log(movieDetailsObj.tomatoes)
+	console.log(movieDetailsObj.metascore)
+	
+	var dataList = [[ {name: "one", value: movieDetailsObj.IMDBScore},
+				{name: "two", value:  10-movieDetailsObj.IMDBScore},],
+				[ {name: "one", value: movieDetailsObj.tomatoes},
+				{name: "two", value:  100-(movieDetailsObj.tomatoes)},],
+				[ {name: "one", value: movieDetailsObj.metascore},
+				{name: "two", value:  100-movieDetailsObj.metascore},]]
+	
+	//var divList
+	
+	for (var i = 0; i < 3; i++){
+		
+		data = dataList[i];
+		
+		var margin = {top: 20, right: 20, bottom: 20, left: 20};
+			width = 200 - margin.left - margin.right;
+			height = width - margin.top - margin.bottom;
+
+		var chart = d3.select("#innertop")
+			.append('svg')
+			.attr("width", width + margin.left + margin.right)
+			.attr("height", height + margin.top + margin.bottom)
+		   .append("g")
+			.attr("transform", "translate(" + ((width/2)+margin.left) + "," + ((height/2)+margin.top) + ")");
+
+		//var div = d3.select("#third-div")
+		//	.append("div")
+		//	.attr("id", "movieInfoContainer")
+		//	.html("<h3>" + "d.plot" + "</h3><br>" +
+		//		"<h3> Directed by:" + "d.director" + "</h3><br>" +
+		//		"<h3> Featuring: " + "d.actor1" + ", " + "d.actor2" + ", " +  "d.actor3" +  "</h3><br>" +
+		//		"<h3> Runtime: " + "d.runtime" + "</h3><br>"+
+		//		"<h3>" + "d.criteria" + "</h3><br>")
+
+		var radius = Math.min(width, height) / 2;
+ 
+		if  (i == 0) {
+			var color = d3.scale.ordinal()
+				.range(["#f08080", "#222",]);
+		} else if  (i == 1) {
+			var color = d3.scale.ordinal()
+				.range(["#32cd32", "#222",]);
+		} else {
+			var color = d3.scale.ordinal()
+				.range(["#9400d3", "#222",]);
+		}
+			
+		var arc = d3.svg.arc()
+			.outerRadius(radius)
+			.innerRadius(radius - 20);
+
+		var pie = d3.layout.pie()
+			.sort(null)
+			.startAngle(1.0*Math.PI)
+			.endAngle(3.0*Math.PI)
+			.value(function(d) { return d.value; });
+
+
+		var g = chart.selectAll(".arc")
+		  .data(pie(data))
+		.enter().append("g")
+		  .attr("class", "arc");
+
+		g.append("path")
+		  .style("fill", function(d) { return color(d.data.name); })
+		  .transition().delay(function(d, i) { return i * 500; }).duration(1500)
+		  .attrTween('d', function(d) {
+			   var i = d3.interpolate(d.startAngle+0.1, d.endAngle);
+			   return function(t) {
+				   d.endAngle = i(t);
+				 return arc(d);
+			   }
+		  });
+	   
+	}
+	
+	var width = 500, height = 800;
+
+	var svg = d3.select("#first-div").append("div")
+		.append("svg")
+		.attr("width", width)
+		.attr("height", height);
+
+	var g = svg.append("g");
+
+	var img = g.append("image")
+		.attr("xlink:href", movieDetailsObj.url)
+		.attr("width", width*.70)
+		.attr("height", height*.70)	
+		.attr("x", 0)
+		.attr("y",0);
+
+</script>
+
+<script>
+
+function drawMap() {
+
+	d3.csv("{% static 'population.csv' %}", function(err, data) {
+
+	  var config = {"data0":"Country (or dependent territory)","data1":"Population",
+				  "label0":"label 0","label1":"label 1","color0":"#99ccff","color1":"#0050A1",
+				  "width":document.getElementById("third-div").offsetWidth,"height":document.getElementById("third-div").offsetHeight}
+	  
+	  var width = config.width,
+		  height = config.height;
+	  
+	  var COLOR_COUNTS = 9;
+	  
+	  function Interpolate(start, end, steps, count) {
+		  var s = start,
+			  e = end,
+			  final = s + (((e - s) / steps) * count);
+		  return Math.floor(final);
+	  }
+	  
+	  function Color(_r, _g, _b) {
+		  var r, g, b;
+		  var setColors = function(_r, _g, _b) {
+			  r = _r;
+			  g = _g;
+			  b = _b;
+		  };
+	  
+		  setColors(_r, _g, _b);
+		  this.getColors = function() {
+			  var colors = {
+				  r: r,
+				  g: g,
+				  b: b
+			  };
+			  return colors;
+		  };
+	  }
+	  
+	  function hexToRgb(hex) {
+		  var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+		  return result ? {
+			  r: parseInt(result[1], 16),
+			  g: parseInt(result[2], 16),
+			  b: parseInt(result[3], 16)
+		  } : null;
+	  }
+	  
+	  function valueFormat(d) {
+		if (d > 1000000000) {
+		  return Math.round(d / 1000000000 * 10) / 10 + "B";
+		} else if (d > 1000000) {
+		  return Math.round(d / 1000000 * 10) / 10 + "M";
+		} else if (d > 1000) {
+		  return Math.round(d / 1000 * 10) / 10 + "K";
+		} else {
+		  return d;
+		}
+	  }
+	  
+	  var COLOR_FIRST = config.color0, COLOR_LAST = config.color1;
+	  
+	  var rgb = hexToRgb(COLOR_FIRST);
+	  
+	  var COLOR_START = new Color(rgb.r, rgb.g, rgb.b);
+	  
+	  rgb = hexToRgb(COLOR_LAST);
+	  var COLOR_END = new Color(rgb.r, rgb.g, rgb.b);
+	  
+	  var startColors = COLOR_START.getColors(),
+		  endColors = COLOR_END.getColors();
+	  
+	  var colors = [];
+	  
+	  for (var i = 0; i < COLOR_COUNTS; i++) {
+		var r = Interpolate(startColors.r, endColors.r, COLOR_COUNTS, i);
+		var g = Interpolate(startColors.g, endColors.g, COLOR_COUNTS, i);
+		var b = Interpolate(startColors.b, endColors.b, COLOR_COUNTS, i);
+		colors.push(new Color(r, g, b));
+	  }
+	  
+	  var MAP_KEY = config.data0;
+	  var MAP_VALUE = config.data1;
+	  
+	  var projection = d3.geo.mercator()
+		  .scale((width + 1) / 2 / Math.PI)
+		  .translate([width / 2, height / 2])
+		  .precision(.1);
+	  
+	  var path = d3.geo.path()
+		  .projection(projection);
+	  
+	  var graticule = d3.geo.graticule();
+	  
+	  var svg = d3.select("#third-div").append("svg")
+		  .attr("width", width)
+		  .attr("height", height);
+	  
+	  svg.append("path")
+		  .datum(graticule)
+		  .attr("class", "graticule")
+		  .attr("d", path);
+	  
+	  var valueHash = {};
+	  
+	  function log10(val) {
+		return Math.log(val);
+	  }
+	  
+	  data.forEach(function(d) {
+		valueHash[d[MAP_KEY]] = +d[MAP_VALUE];
+		console.log(d[MAP_KEY]);
+		
+	  });
+
+	  var quantize = d3.scale.quantize()
+		  .domain([0, 1.0])
+		  .range(d3.range(COLOR_COUNTS).map(function(i) { return i }));
+	  
+	  quantize.domain([d3.min(data, function(d){
+		  return (+d[MAP_VALUE]) }),
+		d3.max(data, function(d){
+		  return (+d[MAP_VALUE]) })]);
+	  
+	  d3.json("https://s3-us-west-2.amazonaws.com/vida-public/geo/world-topo-min.json", function(error, world) {
+		var countries = topojson.feature(world, world.objects.countries).features;
+	  
+		svg.append("path")
+		   .datum(graticule)
+		   .attr("class", "choropleth")
+		   .attr("d", path);
+	  
+		var g = svg.append("g");
+	  
+		g.append("path")
+		 .datum({type: "LineString", coordinates: [[-180, 0], [-90, 0], [0, 0], [90, 0], [180, 0]]})
+		 .attr("class", "equator")
+		 .attr("d", path);
+	  
+		var country = g.selectAll(".country").data(countries);
+		
+		if (movieDetailsObj.country == 'USA'){
+			countryColor = 'United States';
+		} else if (movieDetailsObj.country == 'UK') {
+			countryColor = 'United Kingdom';
+		} else {
+			countryColor = movieDetailsObj.country;
+		}
+		
+		country.enter().insert("path")
+			.attr("class", "country")
+			.attr("d", path)
+			.attr("id", function(d,i) { return d.id; })
+			.attr("title", function(d) { return d.properties.name; })
+			.style("fill", function(d) {
+				console.log(d.properties.name);
+				if (d.properties.name == countryColor) {
+						console.log(d.properties.name);
+					console.log(valueHash[d.properties.name]);
+					var c = quantize((valueHash[d.properties.name]));
+					return "green"
+			  } else {
+					return "#ddd";
+			  }
+			})
+			.on("mousemove", function(d) {
+				var html = "";
+	  
+				html += "<div class=\"tooltip_kv\">";
+				html += "<span class=\"tooltip_key\">";
+				html += d.properties.name;
+				html += "</span>";
+				html += "<span class=\"tooltip_value\">";
+				html += (valueHash[d.properties.name] ? valueFormat(valueHash[d.properties.name]) : "");
+				html += "";
+				html += "</span>";
+				html += "</div>";
+				
+				$("#tooltip-container").html(html);
+				$(this).attr("fill-opacity", "0.8");
+				$("#tooltip-container").show();
+				
+				var coordinates = d3.mouse(this);
+				
+				var map_width = $('.choropleth')[0].getBoundingClientRect().width;
+				
+				if (d3.event.pageX < map_width / 2) {
+				  d3.select("#tooltip-container")
+					.style("top", (d3.event.layerY + 15) + "px")
+					.style("left", (d3.event.layerX + 15) + "px");
+				} else {
+				  var tooltip_width = $("#tooltip-container").width();
+				  d3.select("#tooltip-container")
+					.style("top", (d3.event.layerY + 15) + "px")
+					.style("left", (d3.event.layerX - tooltip_width - 30) + "px");
+				}
+			})
+			.on("mouseout", function() {
+					$(this).attr("fill-opacity", "1.0");
+					$("#tooltip-container").hide();
+				});
+		
+		g.append("path")
+			.datum(topojson.mesh(world, world.objects.countries, function(a, b) { return a !== b; }))
+			.attr("class", "boundary")
+			.attr("d", path);
+		
+		svg.attr("height", config.height * 2.2 / 3);
+	  });
+	  
+	  d3.select(self.frameElement).style("height", (height * 2.3 / 3) + "px");
+	});
+
+}
+	//$(window).resize(function() {
+	//	if(globalResizeTimer != null) window.clearTimeout(globalResizeTimer);
+	//	globalResizeTimer = window.setTimeout(function() {
+	//		$("svg g").remove();
+	//		//$("svg").remove();
+	//		drawMap();
+	//	}, 100);
+	//});
+	
+	drawMap();
+
+
+	
+</script>
+
+
+
+
+
