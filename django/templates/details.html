@@ -59,6 +59,13 @@ div#third-div {
   float:left;
 }
 
+div#movie_info {
+  width: 1000px;
+  height: 500px;
+  float:bottom;
+  background: blue;
+}
+
 #canvas {
 }
 
@@ -125,6 +132,8 @@ div#third-div {
 	</div>
 	<div id="third-div"></div>
 	
+	<div id="movie-info"></div>
+	
 
 
 </body>
@@ -186,9 +195,14 @@ div#third-div {
 		movieDetailsObj.metascore = parseInt(cleanedData[i].fields.metascore);
 		movieDetailsObj.IMDBScore = parseFloat(cleanedData[i].fields.IMDBScore);
 	}
-	console.log(movieDetailsObj.IMDBScore)
-	console.log(movieDetailsObj.tomatoes)
-	console.log(movieDetailsObj.metascore)
+	
+	//console.log(movieDetailsObj.IMDBScore)
+	//console.log(movieDetailsObj.tomatoes)
+	//console.log(movieDetailsObj.metascore)
+	
+	if (movieDetailsObj.metascore == "NaN") {
+		movieDetailsObj.metascore = 0;
+	}
 	
 	var dataList = [[ {name: "one", value: movieDetailsObj.IMDBScore},
 				{name: "two", value:  10-movieDetailsObj.IMDBScore},],
@@ -211,7 +225,7 @@ div#third-div {
 			.append('svg')
 			.attr("width", width + margin.left + margin.right)
 			.attr("height", height + margin.top + margin.bottom)
-		   .append("g")
+			.append("g")
 			.attr("transform", "translate(" + ((width/2)+margin.left) + "," + ((height/2)+margin.top) + ")");
 
 		//var div = d3.select("#third-div")
@@ -248,24 +262,50 @@ div#third-div {
 
 
 		var g = chart.selectAll(".arc")
-		  .data(pie(data))
-		.enter().append("g")
-		  .attr("class", "arc");
+			.data(pie(data))
+			.enter().append("g")
+			.attr("class", "arc");
 
 		g.append("path")
-		  .style("fill", function(d) { return color(d.data.name); })
-		  .transition().delay(function(d, i) { return i * 500; }).duration(1500)
-		  .attrTween('d', function(d) {
+			.style("fill", function(d) { return color(d.data.name); })
+			.transition().delay(function(d, i) { return i * 500; }).duration(1500)
+			.attrTween('d', function(d) {
 			   var i = d3.interpolate(d.startAngle+0.1, d.endAngle);
 			   return function(t) {
 				   d.endAngle = i(t);
 				 return arc(d);
 			   }
-		  });
-	   
+			});
+
+		console.log(i + "iiiiiiiiiiiiiiiiiiiiiiiii")
+			
+		var sentinel = i;
+		
+		g.append("text")
+        .attr("dx", function(d){return -15})
+		.attr("dy", function(d){return 5})
+		.style("font-size", "25px")
+		.style("font-weight", "bold")
+		.attr("fill", "white")
+		.style("family", "helvetica")
+        .text( function(i) {
+			var value = "";
+			if (sentinel == 0) {
+				value = movieDetailsObj.IMDBScore;
+			} else if (sentinel == 1) {
+				value = movieDetailsObj.tomatoes;
+			} else {
+				value = movieDetailsObj.metascore;
+			}
+			return value; 
+		});
+
+		
+		//d3.selectAll("#gender_divide text")
+
 	}
 	
-	var width = 500, height = 800;
+	var width = 450, height = 800;
 
 	var svg = d3.select("#first-div").append("div")
 		.append("svg")
@@ -280,6 +320,9 @@ div#third-div {
 		.attr("height", height*.70)	
 		.attr("x", 0)
 		.attr("y",0);
+		
+		
+	
 
 </script>
 
