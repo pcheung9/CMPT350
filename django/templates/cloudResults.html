@@ -113,19 +113,20 @@
     barData = [];
     scores = [];
 
-    for ( var i = 1; i < cleanedData.length ; i++) {
-        scores.push(parseInt(cleanedData[i].fields.relevance));
-    }
-    var scale = d3.scale.linear();
-    scale.range([400, 1000]);
-    scale.domain([d3.min(scores), d3.max(scores)])
+		for ( var i = 1; i < cleanedData.length ; i++) {
+		    scores.push(parseInt(cleanedData[i].fields.relevance));
+		}
+		var scale = d3.scale.linear();
+		scale.range([400, 1000]);
+		scale.domain([d3.min(scores), d3.max(scores)])
 
-    //build up objects with cleaned data from views.py
-    for ( var i = 1; i < cleanedData.length ; i++) {
-        moviePictureObj = new Object();
-        barDataObj = new Object();
-        moviePictureObj.weight = scale(parseInt(cleanedData[i].fields.relevance));
+		//build up objects with cleaned data from views.py
+		for ( var i = 1; i < cleanedData.length ; i++) {
+		    moviePictureObj = new Object();
+		    barDataObj = new Object();
+		    moviePictureObj.weight = scale(parseInt(cleanedData[i].fields.relevance));
         moviePictureObj.name = cleanedData[i].fields.title;
+        moviePictureObj.movieID = cleanedData[i].fields.movieID;
         moviePictureObj.year = cleanedData[i].fields.year;
         moviePictureObj.plot = cleanedData[i].fields.plot;
         moviePictureObj.actor1 = cleanedData[i].fields.actor1;
@@ -135,7 +136,6 @@
         moviePictureObj.criteria = cleanedData[i].fields.criteria;
         moviePictureObj.runtime = cleanedData[i].fields.runtime;
         moviePictureObj.url = cleanedData[i].fields.poster;
-        moviePictureObj.genres = cleanedData[i].fields.genres;
         barDataObj.name = cleanedData[i].fields.title;
         barDataObj.size = parseInt(cleanedData[i].fields.relevance);
         //push image url into array for pre-cache by loader()
@@ -143,6 +143,7 @@
         barData.push(barDataObj);
         //document.write(data[i].fields.title + " " + data[i].fields.relevance + "<br>");
     }
+
     var pictures = []; // pictures that are already displaced by the layout are pushed into this array
     var svg = d3.select('svg') // obtain a d3 reference to the SVG
 
@@ -172,6 +173,7 @@
             })
             .on("mouseover", mouseover)
             .on("mouseenter", function (d) { return mouseenter(d, d.name); })
+			.on("click", function (d) { post_details(d, d.name); })
             .on("mouseout", mouseout)
             .attr('opacity','0') // fade in animation
           .transition()
@@ -298,6 +300,42 @@
             return d.url;
         }
     }
+	
+	var detailsJson;
+	function post_details(d,ID) {
+		console.log("posting id: " + d.movieID)	
+		$.ajax({
+			url: "/explore/details/", //endpoint (might need to be /explore/details/)
+			type: "GET", //http method
+			data: { node_ID : d.movieID,
+			csrfmiddlewaretoken: '{{ csrf_token }}',
+			},
+			//handle a success
+			success : function(json) {
+				console.log("Success: " + d.movieID);
+				console.log(json);
+				//$('#svgcontainer').replaceWith(json);
+				$('#svgcontainer').html(json);
+				detailsJson = json;
+				//$('#svgcontainer').innerHTML = ajax.json;
+				//drawDetails();
+			},
+		
+		});
+	};
+	
+	$(window).resize(function() {
+		if(globalResizeTimer != null) window.clearTimeout(globalResizeTimer);
+		globalResizeTimer = window.setTimeout(function() {
+			//$("svg g").remove();
+			//$("svg").remove();
+			if (detailsJson != null){
+				$('#svgcontainer').html(detailsJson);
+			}
+		}, 500);
+	});
+	
+	
 </script>
 
 <script>

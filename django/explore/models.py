@@ -27,3 +27,9 @@ class MovieObj(models.Model):
     budget = models.IntegerField(null=True)
     numReviews = models.IntegerField(null=True)
     IMDBScore = models.DecimalField(max_digits=3, decimal_places=1, null=True)
+    awards = models.CharField(max_length=200,null=True)
+    tomatoes = models.IntegerField(null=True)
+    metascore = models.IntegerField(null=True)
+    production = models.CharField(max_length=50,null=True)
+    boxOffice = models.CharField(max_length=50,null=True)
+    
