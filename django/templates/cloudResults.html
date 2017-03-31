@@ -8,41 +8,53 @@
 </head>
 <body>
 <link rel="stylesheet" href="{% static "/css/cloudResults.css" %}">
-<div id="treemap"></div>
-<div id="graphbar"><!--</div>-->
-<!--<div id="sliderbar">-->
 
+<div id="searched">
+    <div id="searchPosterContainer">
+        <img id="searchPoster" url="picB.png" alt="can't display picture" />
+    </div>
+    <div id="searchInfoContainer">
+        <h1 id="searchTitle">Title</h1>
+        <h3 id="searchPlot">Plot</h3>
+        <h3 id="searchDirector">Director</h3>
+        <h3 id="searchActors">Actors</h3>
+        <h3 id="searchRuntime">Runtime</h3>
+        <h3 id="searchGenres">Genres</h3>
+    </div>
+</div>
+
+<div id="graphbar">
 	<div id="sliderWidth" >
 		<label for="actor"
 			style="display: inline-block; width: 240px; text-align: right">
 			actor = <span id="actor-value">…</span>
 		</label>
-		<input type="range" min="1" max="100" id="actor"><br>
+		<input type="range" min="5" max="20" step="1" id="actor"><br>
 		<label for="rating"
 			style="display: inline-block; width: 240px; text-align: right">
 			rating = <span id="rating-value">…</span>
 		</label>
-		<input type="range" min="1" max="100" id="rating"><br>
+		<input type="range" min="5" max="20" step="1" id="rating"><br>
 		<label for="genre"
 			style="display: inline-block; width: 240px; text-align: right">
 			genre = <span id="genre-value">…</span>
 		</label>
-		<input type="range" min="1" max="100" id="genre"><br>
+		<input type="range" min="5" max="20" step="1" id="genre"><br>
 			<label for="director"
 				style="display: inline-block; width: 240px; text-align: right">
 				director = <span id="director-value">…</span>
 			</label>
-		<input type="range" min="1" max="100" id="director"><br>
+		<input type="range" min="5" max="20" step="1" id="director"><br>
 		<label for="year"
 			style="display: inline-block; width: 240px; text-align: right">
 			year = <span id="year-value">…</span>
 		</label>
-		<input type="range" min="1" max="100" id="year"><br>
+		<input type="range" min="5" max="20" step="1" id="year"><br>
 			<label for="score"
 				style="display: inline-block; width: 240px; text-align: right">
 				score = <span id="score-value">…</span>
 			</label>
-		<input type="range" min="1" max="100" id="score"><br>
+		<input type="range" min="5" max="20" step="1" id="score"><br>
 	</div>
 
 	<!--Update Weights!! Re-runs algorithm-->
@@ -64,10 +76,13 @@
 	<svg xmlns="http://www.w3.org/2000/svg" viewBox='-10 -10 20 20'  width='70%' height='85%'>
 	</svg>
 </div>
+
+
 <script src="http://d3js.org/d3.v3.min.js"></script>
 <!--<script src="https://d3js.org/d3.v4.min.js"></script>-->
 <script src="{% static "picturecloud.js" %}"></script>
 <script src="http://davidbau.com/encode/seedrandom-min.js"></script>
+
 <script>
     var globalResizeTimer = null;
 
@@ -76,6 +91,17 @@
 
     //cleaned data from backend data dictionary
     var cleanedData = JSON.parse("{{ data|escapejs }}");
+    console.log(cleanedData[0].fields.poster)
+    document.getElementById("searchPoster").setAttribute("src",cleanedData[0].fields.poster);
+    document.getElementById("searchTitle").innerHTML = cleanedData[0].fields.title + " [" +
+        cleanedData[0].fields.year + "]";
+    document.getElementById("searchPlot").innerHTML = cleanedData[0].fields.plot;
+    document.getElementById("searchDirector").innerHTML = "Director: " + cleanedData[0].fields.director;
+    document.getElementById("searchActors").innerHTML = cleanedData[0].fields.actor1 + " " +
+        cleanedData[0].fields.actor2 + " " + cleanedData[0].fields.actor3;
+    document.getElementById("searchRuntime").innerHTML = "Runtime: " + cleanedData[0].fields.runtime;
+    document.getElementById("searchGenres").innerHTML = "Genres: " + cleanedData[0].fields.genres;
+
 
     //create new movieList object to represent all of the movies
     var movieObjList = new Object();
@@ -84,11 +110,8 @@
     //array for preload caching
     //images = [];
     moviePictures = [];
-
     barData = [];
-
-		scores = [];
-
+    scores = [];
 
 		for ( var i = 1; i < cleanedData.length ; i++) {
 		    scores.push(parseInt(cleanedData[i].fields.relevance));
@@ -102,24 +125,25 @@
 		    moviePictureObj = new Object();
 		    barDataObj = new Object();
 		    moviePictureObj.weight = scale(parseInt(cleanedData[i].fields.relevance));
-            moviePictureObj.name = cleanedData[i].fields.title;
-			moviePictureObj.movieID = cleanedData[i].fields.movieID;
-            moviePictureObj.year = cleanedData[i].fields.year;
-            moviePictureObj.plot = cleanedData[i].fields.plot;
-            moviePictureObj.actor1 = cleanedData[i].fields.actor1;
-            moviePictureObj.actor2 = cleanedData[i].fields.actor2;
-            moviePictureObj.actor3 = cleanedData[i].fields.actor3;
-            moviePictureObj.director = cleanedData[i].fields.director;
-            moviePictureObj.criteria = cleanedData[i].fields.criteria;
-            moviePictureObj.runtime = cleanedData[i].fields.runtime;
-            moviePictureObj.url = cleanedData[i].fields.poster;
-            barDataObj.name = cleanedData[i].fields.title;
-            barDataObj.size = parseInt(cleanedData[i].fields.relevance);
-            //push image url into array for pre-cache by loader()
-            moviePictures.push(moviePictureObj);
-            barData.push(barDataObj);
-            //document.write(data[i].fields.title + " " + data[i].fields.relevance + "<br>");
-        }
+        moviePictureObj.name = cleanedData[i].fields.title;
+        moviePictureObj.movieID = cleanedData[i].fields.movieID;
+        moviePictureObj.year = cleanedData[i].fields.year;
+        moviePictureObj.plot = cleanedData[i].fields.plot;
+        moviePictureObj.actor1 = cleanedData[i].fields.actor1;
+        moviePictureObj.actor2 = cleanedData[i].fields.actor2;
+        moviePictureObj.actor3 = cleanedData[i].fields.actor3;
+        moviePictureObj.director = cleanedData[i].fields.director;
+        moviePictureObj.criteria = cleanedData[i].fields.criteria;
+        moviePictureObj.runtime = cleanedData[i].fields.runtime;
+        moviePictureObj.url = cleanedData[i].fields.poster;
+        barDataObj.name = cleanedData[i].fields.title;
+        barDataObj.size = parseInt(cleanedData[i].fields.relevance);
+        //push image url into array for pre-cache by loader()
+        moviePictures.push(moviePictureObj);
+        barData.push(barDataObj);
+        //document.write(data[i].fields.title + " " + data[i].fields.relevance + "<br>");
+    }
+
     var pictures = []; // pictures that are already displaced by the layout are pushed into this array
     var svg = d3.select('svg') // obtain a d3 reference to the SVG
 
@@ -179,6 +203,7 @@
 				    "<h3> Directed by:" + d.director + "</h3><br>" +
 				    "<h3> Featuring: " + d.actor1 + ", " + d.actor2 + ", " +  d.actor3 +  "</h3><br>" +
                     "<h3> Runtime: " + d.runtime + "</h3><br>"+
+                    "<h3> Genres: " + d.genres + "</h3><br>"+
                     "<h3>" + d.criteria + "</h3><br>")
                 .style("top", (d3.event.pageY - 10) + "px");
 
@@ -190,29 +215,12 @@
             var margin = {top: 20, right: 20, bottom: 30, left: 40},
                 width = 200 - margin.left - margin.right,
                 height = 300 - margin.top - margin.bottom;
-            // set the ranges
-
-            //var yScale = d3.scale.linear()
-            //    .domain([0, d3.max(data)])
-            //    .range([height, 0])
-
-            //var xScale = d3.scale.linear()
-            //    .domain(d3.range(0, data.length))
-            //    .range([0, width]);
 
             var x = d3.scale.ordinal()
                 .rangeRoundBands([0, width], .1);
 
             var y = d3.scale.linear()
                 .range([height, 0]);
-
-            var color = d3.scale.ordinal(d3.schemeCategory20b);
-
-            //var xAxis = d3.axisBottom()
-            //    .scale(xScale);
-
-            //var yAxis = d3.axisLeft()
-            //    .scale(yScale);
 
             var xAxis = d3.svg.axis().scale(x);
             var yAxis = d3.svg.axis().scale(y).orient("left");
@@ -332,8 +340,8 @@
 
 <script>
 
-	var width = 600;
-	var height = 300;
+	var width = 900;
+	var height = 600;
 
 	//get original search value for repeat search
 	var originalMovie = cleanedData[0].fields.title;
@@ -349,7 +357,7 @@
 	var newWeights = [];
 	newWeights.push(originalMovie);
 	for (var i = 0; i < 6; i++){
-		newWeights.push(50);
+		newWeights.push(10);
 	}
 
 	var holder = d3.select("body")
@@ -361,9 +369,9 @@
 	d3.select("#actor").on("input", function() {
 		updateActor(+this.value);
 	});
-	updateActor(15);
+	updateActor(10);
 
-	var actorVar = 50;
+	var actorVar = 1;
 	function updateActor(actor) {
 		// adjust the text on the range slider
 		d3.select("#actor-value").text(actor);
@@ -378,9 +386,9 @@
 	d3.select("#rating").on("input", function() {
 		updateRating(+this.value);
 	});
-	updateRating(15);
+	updateRating(10);
 
-	var ratingVar = 50;
+	var ratingVar = 1;
 	function updateRating(rating) {
 		// adjust the text on the range slider
 		d3.select("#rating-value").text(rating);
@@ -394,9 +402,9 @@
 	d3.select("#genre").on("input", function() {
 		updateGenre(+this.value);
 	});
-	updateGenre(15);
+	updateGenre(10);
 
-	var genreVar = 50;
+	var genreVar = 1;
 	function updateGenre(genre) {
 		// adjust the text on the range slider
 		d3.select("#genre-value").text(genre);
@@ -410,9 +418,9 @@
 	d3.select("#director").on("input", function() {
 		updateDirector(+this.value);
 	});
-	updateDirector(15);
+	updateDirector(10);
 
-	var directorVar = 50;
+	var directorVar = 1;
 	function updateDirector(director) {
 		// adjust the text on the range slider
 		d3.select("#director-value").text(director);
@@ -426,9 +434,9 @@
 	d3.select("#year").on("input", function() {
 		updateYear(+this.value);
 	});
-	updateYear(15);
+	updateYear(10);
 
-	var yearVar = 50;
+	var yearVar = 1;
 	function updateYear(year) {
 		// adjust the text on the range slider
 		d3.select("#year-value").text(year);
@@ -443,9 +451,9 @@
 	d3.select("#score").on("input", function() {
 		updateScore(+this.value);
 	});
-	updateScore(15);
+	updateScore(10);
 
-	var scoreVar = 50;
+	var scoreVar = 1;
 	function updateScore(score) {
 		// adjust the text on the range slider
 		d3.select("#score-value").text(score);
@@ -475,10 +483,6 @@
 					+ 'color-stop(' + val + ', #C5C5C5)'
 					+ ')'
 		);
-					
-		//$('input[type="range"]').foundation('slider', 'set_value', 50);
-		//$("input#actor").change('value',51);
-		
 	});
 </script>
 </html>

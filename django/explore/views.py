@@ -41,7 +41,7 @@ def weight(request):
     
     #convert to int
     for i in range(1,6):
-        weightArgs[i] = int(weightArgs[i])/50
+        weightArgs[i] = int(weightArgs[i])/10
         print(weightArgs[i])
     
     #ex
@@ -113,6 +113,7 @@ def response(request, results):
         temp.plot = response.json()["Plot"]
         temp.runtime = response.json()["Runtime"]
         temp.criteria = i[2]
+        temp.genres = i[3]
         pairs.append(temp)
     
     print(pairs)
