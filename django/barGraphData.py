@@ -12,7 +12,7 @@ with open('movie.csv', 'r', encoding="utf8") as csvfile:
                 if movie.movieID == row[28]:
                     if row[2] != '':
                         movie.numCritic = row[2]
-                        #print(movie.numCritic)
+                        #print(movie.IMDBScore)
                     if row[8] != '':
                         movie.gross = row[8]
                        # print(movie.gross)

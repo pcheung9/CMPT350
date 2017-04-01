@@ -116,8 +116,8 @@
 				
 				var barDataObj = new Object()
 				
-				barDataObj.name = cleanedData[i].fields.title;
-				barDataObj.size = parseInt(cleanedData[i].fields.relevance);
+				barGraphDataObj.name = cleanedData[i].fields.title;
+				barGraphDataObj.size = parseInt(cleanedData[i].fields.relevance);
 				
 				movieData.name = cleanedData[i].fields.title;
 				movieData.poster = cleanedData[i].fields.poster;
@@ -130,7 +130,7 @@
 				movieObj.children.push(movieData);
 				
 				movieObjList.children.push(movieObj);
-				barData.push(barDataObj);
+				barData.push(barGraphDataObj);
 				
 				//push image url into array for pre-cache by loader()
 				images.push(cleanedData[i].fields.poster);

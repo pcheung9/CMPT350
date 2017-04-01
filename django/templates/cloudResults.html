@@ -8,6 +8,7 @@
 </head>
 <body>
 <link rel="stylesheet" href="{% static "/css/cloudResults.css" %}">
+
 <div id="treemap"></div>
 <div id="graphbar"><!--</div>-->
 <!--<div id="sliderbar">-->
@@ -56,15 +57,18 @@
 	<form name = "movieInput" action="/explore" onsubmit="return valid()" method="get">
 		<input type="submit" value="New Search"></input>
 	</form>
-
+    <br>
+    <a href="/explore/bargraphs"  class="btn btn-default">View Movie Data Bar Graphs</a>
 
 </div>
+
+
 
 <div id = "svgcontainer">
 	<svg xmlns="http://www.w3.org/2000/svg" viewBox='-10 -10 20 20'  width='70%' height='85%'>
 	</svg>
 </div>
-<script src="http://d3js.org/d3.v3.min.js"></script>
+    <script src="http://d3js.org/d3.v3.min.js"></script>
 <!--<script src="https://d3js.org/d3.v4.min.js"></script>-->
 <script src="{% static "picturecloud.js" %}"></script>
 <script src="http://davidbau.com/encode/seedrandom-min.js"></script>
@@ -87,7 +91,7 @@
 
     barData = [];
 
-		scores = [];
+	scores = [];
 
 
 		for ( var i = 1; i < cleanedData.length ; i++) {
@@ -100,7 +104,7 @@
 		//build up objects with cleaned data from views.py
 		for ( var i = 1; i < cleanedData.length ; i++) {
 		    moviePictureObj = new Object();
-		    barDataObj = new Object();
+		    barGraphDataObj = new Object();
 		    moviePictureObj.weight = scale(parseInt(cleanedData[i].fields.relevance));
             moviePictureObj.name = cleanedData[i].fields.title;
             moviePictureObj.year = cleanedData[i].fields.year;
@@ -112,11 +116,11 @@
             moviePictureObj.criteria = cleanedData[i].fields.criteria;
             moviePictureObj.runtime = cleanedData[i].fields.runtime;
             moviePictureObj.url = cleanedData[i].fields.poster;
-            barDataObj.name = cleanedData[i].fields.title;
-            barDataObj.size = parseInt(cleanedData[i].fields.relevance);
+            barGraphDataObj.name = cleanedData[i].fields.title;
+            barGraphDataObj.size = parseInt(cleanedData[i].fields.relevance);
             //push image url into array for pre-cache by loader()
             moviePictures.push(moviePictureObj);
-            barData.push(barDataObj);
+            barData.push(barGraphDataObj);
             //document.write(data[i].fields.title + " " + data[i].fields.relevance + "<br>");
         }
     var pictures = []; // pictures that are already displaced by the layout are pushed into this array
@@ -226,7 +230,6 @@
 
             data.forEach(function(d) {
                 d.name = d.name;
-                d.yearm
                 //console.log(d.name);
                 d.size = +d.size;
             });
