@@ -1,44 +1,43 @@
-<!DOCTYPE html>
+<style>
+
+
+</style>
+
 {% load static %}
 {% load staticfiles %}
+<!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
-	<head>
-		<meta charset="utf-8">
-
-        <!--src for D3 library-->
-        <!--<script src="https://d3js.org/d3.v4.min.js"></script>-->
-        <!--<script src="https://d3js.org/d3.v4.min.js"></script>-->
-        <script src="http://cdnjs.cloudflare.com/ajax/libs/Colors.js/1.2.3/colors.min.js"></script>
-
-        <!--Bootstrap-->
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-
-        <!--insert title-->
-        <title>
-            {% block title %}
-            {% endblock %}
-        </title>
-
-        <!--links to css files-->
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
-        <!--<link rel="stylesheet" href="{% static "/css/style.css" %}">-->
-
-
-        <!--{% block stylesheets %}
-        {% endblock %}-->
-
-  </head>
-	<body>
-
-
-        {% block content %}
+<head>
+    <meta charset="utf-8" />
+    <title>
+        {% block title %}
         {% endblock %}
+    </title>
+    <link rel="stylesheet" href="{% static "/css/base.css" %}">
+    <link rel="icon" type="image/x-icon" href="{% static "favicon.ico" %}">
+    {% block stylesheets %}
+    {% endblock %}
+</head>
 
-        <!--src for svg javascript-->
-        <!--<script type="text/javascript" src="movieGraph.js"></script>-->
-  </body>
+<body>
+<div class="container-fluid">
+        <div class="navbar navbar-default navbar-fixed-top">
+            <div class ="navbar-brand navbar-logo">
+                <a href="/EPL"><img src="{% static "favicon.png" %}" alt="Edmonton Public Library"></a>
+            </div>
+            <div>
+                <ul class="nav navbar-nav navbar-left">
+                    <li><a href="/EPL"><span class="glyphicon glyphicon-home"></span> Dashboard</a></li>
+                    <li><a href="/EPL/CreateTicket"><span class="glyphicon glyphicon-plus"></span> Create Ticket</a></li>
+                    <li><a href="/demo"><span class="glyphicon glyphicon-list-alt"></span> View Tickets</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    {% block content %}
+    {% endblock %}
+
+</body>
 
 </html>

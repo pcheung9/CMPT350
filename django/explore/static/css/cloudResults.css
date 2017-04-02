@@ -27,6 +27,7 @@ div.tooltip {
     border: solid 1px #aaa;
     border-radius: 8px;
     pointer-events: none;
+    line-height: 1;
 }
 
 
@@ -54,7 +55,7 @@ graphContainer{
     float: right;
     position: absolute;
     text-align: right;
-    width: 45%;
+    width: 100%;
     height: 500px;
     padding: 8px;
     font: 10px sans-serif;
@@ -64,19 +65,38 @@ graphContainer{
     pointer-events: none;
 }
 
-div#svgcontainer{
+img {
+    max-width:90%;
+}
+div#searched{
     float: left;
-    text-align: center;
-    width: 74%;
+    width: 15%;
     height: 100%;
-    padding: 0px;
+    background: #ddd;
+    padding: auto;
+    margin: auto;
+}
+div#searchPosterContainer{
+    padding: auto;
+    margin: auto;
+}
+
+div#searchinfocontainer{
+    line-height: 1;
+}
+div#svgcontainer{
+    text-align: center;
+    width: 64%;
+    height: 100%;
+    padding: auto;
     font: 10px sans-serif;
+    margin: auto;
 }
 
 div#graphbar{
     float: right;
     text-align: left;
-    width: 24%;
+    width: 19%;
     height: 100%;
     padding: 0px;
     font: 10px sans-serif;
