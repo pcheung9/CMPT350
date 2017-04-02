@@ -10,7 +10,6 @@
 <link rel="stylesheet" href="{% static "/css/cloudResults.css" %}">
 
 <div id="treemap"></div>
-<div id="graphbar"><!--</div>-->
 <!--<div id="sliderbar">-->
 
 <div id="searched">
@@ -133,29 +132,30 @@
 		    moviePictureObj = new Object();
 		    barGraphDataObj = new Object();
 		    moviePictureObj.weight = scale(parseInt(cleanedData[i].fields.relevance));
-        moviePictureObj.name = cleanedData[i].fields.title;
-        moviePictureObj.year = cleanedData[i].fields.year;
-        moviePictureObj.plot = cleanedData[i].fields.plot;
-         moviePictureObj.movieID = cleanedData[i].fields.movieID;
-        moviePictureObj.actor1 = cleanedData[i].fields.actor1;
-        moviePictureObj.actor2 = cleanedData[i].fields.actor2;
-        moviePictureObj.actor3 = cleanedData[i].fields.actor3;
-        moviePictureObj.director = cleanedData[i].fields.director;
-        moviePictureObj.criteria = cleanedData[i].fields.criteria;
-        moviePictureObj.runtime = cleanedData[i].fields.runtime;
-        moviePictureObj.url = cleanedData[i].fields.poster;
-        barGraphDataObj.name = cleanedData[i].fields.title;
-        barGraphDataObj.size = parseInt(cleanedData[i].fields.relevance);
-        //push image url into array for pre-cache by loader()
-        moviePictures.push(moviePictureObj);
-        barData.push(barGraphDataObj);
-        //document.write(data[i].fields.title + " " + data[i].fields.relevance + "<br>");
+            moviePictureObj.name = cleanedData[i].fields.title;
+            moviePictureObj.year = cleanedData[i].fields.year;
+            moviePictureObj.plot = cleanedData[i].fields.plot;
+            moviePictureObj.movieID = cleanedData[i].fields.movieID;
+            moviePictureObj.actor1 = cleanedData[i].fields.actor1;
+            moviePictureObj.actor2 = cleanedData[i].fields.actor2;
+            moviePictureObj.actor3 = cleanedData[i].fields.actor3;
+            moviePictureObj.director = cleanedData[i].fields.director;
+            moviePictureObj.criteria = cleanedData[i].fields.criteria;
+            moviePictureObj.runtime = cleanedData[i].fields.runtime;
+            moviePictureObj.url = cleanedData[i].fields.poster;
+            barGraphDataObj.name = cleanedData[i].fields.title;
+            barGraphDataObj.size = parseInt(cleanedData[i].fields.relevance);
+            //push image url into array for pre-cache by loader()
+            moviePictures.push(moviePictureObj);
+            barData.push(barGraphDataObj);
+            //document.write(data[i].fields.title + " " + data[i].fields.relevance + "<br>");
     }
 
     var pictures = []; // pictures that are already displaced by the layout are pushed into this array
     var svg = d3.select('svg') // obtain a d3 reference to the SVG
 
     var div = d3.select("body").append("div")
+        .attr("id", "tooltipdiv")
         .attr("class", "tooltip")
         .style("opacity", 1e-6);
 
@@ -323,6 +323,8 @@
 				console.log(json);
 				//$('#svgcontainer').replaceWith(json);
 				$('#svgcontainer').html(json);
+                var element = document.getElementById("imageContainer");
+                element.parentNode.removeChild(element);
 				detailsJson = json;
 				//$('#svgcontainer').innerHTML = ajax.json;
 				//drawDetails();
@@ -445,7 +447,7 @@
 
 	var yearVar = 1;
 	function updateYear(year) {
-		// adjust the text on the range slider
+		//adjust the text on the range slider
 		d3.select("#year-value").text(year);
 		d3.select("#year").property("value", year);
 		//updateVar._groups[0][0].textContent
