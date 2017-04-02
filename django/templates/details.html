@@ -241,7 +241,7 @@ div#movie_info {
  
 		if  (i == 0) {
 			var color = d3.scale.ordinal()
-				.range(["#f08080", "#222",]);
+				.range(["orange", "#222",]);
 		} else if  (i == 1) {
 			var color = d3.scale.ordinal()
 				.range(["#32cd32", "#222",]);
@@ -488,7 +488,7 @@ function drawMap() {
 						console.log(d.properties.name);
 					console.log(valueHash[d.properties.name]);
 					var c = quantize((valueHash[d.properties.name]));
-					return "green"
+					return "red"
 			  } else {
 					return "#ddd";
 			  }
@@ -542,19 +542,7 @@ function drawMap() {
 	});
 
 }
-	//$(window).resize(function() {
-	//	if(globalResizeTimer != null) window.clearTimeout(globalResizeTimer);
-	//	globalResizeTimer = window.setTimeout(function() {
-	//		$("svg g").remove();
-	//		//$("svg").remove();
-	//		drawMap();
-	//	}, 100);
-	//});
-	
 	drawMap();
-
-
-	
 </script>
 
 

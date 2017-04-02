@@ -14,19 +14,22 @@
 <!--<div id="bg">
     <img src="{% static "logopic.jpg" %}" id="bg" alt="">
 </div>-->
-<form name = "movieInput" action="/explore/view/" onsubmit="return valid()" method="get">
-    {% csrf_token %}
-    <h3>MOVIE EXPLORER</h3>
-    <!--<input type ='text' id="search" name="search"/>-->
-    <input list="movies" id="search" name="search" autocomplete="off">
-    <input type="submit" value="Submit">
-
-    <datalist id="movies">
-        {% for title in titles %}
-            <option value="{{ title.0 }}" /> {{ title.1 }}
-        {% endfor %}
-    </datalist>
-</form>
+<div>
+    <form name = "movieInput" action="/explore/view/" onsubmit="return valid()" method="get">
+        {% csrf_token %}
+        <div id="logo">
+            <img id="MovieMe" src="{% static "MovieMe.png" %}"/>
+        </div>
+        <!--<input type ='text' id="search" name="search"/>-->
+        <input list="movies" id="search" name="search" autocomplete="off">
+        <input type="submit" value="Submit">
+        <datalist id="movies">
+            {% for title in titles %}
+                <option value="{{ title.0 }}" /> {{ title.1 }}
+            {% endfor %}
+        </datalist>
+    </form>
+<div>
 
 
 </body>
