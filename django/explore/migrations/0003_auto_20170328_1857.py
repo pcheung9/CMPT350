@@ -29,7 +29,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name='movieobj',
-            name='numCritic',
+            name='IMDBScore',
             field=models.IntegerField(null=True),
         ),
         migrations.AddField(
