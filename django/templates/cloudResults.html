@@ -322,54 +322,24 @@
 				console.log("Success: " + d.movieID);
 				console.log(json);
 				//$('#svgcontainer').replaceWith(json);
+                var state = document.getElementById('svgcontainer').innerHTML;
 				$('#svgcontainer').html(json);
                 var element = document.getElementById("imageContainer");
                 element.parentNode.removeChild(element);
 				detailsJson = json;
-				//$('#svgcontainer').innerHTML = ajax.json;
 
+                var button = document.createElement("button");
+                button.innerHTML = "Back to movie cloud";
 
+                var body = document.getElementById("svgcontainer");
+                body.appendChild(button);
 
+                console.log(state);
+                button.addEventListener ("click", function() {
+                    location.reload();
+                });
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-				//drawDetails();
 			},
-		
 		});
 	};
 	

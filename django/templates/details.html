@@ -2,7 +2,14 @@
 {% load static %}
 {% load staticfiles %}
 <meta charset="utf-8">
-<style> 
+<style>
+
+div#selected{
+    color: white;
+
+
+
+}
 
 div#svgcontainer{
     float: left;
@@ -122,7 +129,23 @@ div#movie_info {
 <body>
 
 
-    <div id="first-div"></div>
+    <div id="first-div">
+        <div id="selected">
+            <div id="selectedPosterContainer">
+                <img id="selectedPoster" url="picB.png" alt="can't display picture" />
+            </div>
+            <div id="selectedInfoContainer">
+                <h1 id="selectedTitle">Title</h1>
+                <h3 id="selectedPlot">Plot</h3>
+                <h3 id="selectedDirector">Director</h3>
+                <h3 id="selectedActors">Actors</h3>
+                <h3 id="selectedRuntime">Runtime</h3>
+                <h3 id="selectedGenres">Genres</h3>
+            </div>
+        </div>
+    </div>
+
+
 	<div id="second-div">
 		<div id="innertop"></div>
 		<div id="innermiddle"></div>
@@ -152,6 +175,16 @@ div#movie_info {
 	
     //cleaned data from backend data dictionary
     var cleanedData = JSON.parse("{{ data|escapejs }}");
+        document.getElementById("selectedPoster").setAttribute("src",cleanedData[0].fields.poster);
+    document.getElementById("selectedTitle").innerHTML = cleanedData[0].fields.title + " [" +
+        cleanedData[0].fields.year + "]";
+    document.getElementById("selectedPlot").innerHTML = cleanedData[0].fields.plot;
+    document.getElementById("selectedDirector").innerHTML = "Director: " + cleanedData[0].fields.director;
+    document.getElementById("selectedActors").innerHTML = cleanedData[0].fields.actor1 + " " +
+        cleanedData[0].fields.actor2 + " " + cleanedData[0].fields.actor3;
+    document.getElementById("selectedRuntime").innerHTML = "Runtime: " + cleanedData[0].fields.runtime;
+    document.getElementById("selectedGenres").innerHTML = "Genres: " + cleanedData[0].fields.genres;
+
 
     //create new movieList object to represent all of the movies
     var movieObjList = new Object();
@@ -228,15 +261,6 @@ div#movie_info {
 			.append("g")
 			.attr("transform", "translate(" + ((width/2)+margin.left) + "," + ((height/2)+margin.top) + ")");
 
-		//var div = d3.select("#third-div")
-		//	.append("div")
-		//	.attr("id", "movieInfoContainer")
-		//	.html("<h3>" + "d.plot" + "</h3><br>" +
-		//		"<h3> Directed by:" + "d.director" + "</h3><br>" +
-		//		"<h3> Featuring: " + "d.actor1" + ", " + "d.actor2" + ", " +  "d.actor3" +  "</h3><br>" +
-		//		"<h3> Runtime: " + "d.runtime" + "</h3><br>"+
-		//		"<h3>" + "d.criteria" + "</h3><br>")
-
 		var radius = Math.min(width, height) / 2;
  
 		if  (i == 0) {
@@ -305,21 +329,21 @@ div#movie_info {
 
 	}
 	
-	var width = 450, height = 800;
+	//var width = 450, height = 800;
 
-	var svg = d3.select("#first-div").append("div")
-		.append("svg")
-		.attr("width", width)
-		.attr("height", height);
+	//var svg = d3.select("#first-div").append("div")
+		//.append("svg")
+		//.attr("width", width)
+		//.attr("height", height);
 
-	var g = svg.append("g");
+	//var g = svg.append("g");
 
-	var img = g.append("image")
-		.attr("xlink:href", movieDetailsObj.url)
-		.attr("width", width*.70)
-		.attr("height", height*.70)	
-		.attr("x", 0)
-		.attr("y",0);
+	//var img = g.append("image")
+		//.attr("xlink:href", movieDetailsObj.url)
+		//.attr("width", width*.70)
+		//.attr("height", height*.70)
+		//.attr("x", 0)
+		//.attr("y",0);
 		
 		
 	
@@ -543,6 +567,18 @@ function drawMap() {
 
 }
 	drawMap();
+</script>
+
+<script>
+
+    var div = d3.select("#movieinfo")
+    .append("div")
+    .attr("id", "movieInfoContainer")
+    .html("<h3>" + d.plot + "</h3><br>" +
+        "<h3> Directed by:" + d.director + "</h3><br>" +
+        "<h3> Featuring: " + d.actor1 + ", " + d.actor2 + ", " +  d.actor3 +  "</h3><br>" +
+        "<h3> Runtime: " + d.runtime + "</h3><br>"+
+        "<h3>" + d.criteria + "</h3><br>")
 </script>
 
 
