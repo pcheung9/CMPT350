@@ -103,8 +103,8 @@
         cleanedData[0].fields.year + "]";
     document.getElementById("searchPlot").innerHTML = cleanedData[0].fields.plot;
     document.getElementById("searchDirector").innerHTML = "Director: " + cleanedData[0].fields.director;
-    document.getElementById("searchActors").innerHTML = cleanedData[0].fields.actor1 + " " +
-        cleanedData[0].fields.actor2 + " " + cleanedData[0].fields.actor3;
+    document.getElementById("searchActors").innerHTML = "Featuring: " + cleanedData[0].fields.actor1 + ", " +
+        cleanedData[0].fields.actor2 + ", " + cleanedData[0].fields.actor3;
     document.getElementById("searchRuntime").innerHTML = "Runtime: " + cleanedData[0].fields.runtime;
     document.getElementById("searchGenres").innerHTML = "Genres: " + cleanedData[0].fields.genres;
 
@@ -202,17 +202,18 @@
             div
                 .attr("id", "imageContainer")
                 .html("<span><h1>" + d.name + " [" + d.year +"]</h1><br><ahref='imageURL()'><img height='75%' src='" + imageUrl(d) + ")'></ahref></span>")
-                .style("top", ((d3.event.pageY + 500) > d3.select("#svgcontainer").node().getBoundingClientRect().height) ? (d3.event.pageY - ((d3.event.pageY + 500)- d3.select("#svgcontainer").node().getBoundingClientRect().height)) + "px" : (d3.event.pageY) + "px");
+                .style("left", ((d3.event.pageX + 400) > d3.select("#svgcontainer").node().getBoundingClientRect().width) ? (d3.event.pageX - ((d3.event.pageX + 400)- d3.select("#svgcontainer").node().getBoundingClientRect().width)) + "px" : (d3.event.pageX) + "px")
+                .style("top", ((d3.event.pageY + 400) > d3.select("#svgcontainer").node().getBoundingClientRect().height) ? (d3.event.pageY - ((d3.event.pageY + 400)- d3.select("#svgcontainer").node().getBoundingClientRect().height)) + "px" : (d3.event.pageY) + "px");
 
             div
 				.append("div")
 				.attr("id", "movieInfoContainer")
-				.html("<h3>" + d.plot + "</h3><br>" +
-				    "<h3> Directed by:" + d.director + "</h3><br>" +
-				    "<h3> Featuring: " + d.actor1 + ", " + d.actor2 + ", " +  d.actor3 +  "</h3><br>" +
-                    "<h3> Runtime: " + d.runtime + "</h3><br>"+
-                    "<h3> Genres: " + d.genres + "</h3><br>"+
-                    "<h3>" + d.criteria + "</h3><br>")
+				.html("<h3>" + d.plot + "</h3>" +
+				    "<h3> Directed by:" + d.director + "</h3>" +
+				    "<h3> Featuring: " + d.actor1 + ", " + d.actor2 + ", " +  d.actor3 +  "</h3>" +
+                    "<h3> Runtime: " + d.runtime + "</h3>"+
+                    "<h3> Genres: " + d.genres + "</h3>"+
+                    "<h3>" + d.criteria + "</h3>")
                 .style("top", (d3.event.pageY - 10) + "px");
 
 
