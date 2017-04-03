@@ -17,7 +17,6 @@ svg {
 
 div.tooltip {
     position: absolute;
-    float: left;
     text-align: left;
     width: 550px;
     height: 400px;
@@ -27,9 +26,7 @@ div.tooltip {
     border: solid 1px #aaa;
     border-radius: 8px;
     pointer-events: none;
-    line-height: 1;
 }
-
 
 imageContainer{
     flex-direction: row;
@@ -123,6 +120,7 @@ div#movieInfoContainer{
     padding: 0px;
     font: 10px sans-serif;
     background: #ddd;
+    line-height: 1.5;
 }
 
 div#sliderWidth{
@@ -201,3 +199,15 @@ input[type='range']::-webkit-slider-thumb {
     height: 15px;
     width: 15px;
 }
+
+button{
+    height: 100px;
+    width: 200px;
+    font: 20px sans-serif;
+
+}
+
+
+
+
+
