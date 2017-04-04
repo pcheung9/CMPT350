@@ -16,7 +16,7 @@
 </div>-->
 <div>
     <form name = "movieInput" action="/explore/view/" onsubmit="return valid()" method="get">
-        {% csrf_token %}
+
         <div id="logo">
             <img id="MovieMe" src="{% static "MovieMe.png" %}"/>
         </div>
@@ -29,7 +29,7 @@
             {% endfor %}
         </datalist>
     </form>
-<div>
+</div>
 
 
 </body>
