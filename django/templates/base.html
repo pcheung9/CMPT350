@@ -1,8 +1,18 @@
 <style>
-
-
+    img#logo {
+        height: 45px;
+    }
+    div#header-inner {
+        padding: auto;
+        margin: auto;
+    }
+    header {
+        height: 50px;
+        background: darkcyan;
+        padding: auto;
+        margin: auto;
+    }
 </style>
-
 {% load static %}
 {% load staticfiles %}
 <!DOCTYPE html>
@@ -20,21 +30,11 @@
 </head>
 
 <body>
-<div class="container-fluid">
-        <div class="navbar navbar-default navbar-fixed-top">
-            <div class ="navbar-brand navbar-logo">
-                <a href="/EPL"><img src="{% static "favicon.png" %}" alt="Edmonton Public Library"></a>
-            </div>
-            <div>
-                <ul class="nav navbar-nav navbar-left">
-                    <li><a href="/EPL"><span class="glyphicon glyphicon-home"></span> Dashboard</a></li>
-                    <li><a href="/EPL/CreateTicket"><span class="glyphicon glyphicon-plus"></span> Create Ticket</a></li>
-                    <li><a href="/demo"><span class="glyphicon glyphicon-list-alt"></span> View Tickets</a></li>
-                </ul>
-            </div>
-        </div>
+<header class="global-header">
+    <div id="header-inner">
+        <a href="/explore"><img id="logo" src="{% static "MovieMe.png" %}" alt="MovieMe"></a>
     </div>
-
+</header>
     {% block content %}
     {% endblock %}
 
