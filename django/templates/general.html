@@ -17,6 +17,7 @@
   fill: white;
 }
 
+
 .label {
   font: 11px "Helvetica Neue", Helvetica, Arial, sans-serif;
   text-anchor: middle;
@@ -26,7 +27,6 @@
 .label,
 .node--root,
 .node--leaf {
-  pointer-events: none;
 }
 
 </style>
@@ -94,6 +94,7 @@ https://bl.ocks.org/mbostock/7607535
     var cleanedData = JSON.parse("{{ data|escapejs }}");
 	//var cleanedgenreData = [JSON.parse("{{ genre|escapejs }}")];
 	var root = Object();
+	console.log(cleanedData)
 	root.name = "movies";
 	root.children = [];
 	
@@ -118,10 +119,10 @@ https://bl.ocks.org/mbostock/7607535
 	            for (var k = 0; k < root.children.length; k++) { // genres[k]
 	                for (var l = 0; l < root.children[k].children.length; l++) { // years[l]
 	                    if (genreArr[j] == root.children[k].name) {
-	                        if (root.children[k].children[l].name <= cleanedData[i].fields.year < (root.children[k].children[l].name + 10)) {
+	                        if ((root.children[k].children[l].name <= cleanedData[i].fields.year) && (cleanedData[i].fields.year < (root.children[k].children[l].name + 10))) {
 	                            var movie = Object();
 	                            movie.name = cleanedData[i].fields.title;
-	                            movie.size = 3000;
+	                            movie.size = 1000000;
 	                            root.children[k].children[l].children.push({"name":movie.name, "size":movie.size});
                             }
 	                    }
@@ -184,7 +185,18 @@ https://bl.ocks.org/mbostock/7607535
         .attr("class", "label")
         .style("fill-opacity", function(d) { return d.parent === root ? 1 : 0; })
         .style("display", function(d) { return d.parent === root ? "inline" : "none"; })
-        .text(function(d) { return d.data.name; });
+        .style("font-size", function(d) {
+			  var len = d.data.name.length;
+			  var size = d.r/3;
+			  size *= 10 / len;
+			  size += 1;
+			  return Math.round(size)+'px';
+		  })
+		  .text(function(d) {
+			  console.log(d.data.name);
+		      //var text = d.data.substring(0, d.r / 3);
+			  return d.data.name;
+		  });
 
     var node = g.selectAll("circle,text");
 
