@@ -8,6 +8,7 @@ div#logo {
 body {
     background: url("../movieCollageBlur.jpg") no-repeat scroll;
     background-size: cover;
+    padding: 250px;
 
 }
 
@@ -16,10 +17,18 @@ form {
     padding: 5%;
     margin: auto;
     width: 25%;
-    background-color: whitesmoke;
+    background-color: rgba(200, 200, 200, 0.8);
     text-align: center;
     border-radius: 25px;
-    font-size: 30px;
-    font-family: Impact, sans-serif;
     box-shadow: black;
+}
+.button {
+    background-color: #4CAF50; /* Green */
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
 }

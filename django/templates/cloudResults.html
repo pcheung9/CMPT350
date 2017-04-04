@@ -1,13 +1,13 @@
 <!DOCTYPE html>
+{% extends 'base.html' %}
 {% load static %}
 {% load staticfiles %}
 <meta charset="utf-8">
-<style></style>
-<head>
+{% block head %}
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-</head>
-<body>
-<link rel="stylesheet" href="{% static "/css/cloudResults.css" %}">
+    <link rel="stylesheet" href="{% static "/css/cloudResults.css" %}">
+{% endblock %}
+{% block content %}
 
 <div id="treemap"></div>
 <!--<div id="sliderbar">-->
@@ -142,6 +142,7 @@
             moviePictureObj.director = cleanedData[i].fields.director;
             moviePictureObj.criteria = cleanedData[i].fields.criteria;
             moviePictureObj.runtime = cleanedData[i].fields.runtime;
+            moviePictureObj.genres = cleanedData[i].fields.genres;
             moviePictureObj.url = cleanedData[i].fields.poster;
             barGraphDataObj.name = cleanedData[i].fields.title;
             barGraphDataObj.size = parseInt(cleanedData[i].fields.relevance);
@@ -213,7 +214,7 @@
 				    "<h3> Featuring: " + d.actor1 + ", " + d.actor2 + ", " +  d.actor3 +  "</h3>" +
                     "<h3> Runtime: " + d.runtime + "</h3>"+
                     "<h3> Genres: " + d.genres + "</h3>"+
-                    "<h3>" + d.criteria + "</h3>")
+                    "<h2>Click for more info</h2>")
                 .style("top", (d3.event.pageY - 10) + "px");
 
 
@@ -490,7 +491,6 @@
 	
 	
 </script>
-</body>
 <script>
 	$('input[type="range"]').change(function () {
 		var val = ($(this).val() - $(this).attr('min')) / ($(this).attr('max') - $(this).attr('min'));
@@ -505,6 +505,7 @@
 		);
 	});
 </script>
+{% endblock %}
 </html>
 
 

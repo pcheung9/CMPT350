@@ -38,7 +38,6 @@ imageContainer{
     width: 45%;
     height: 500px;
     padding: 8px;
-    font: 10px sans-serif;
     background: #ddd;
     border: solid 1px #aaa;
     border-radius: 8px;
@@ -55,7 +54,6 @@ graphContainer{
     width: 100%;
     height: 500px;
     padding: 8px;
-    font: 10px sans-serif;
     background: #ddd;
     border: solid 1px #aaa;
     border-radius: 8px;
@@ -77,9 +75,8 @@ div#searchPosterContainer{
     padding: auto;
     margin: auto;
 }
-
-div#searchinfocontainer{
-    line-height: 1;
+div#searchInfoContainer {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 div#svgcontainer{
     text-align: center;
@@ -107,7 +104,6 @@ div#sliderbar{
     width: 24%;
     height: 50%;
     padding: 0px;
-    font: 10px sans-serif;
     background: #ddd;
     border: solid 1px #aaa;
 }
@@ -126,7 +122,6 @@ div#movieInfoContainer{
 div#sliderWidth{
     width: 100%;
     padding: 0px;
-    font: 17px sans-serif;
     background: #ddd;
 }
 
@@ -167,9 +162,6 @@ background: #BABABA;
     fill: brown;
 }
 
-.axis {
-    font: 10px sans-serif;
-}
 
 .axis path,
 .axis line {
