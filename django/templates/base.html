@@ -9,8 +9,7 @@
     header {
         height: 50px;
         background: darkcyan;
-        padding: auto;
-        margin: auto;
+        width: 100%;
     }
 </style>
 {% load static %}
@@ -25,7 +24,7 @@
     </title>
     <link rel="stylesheet" href="{% static "/css/base.css" %}">
     <link rel="icon" type="image/x-icon" href="{% static "favicon.ico" %}">
-    {% block stylesheets %}
+    {% block head %}
     {% endblock %}
 </head>
 
