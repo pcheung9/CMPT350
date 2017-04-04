@@ -8,28 +8,26 @@
     <link rel="shortcut icon" href="{% static "favicon.png" %}">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+    <link rel="stylesheet" href="{% static "/css/search.css" %}">
 </head>
 <body>
-<link rel="stylesheet" href="{% static "/css/search.css" %}">
 <!--<div id="bg">
     <img src="{% static "logopic.jpg" %}" id="bg" alt="">
 </div>-->
-<div>
-    <form name = "movieInput" action="/explore/view/" onsubmit="return valid()" method="get">
-        {% csrf_token %}
-        <div id="logo">
-            <img id="MovieMe" src="{% static "MovieMe.png" %}"/>
-        </div>
-        <!--<input type ='text' id="search" name="search"/>-->
-        <input list="movies" id="search" name="search" autocomplete="off">
-        <input type="submit" value="Submit">
-        <datalist id="movies">
-            {% for title in titles %}
-                <option value="{{ title.0 }}" /> {{ title.1 }}
-            {% endfor %}
-        </datalist>
-    </form>
-<div>
+<form name = "movieInput" action="/explore/view/" onsubmit="return valid()" method="get">
+
+    <div id="logo">
+        <img id="MovieMe" src="{% static "MovieMe.png" %}"/>
+    </div>
+    <!--<input type ='text' id="search" name="search"/>-->
+    <input list="movies" id="search" name="search" autocomplete="off">
+    <input type="submit" value="Submit">
+    <datalist id="movies">
+        {% for title in titles %}
+            <option value="{{ title.0 }}" /> {{ title.1 }}
+        {% endfor %}
+    </datalist>
+</form>
 
 
 </body>
