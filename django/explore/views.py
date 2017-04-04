@@ -22,7 +22,7 @@ def load(request):
 
 def search(request):
     titles = getTitles()
-    print(titles)
+    #print(titles)
     return TemplateResponse(request, 'search.html', {'titles': titles})
 
 #working data
