@@ -1,58 +1,60 @@
 <!DOCTYPE html>
+{%  extends 'base.html' %}
 {% load static %}
 {% load staticfiles %}
 <html>
-<head>
+
+{% block head %}
     <title>Search</title>
     <script type="text/javascript" src="http://code.jquery.com/jquery-2.0.0.min.js"></script>
     <link rel="shortcut icon" href="{% static "favicon.png" %}">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
     <link rel="stylesheet" href="{% static "/css/search.css" %}">
-</head>
-<body>
-<!--<div id="bg">
-    <img src="{% static "logopic.jpg" %}" id="bg" alt="">
-</div>-->
-<form name = "movieInput" action="/explore/view/" onsubmit="return valid()" method="get">
+{%  endblock %}
 
-    <div id="logo">
-        <img id="MovieMe" src="{% static "MovieMe.png" %}"/>
+{% block content %}
+    <body>
+    <div id="formcontainer">
+        <form name = "movieInput" action="/explore/view/" onsubmit="return valid()" method="get">
+            <div id="logo">
+                <img id="MovieMe" src="{% static "MovieMe.png" %}"/>
+            </div>
+            <input list="movies" id="search" name="search" autocomplete="off">
+            <input type="submit" value="Submit">
+            <datalist id="movies">
+                {% for title in titles %}
+                    <option value="{{ title.0 }}" /> {{ title.1 }}
+                {% endfor %}
+            </datalist>
+        </form>
     </div>
-    <!--<input type ='text' id="search" name="search"/>-->
-    <input list="movies" id="search" name="search" autocomplete="off">
-    <input type="submit" value="Submit">
-    <datalist id="movies">
-        {% for title in titles %}
-            <option value="{{ title.0 }}" /> {{ title.1 }}
-        {% endfor %}
-    </datalist>
-</form>
 
 
-</body>
+    </body>
 
-</html>
-<script type="text/javascript">
-    function valid() {
-        var input = document.forms["movieInput"]["search"].value;
-        var list = document.forms["movieInput"]["search"].list.options;
-        console.log(input);
-        console.log(list);
-        console.log(list.length);
-        if (input == "") {
-            toastr.error('Please enter a movie name');
-            return false;
-        }
-        else {
-            for (var i = 0; i < list.length; i++) {
-                console.log(list[i]);
-                if (list[i].value.toLowerCase() == input.toLowerCase()) {
-                    return true;
-                }
+    </html>
+    <script type="text/javascript">
+        function valid() {
+            var input = document.forms["movieInput"]["search"].value;
+            var list = document.forms["movieInput"]["search"].list.options;
+            console.log(input);
+            console.log(list);
+            console.log(list.length);
+            if (input == "") {
+                toastr.error('Please enter a movie name');
+                return false;
             }
-            toastr.error('Selected movie not in database. Use the dropdown as a guide.');
-            return false;
+            else {
+                for (var i = 0; i < list.length; i++) {
+                    console.log(list[i]);
+                    if (list[i].value.toLowerCase() == input.toLowerCase()) {
+                        return true;
+                    }
+                }
+                toastr.error('Selected movie not in database. Use the dropdown as a guide.');
+                return false;
+            }
         }
-    }
-</script>
+    </script>
+{%  endblock %}

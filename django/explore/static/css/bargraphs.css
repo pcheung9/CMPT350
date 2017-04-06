@@ -1,0 +1,58 @@
+    .bar {
+      fill: blue;
+    }
+
+    div#svgcontainer{
+        float: left;
+        text-align: center;
+        height: 100%;
+        padding: 0px;
+        font: 10px sans-serif;
+        overflow: auto;
+    }
+
+    div#svgcontainer > div#first-div, div#second-div, div#third-div{
+        float: left;
+        width: 30%;
+    }
+
+    div#textbar{
+        float: right;
+        text-align: left;
+        width: 24%;
+        height: 50%;
+        padding: 0px;
+        font: 10px sans-serif;
+        background: #ddd;
+        border: solid 1px #aaa;
+    }
+
+    div#infobar{
+        float: right;
+        text-align: left;
+        width: 24%;
+        height: 50%;
+        padding: 0px;
+        font: 10px sans-serif;
+        background: #ddd;
+        border: solid 1px #aaa;
+    }
+
+    div#first-div {
+        width:29%;
+        height:50%;
+        float:left;
+    }
+
+    div#second-div {
+        width:29%;
+        height:50%;
+        float:left;
+    }
+
+    div#third-div {
+        padding: 3% 0;
+        width:39%;
+        height:50%;
+        float:left;
+    }
