@@ -5,7 +5,7 @@
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
 
 <head>
-    <meta charset="utf-8" />
+    <meta charset="utf-8"/>
     <link rel="stylesheet" href="{% static "/css/base.css" %}">
     <link rel="icon" type="image/x-icon" href="{% static "favicon.ico" %}">
     {% block head %}
@@ -18,8 +18,9 @@
         <div id = "logo-container">
             <a href="/explore"><img id="logo" src="{% static "MovieMe.png" %}" alt="MovieMe"></a>
         </div>
-        <div id=navbar">
+        <div id="navbar">
             <ul class="nav navbar-nav navbar-left">
+                <li><a href="/explore/search">New Search</a></li>
                 <li><a href="/explore/general">Explore the Data</a></li>
             </ul>
         </div>
