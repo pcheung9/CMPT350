@@ -1,6 +1,9 @@
 import csv
 import bisect
 from explore.models import MovieObj
+import requests
+from time import sleep
+import pprint
 
 ratings = {"Passed": 0, "Approved": 0, "Unrated": 0, "Not Rated": 0, "": 0, "TV-Y": 0, "TV-G": 1,
            "G": 1, "TV-Y7": 2, "GP": 2, "TV-PG": 2, "PG": 2, "TV-14": 3, "PG-13": 3, "TV-MA": 4,
@@ -28,6 +31,10 @@ class Movie:
         self.rating = 0
         self.score = 0
         self.ID = ""
+        self.gross = 0
+        self.fblikes = 0
+        self.budget = 0
+        self.numReviews = 0                 
 
     def __lt__(self, other):
         return self.relevance > other.relevance
@@ -35,7 +42,7 @@ class Movie:
 
 # Temp function. Use to make generate input strings for now. Enter names into array.
 def stringBuilder(name):
-    movies = reader("movieDB.txt")
+    movies = reader("movieDBbackup.txt")
     inputs = [name]
     IDs = []
     for j in inputs:
@@ -58,6 +65,7 @@ def reader(fileName):
     with open(fileName, 'r', encoding="utf8") as csvfile:
         TSVreader = csv.reader(csvfile, delimiter='\t', quotechar='"', skipinitialspace=True)
         for row in TSVreader:
+            #print(row[11])
             temp = Movie()
             if count > 0:  # Makes sure the headers aren't stored in an object
 
@@ -85,15 +93,20 @@ def reader(fileName):
                 temp.rating = ratings[row[21]]
                 temp.score = float(row[25])
                 temp.ID = row[28].lower()
-
-
+                
+                temp.numCritic = row[2]
+                temp.gross = row[8]
+                temp.fblikes = row[13]
+                temp.budget = row[22]
+                temp.numReviews = row[18]             
 
                 movies.append(temp)
-            #if(flag):
+            #if ((flag) and (count > 0)):
                 #makeMovieObj(temp)
                 #print(temp)
                 # uncomment if you want to repopulate the database from scratch for some reason. Or, load the fixture like a reasonable human.
             count += 1
+            #print(count)
     flag = False
     return(movies)
 
@@ -106,8 +119,8 @@ def reader(fileName):
 def related(num_results, ID_string, actorWeight, genreWeight, directorWeight, yearWeight, scoreWeight):
 
     listIDs = ID_string.split(" ")  # Splits inFilm string into list of IDs
-    movies = reader("movieDB.txt")
-
+    movies = reader("movieDBbackup.txt")
+    
     # Populates
     inputs = []
     for i in movies:
@@ -203,7 +216,7 @@ def related(num_results, ID_string, actorWeight, genreWeight, directorWeight, ye
 def getTitles():
     count = 0
     titles = []
-    with open("movieDB.txt", 'r', encoding="utf8") as csvfile:
+    with open("movieDBbackup.txt", 'r', encoding="utf8") as csvfile:
         TSVreader = csv.reader(csvfile, delimiter='\t', quotechar='"', skipinitialspace=True)
         for row in TSVreader:
             temp = Movie()
@@ -216,6 +229,61 @@ def getTitles():
 def makeMovieObj(temp):
     movie = MovieObj()
 
+    sleep(0.0001)
+    #print(temp.ID)
+    response = requests.post(str("http://www.omdbapi.com/?i=" + str(temp.ID))) #OMDB API call
+    while response.status_code != 200:
+        sleep(0.0001)
+        print('....................................', end='')
+        response = requests.post(str("http://www.omdbapi.com/?i=" + str(temp.ID))) #OMDB API call
+
+    try:
+        movie.poster = response.json()['Poster']
+    except Exception as e:
+        print("no poster")
+        
+    try:
+        movie.plot = response.json()["Plot"]
+    except Exception as e:
+        print("no plot")        
+
+    try:
+        movie.runtime = response.json()["Runtime"].split(' ')[0]
+    except Exception as e:
+        print("no runtime")        
+
+    try:
+        movie.awards = response.json()["Awards"]    
+    except Exception as e:
+        print("no awards")      
+    
+    try:
+        movie.IMDBScore = response.json()["imdbRating"]
+    except Exception as e:
+        print("no imdb")    
+        
+    try:
+        movie.tomatoes = response.json()["Ratings"][1]["Value"].replace("%","")
+    except Exception as e:
+        print("no tomato")             
+
+    try:
+        movie.metascore = response.json()["Metascore"].replace("%","")
+    except Exception as e:
+        print("no Metascore")     
+
+    try:
+        movie.production = response.json()["Production"]
+    except Exception as e:
+        print("no Production")  
+
+    try:
+        movie.boxOffice = response.json()["BoxOffice"]      
+    except Exception as e:
+        print("no BoxOffice")  
+ 
+    #movie.poster = response.json()['Poster']    
+
     movie.title = temp.title
     # movie.titleWords = temp.titleWords
     movie.year = temp.year
@@ -223,14 +291,19 @@ def makeMovieObj(temp):
     movie.actor2 = temp.actor2
     movie.actor3 = temp.actor3
     movie.director = temp.director
-    # movie.keywords = row[16].split('|')
-    # movie.genres = row[9].split('|')
+    movie.keywords = temp.keywords
+    movie.genres = temp.genres
     movie.country = temp.country
     movie.language = temp.language
     movie.rating = temp.rating
     movie.score = temp.score
     movie.movieID = temp.ID
-    #if count <= 4920:
-    #    global flag
-    #    flag = False
+    
+    movie.numCritic = temp.numCritic
+    movie.gross = temp.gross
+    movie.fblikes = temp.fblikes
+    movie.budget = temp.budget
+    movie.numReviews = temp.numReviews
+    
+    print(movie)
     movie.save()

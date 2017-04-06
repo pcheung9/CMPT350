@@ -128,7 +128,7 @@
 		scale.domain([d3.min(scores), d3.max(scores)])
 
 		//build up objects with cleaned data from views.py
-		for ( var i = 1; i < cleanedData.length ; i++) {
+		for ( var i = 0; i < cleanedData.length ; i++) {
 		    moviePictureObj = new Object();
 		    barGraphDataObj = new Object();
 		    moviePictureObj.weight = scale(parseInt(cleanedData[i].fields.relevance));
@@ -222,9 +222,9 @@
             //console.log(barData);
 
             // set the dimensions and margins of the graph
-            var margin = {top: 20, right: 20, bottom: 30, left: 40},
-                width = 200 - margin.left - margin.right,
-                height = 300 - margin.top - margin.bottom;
+            var margin = {top: 20, right: 20, bottom: 250, left: 60},
+                width = 300 - margin.left - margin.right,
+                height = 500 - margin.top - margin.bottom;
 
             var x = d3.scale.ordinal()
                 .rangeRoundBands([0, width], .1);
@@ -261,19 +261,21 @@
                 .call(xAxis)
                 .selectAll("text")
                 .style("text-anchor", "end")
+				.style("font-weight", "bold")
                 .attr("dx", "-.8em")
                 .attr("dy", "-.55em")
-                .attr("transform", "rotate(-90)" );
+                .attr("transform", "rotate(-75)" );
 
             svg.append("g")
                 .attr("class", "y axis")
                 .call(yAxis)
                 .append("text")
+				.style("font-weight", "italic")
                 .attr("transform", "rotate(-90)")
                 .attr("y", 5)
                 .attr("dy", ".71em")
-                .style("text-anchor", "end")
-                .text("Frequency");
+                .style("text-anchor", "end");
+
 
             svg.selectAll(".bar")
                 .data(data)
