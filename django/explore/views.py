@@ -133,10 +133,8 @@ def general(request):
 def response(request, results):
     pairs = []
     for i in results:
-        movie = MovieObj()
         temp = get_object_or_404(MovieObj, movieID=str(i[0]))
         temp.relevance = i[1]
-        print(str(i[0] + str("NO F***** API CALLS")))
         temp.criteria = i[2]
         pairs.append(temp)
 

@@ -65,7 +65,6 @@
 
 	<!--Update Weights!! Re-runs algorithm-->
 	<form name = "movieWeight" action="/explore/weight/" onsubmit="return valid()" method="get">
-		{% csrf_token %}
 		<input type="hidden" id="update" name="update" autocomplete="off">
 		<input type="submit" value="Update Criteria Weight" onclick="weight()")></input>
 	</form>
@@ -130,7 +129,7 @@
 		scale.domain([d3.min(scores), d3.max(scores)])
 
 		//build up objects with cleaned data from views.py
-		for ( var i = 0; i < cleanedData.length ; i++) {
+		for ( var i = 1; i < cleanedData.length ; i++) {
 		    moviePictureObj = new Object();
 		    barGraphDataObj = new Object();
 		    moviePictureObj.weight = scale(parseInt(cleanedData[i].fields.relevance));
@@ -333,7 +332,6 @@
 			data: { node_ID : d.movieID,
                     movieidlist : movieidlist,
                     flag : ID,
-			csrfmiddlewaretoken: '{{ csrf_token }}',
 			},
 			//handle a success
 			success : function(json) {
