@@ -3,94 +3,25 @@
 {% load staticfiles %}
 <html lang="en">
 
-<style>
-    .bar {
-      fill: blue;
-    }
-
-    div#svgcontainer{
-        float: left;
-        text-align: center;
-        height: 100%;
-        padding: 0px;
-        font: 10px sans-serif;
-        overflow: auto;
-    }
-
-    div#svgcontainer > div#first-div, div#second-div, div#third-div{
-        float: left;
-        width: 30%;
-    }
-
-    div#textbar{
-        float: right;
-        text-align: left;
-        width: 24%;
-        height: 50%;
-        padding: 0px;
-        font: 10px sans-serif;
-        background: #ddd;
-        border: solid 1px #aaa;
-    }
-
-    div#infobar{
-        float: right;
-        text-align: left;
-        width: 24%;
-        height: 50%;
-        padding: 0px;
-        font: 10px sans-serif;
-        background: #ddd;
-        border: solid 1px #aaa;
-    }
-
-    div#first-div {
-        width:29%;
-        height:50%;
-        float:left;
-    }
-
-    div#second-div {
-        width:29%;
-        height:50%;
-        float:left;
-    }
-
-    div#third-div {
-        padding: 3% 0;
-        width:39%;
-        height:50%;
-        float:left;
-    }
-</style>
-
-<div id="canvas-svg"></div>
-
 <head>
     <meta charset="UTF-8">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
     <script src="http://d3js.org/d3.v3.min.js"></script>
-    <!--Ref.:https://bost.ocks.org/mike/bar/3/-->
+    <link rel="stylesheet" href="{% static "/css/bargraphs.css" %}">
     <title>Movie Bar Chart Data</title>
 </head>
+
 <body>
-
-    <div id="first-div"></div>
-	<div id="second-div"></div>
-	<div id="third-div"></div>
-
-
+<div id="canvas-svg"></div>
+<div id="first-div"></div>
+<div id="second-div"></div>
+<div id="third-div"></div>
 </body>
 
 <script>
-   // $(document).ready ( function(){
-
     //Put data returned from views.py into JSON format
     var cleanedData = JSON.parse("{{ data|escapejs }}");
     barGraphDataList = [];
-
-    //console.log(cleanedData[3].fields.title);
-    //console.log(cleanedData[3].fields.IMDBScore);
 
     //build up objects with cleaned data from views.py
     for (var i = 1; i < cleanedData.length ; i++) {
@@ -134,8 +65,8 @@
     //get the scaled output for the x values
     var x = d3.scale.ordinal()
         .rangeRoundBands([0, width], 0.10) //1% of each band to be used for spacing
-        x.domain(data.map(function(d) { return d.title; }));
-        //.domain(d3.range(data.length)); //set x range to length of movie set
+    x.domain(data.map(function(d) { return d.title; }));
+    //.domain(d3.range(data.length)); //set x range to length of movie set
 
     //get the scaled output for the y values
     var y = d3.scale.linear() //linear as numeric values
@@ -152,11 +83,11 @@
         .scale(y)
         .orient("left");
 
-   //convert strings to number
-   function type(d) {
-      d.IMDBScore = +d.IMDBScore;
-      return d;
-   }
+    //convert strings to number
+    function type(d) {
+        d.IMDBScore = +d.IMDBScore;
+        return d;
+    }
 
     //set the y-axis to the left
     svg.append("g")
@@ -172,8 +103,8 @@
         .text("IMDB Score");
 
     //add the bars
-     svg.selectAll(".bar")
-         .data(data)
+    svg.selectAll(".bar")
+        .data(data)
         .enter().append("rect")
         .attr("class", "bar")
         .attr("x", function(d) { return x(d.title); })

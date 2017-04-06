@@ -1,0 +1,16 @@
+    img#logo {
+        height: 45px;
+    }
+    div#header-inner {
+        padding: auto;
+        margin: auto;
+    }
+    div#logo-container{
+        padding: auto;
+        margin: auto;
+    }
+    header {
+        height: 50px;
+        background: darkcyan;
+        width: 100%;
+    }

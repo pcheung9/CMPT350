@@ -1,27 +1,11 @@
-<style>
-    img#logo {
-        height: 45px;
-    }
-    div#header-inner {
-        padding: auto;
-        margin: auto;
-    }
-    header {
-        height: 50px;
-        background: darkcyan;
-        width: 100%;
-    }
-</style>
+<!DOCTYPE html>
 {% load static %}
 {% load staticfiles %}
 <!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+
 <head>
     <meta charset="utf-8" />
-    <title>
-        {% block title %}
-        {% endblock %}
-    </title>
     <link rel="stylesheet" href="{% static "/css/base.css" %}">
     <link rel="icon" type="image/x-icon" href="{% static "favicon.ico" %}">
     {% block head %}
@@ -31,12 +15,18 @@
 <body>
 <header class="global-header">
     <div id="header-inner">
-        <a href="/explore"><img id="logo" src="{% static "MovieMe.png" %}" alt="MovieMe"></a>
+        <div id = "logo-container">
+            <a href="/explore"><img id="logo" src="{% static "MovieMe.png" %}" alt="MovieMe"></a>
+        </div>
+        <div id=navbar">
+            <ul class="nav navbar-nav navbar-left">
+                <li><a href="/explore/general">Explore the Data</a></li>
+            </ul>
+        </div>
     </div>
 </header>
-    {% block content %}
-    {% endblock %}
+{% block content %}
+{% endblock %}
 
 </body>
-
 </html>
