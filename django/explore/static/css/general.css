@@ -36,3 +36,14 @@ div.tooltip {
     border-radius: 8px;
     pointer-events: none;
 }
+
+body {
+    background-color: #6666;
+    margin: auto;
+}
+
+div#svgcontainer{
+    text-align: center;
+    margin: auto;
+    padding: auto;
+}

@@ -6,8 +6,10 @@ div#logo {
     margin: auto;
 }
 body {
-    background: url("../movieCollageBlur.jpg") no-repeat scroll;
-    background-size: cover
+    background: url("../movieCollageBlur.jpg") no-repeat;
+    background-size: cover;
+    width: 100%;
+    margin: 0px 0px 0px 0px;
 }
 div#formcontainer{
     padding: 250px;
