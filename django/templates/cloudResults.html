@@ -60,6 +60,9 @@
 		<input type="range" min="5" max="20" step="1" id="score"><br>
 	</div>
 
+	<!--view graphs-->
+    <input type="submit" value="View Bar Graphs" onclick="post_details('flag','flag')"></input>
+
 	<!--Update Weights!! Re-runs algorithm-->
 	<form name = "movieWeight" action="/explore/weight/" onsubmit="return valid()" method="get">
 		{% csrf_token %}
@@ -72,7 +75,6 @@
 		<input type="submit" value="New Search"></input>
 	</form>
     <br>
-    <a href="/explore/bargraphs"  class="btn btn-default">View Movie Data Bar Graphs</a>
 
 </div>
 
@@ -313,39 +315,69 @@
     }
 	
 	var detailsJson;
+	var detailsFlag = 0;
 	function post_details(d,ID) {
+
+        console.log("length of cleandata", cleanedData.length);
+        var movieIDs = [];
+        for (var i = 0; i <= cleanedData.length - 1; i++) {
+            console.log("movie id in bargraph loop:", cleanedData[i].fields.movieID, "index: ", i);
+            movieIDs.push(cleanedData[i].fields.movieID);
+        }
+        var movieidlist = movieIDs.join();
+
 		console.log("posting id: " + d.movieID)	
 		$.ajax({
 			url: "/explore/details/", //endpoint (might need to be /explore/details/)
 			type: "GET", //http method
 			data: { node_ID : d.movieID,
+                    movieidlist : movieidlist,
+                    flag : ID,
 			csrfmiddlewaretoken: '{{ csrf_token }}',
 			},
 			//handle a success
 			success : function(json) {
 				console.log("Success: " + d.movieID);
+
+				//log htmlresponse to console for debug :)
 				console.log(json);
-				//$('#svgcontainer').replaceWith(json);
-                var state = document.getElementById('svgcontainer').innerHTML;
+
+                //save state (broken for now)
+                //var state = document.getElementById('svgcontainer').innerHTML;
+
+                //update view
 				$('#svgcontainer').html(json);
-                var element = document.getElementById("imageContainer");
-                element.parentNode.removeChild(element);
-				detailsJson = json;
+				detailsFlag = 1;
 
-                var button = document.createElement("button");
-                button.innerHTML = "Back to movie cloud";
+                // removes tooltip if it exists
+                if (($('#imageContainer').length > 0) && (ID != 'flag')) {
+                    var element = document.getElementById("imageContainer");
+                    element.parentNode.removeChild(element); // testing - Steve
+                }
 
-                var body = document.getElementById("svgcontainer");
-                body.appendChild(button);
+				detailsJson = json;  // testing - Steve
 
-                console.log(state);
-                button.addEventListener ("click", function() {
-                    location.reload();
-                });
+				addButton(detailsFlag);
 
 			},
 		});
 	};
+	
+	function addButton(detailsFlag){
+		if (detailsFlag == 1){
+			//dynamically add back button to svg
+			var button = document.createElement("button");
+			button.innerHTML = "Back to movie cloud";
+			var body = document.getElementById("svgcontainer");
+			body.appendChild(button);
+		}
+
+		//reload svg on back button click
+		button.addEventListener ("click", function() {
+			detailsFlag = 0;
+			location.reload();
+		});
+	}
 	
 	$(window).resize(function() {
 		if(globalResizeTimer != null) window.clearTimeout(globalResizeTimer);
@@ -355,6 +387,7 @@
 			if (detailsJson != null){
 				$('#svgcontainer').html(detailsJson);
 			}
+			addButton(detailsFlag);
 		}, 500);
 	});
 	

@@ -67,41 +67,44 @@ def weight(request):
     return response(request, results)
 
 def details(request):
-    node_ID = request.GET['node_ID']
-    print(request.GET['node_ID'])
-    
-    pairs = []
-    temp = get_object_or_404(MovieObj, movieID=str(node_ID))
-    
-    response = requests.post(str("http://www.omdbapi.com/?i=" + node_ID)) #OMDB API call
-    while response.status_code != 200:
-        response = requests.post(str("http://www.omdbapi.com/?i=" + node_ID)) #OMDB API call
-    
-    print(str(node_ID + str(response)))
-    temp.poster = response.json()["Poster"]
-    temp.plot = response.json()["Plot"]
-    temp.runtime = response.json()["Runtime"]    
-    
-    temp.awards = response.json()["Awards"]
-    temp.IMDBScore = response.json()["imdbRating"]
-    temp.tomatoes = response.json()["Ratings"][1]["Value"]
-    temp.metascore = response.json()["Metascore"]
-    temp.production = response.json()["Production"]
-    temp.boxOffice = response.json()["BoxOffice"]
-    
-    pairs.append(temp)
-    
-    print(temp.awards, temp.tomatoes, temp.metascore, temp.production, temp.boxOffice)
-    
-    print(pairs)
-    object_list = list(pairs)
-    nonetype_querySet = MovieObj.objects.none()
-    
-    data = list(chain(nonetype_querySet, object_list))
-    
-    data = serializers.serialize('json', data)
-    print(data)
-    return render_to_response("details.html", {'data': mark_safe(data)}, RequestContext(request))    
+    try:
+        flag = request.GET['flag']
+    except Exception as e:
+        print("no flag")
+
+    if flag == "flag":
+        movieLst = request.GET['movieidlist']
+        cleanMovieIDLst = []
+        cleanMovieIDLst = movieLst.split(",")
+        finalMovieLst = []
+
+        for item in cleanMovieIDLst:
+            if item != None:
+                finalMovieLst.append(item)
+
+        print("printing final movie id list in views.py", finalMovieLst)
+
+        # get the list of movies
+        movies = MovieObj.objects.filter(movieID__in=finalMovieLst)
+
+        data = serializers.serialize('json', movies)
+        print("views.py json data: ", data)
+        return render_to_response("bargraphs.html", {'data': mark_safe(data)}, RequestContext(request))
+    else:
+        node_ID = request.GET['node_ID']
+        print(request.GET['node_ID'])
+
+        pairs = []
+        temp = get_object_or_404(MovieObj, movieID=str(node_ID))
+
+        pairs.append(temp)
+        object_list = list(pairs)
+        nonetype_querySet = MovieObj.objects.none()
+
+        data = list(chain(nonetype_querySet, object_list))
+
+        data = serializers.serialize('json', data)
+        return render_to_response("details.html", {'data': mark_safe(data)}, RequestContext(request))
 
 def general(request):
     data = MovieObj.objects.all()
