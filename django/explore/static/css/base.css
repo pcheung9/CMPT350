@@ -19,7 +19,9 @@
         font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
         padding-top: 25px;
     }
-    #navbar ul li { display: inline; }
+    #navbar ul li {
+        display: inline;
+    }
     ul {
         list-style-type: none;
         margin: 0;
