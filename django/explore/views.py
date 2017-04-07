@@ -71,6 +71,11 @@ def details(request):
         flag = request.GET['flag']
     except Exception as e:
         print("no flag")
+        
+    try:
+        flag = request.GET['circle']
+    except Exception as e:
+        print("no flag")    
 
     if flag == "flag":
         movieLst = request.GET['movieidlist']
@@ -90,6 +95,37 @@ def details(request):
         data = serializers.serialize('json', movies)
         print("views.py json data: ", data)
         return render_to_response("bargraphs.html", {'data': mark_safe(data)}, RequestContext(request))
+    elif flag == "circle":
+        movieLst = request.GET['movieidlist']
+        cleanMovieIDLst = []
+        cleanMovieIDLst = movieLst.split(",")
+        finalMovieLst = []
+
+        for item in cleanMovieIDLst:
+            if item != None:
+                finalMovieLst.append(item)
+
+        print("printing final movie id list in views.py", finalMovieLst)
+
+        # get the list of movies
+        movies = MovieObj.objects.filter(movieID__in=finalMovieLst)
+        highlights = serializers.serialize('json', movies)
+        
+        data = MovieObj.objects.all()
+        data = serializers.serialize('json', data)
+        
+        genreset = set()
+        
+        with open('explore/genre.txt') as f:
+            lines = f.readlines()
+            
+            for line in lines:
+                line = line.replace("\n","")
+                arr = line.split('|')
+                for word in arr:
+                    genreset.add(word)        
+        
+        return render_to_response("generalHighlights.html", {'data': mark_safe(data), 'highlights': mark_safe(highlights), 'genre' : list(genreset)}, RequestContext(request))
     else:
         node_ID = request.GET['node_ID']
         print(request.GET['node_ID'])
