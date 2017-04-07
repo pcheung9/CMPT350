@@ -10,7 +10,12 @@
 <script src="http://davidbau.com/encode/seedrandom-min.js"></script>
 <script src="https://d3js.org/d3.v4.min.js"></script>
 <link rel="stylesheet" href="{% static "/css/general.css" %}">
-
+<style>
+#circles {
+	width:90%;
+	height: 100%;
+}
+</style>
 <!--<link rel="stylesheet" href="{% static "/css/cloudResults.css" %}">-->
 <!--LICENSE#
 
@@ -22,8 +27,8 @@ https://bl.ocks.org/mbostock/7607535
 <body>
     <div id="tooltip-container"></div>
     <div id="div1">
-		<div id="svgcontainer" width="100%" height="2000" style="margin:auto;">
-			<svg width="960" height="960"></svg>
+		<div id="circles">
+			<svg width="800" height="800" style="margin:auto"></svg>
 		</div>
     </div>
 </body>
@@ -205,7 +210,7 @@ https://bl.ocks.org/mbostock/7607535
     var node = g.selectAll("circle,text");
 
     svg
-        .style("background", "#666666")
+        .style("background", "#222")
         .on("click", function() { zoom(root); });
 
     zoomTo([root.x, root.y, root.r * 2 + margin]);

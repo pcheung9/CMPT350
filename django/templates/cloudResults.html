@@ -341,7 +341,6 @@
                     movieidlist : movieidlist,
                     flag : ID,
 					circle : ID,
-			csrfmiddlewaretoken: '{{ csrf_token }}',
 			},
 			//handle a success
 			success : function(json) {
@@ -351,7 +350,8 @@
 				//console.log(json);
 				
                 //update view
-				$('#svgcircles').html(json);
+				
+				$('#svgcontainer').html(json);
 
 				//$('#svgcontainer').html(json);
 				//$().html(json);
@@ -381,7 +381,7 @@
 			//dynamically add back button to svg
 			var button = document.createElement("button");
 			button.innerHTML = "Back to movie cloud";
-			var body = document.getElementById("svgcontainer");
+			var body = document.getElementById("graphbar");
 			body.appendChild(button);
 		}
 
@@ -392,7 +392,7 @@
 
 		});
 	}
-	
+	/*
 	$(window).resize(function() {
 		if(globalResizeTimer != null) window.clearTimeout(globalResizeTimer);
 		globalResizeTimer = window.setTimeout(function() {
@@ -402,9 +402,9 @@
 				$('#svgcontainer').html(detailsJson);
 			}
 			addButton(detailsFlag);
-		}, 500);
+		}, 0001);
 	}); 
-	
+	*/
 	
 </script>
 
