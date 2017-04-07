@@ -85,7 +85,8 @@ https://bl.ocks.org/mbostock/7607535
 	            for (var k = 0; k < root.children.length; k++) { // genres[k]
 	                for (var l = 0; l < root.children[k].children.length; l++) { // years[l]
 	                    if (genreArr[j] == root.children[k].name) {
-	                        if (parseInt(root.children[k].children[l].name.slice(0, -1)) <= cleanedData[i].fields.year && (cleanedData[i].fields.year < (parseInt(root.children[k].children[l].name.slice(0, -1))) + 10)) {
+	                        if (parseInt(root.children[k].children[l].name.slice(0, -1)) <= cleanedData[i].fields.year
+                                    && (cleanedData[i].fields.year < (parseInt(root.children[k].children[l].name.slice(0, -1))) + 10)) {
 	                            var movie = Object();
 	                            movie.name = cleanedData[i].fields.title;
 								movie.id = cleanedData[i].fields.movieID;
