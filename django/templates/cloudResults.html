@@ -3,31 +3,13 @@
 {% load static %}
 {% load staticfiles %}
 <meta charset="utf-8">
-
 {% block head %}
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-    <script src="http://d3js.org/d3.v3.min.js"></script>
-    <script src="{% static "picturecloud.js" %}"></script>
-    <script src="http://davidbau.com/encode/seedrandom-min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
     <link rel="stylesheet" href="{% static "/css/cloudResults.css" %}">
     <title>Cloud View</title>
 {% endblock %}
-
 {% block content %}
-    <div id="treemap"></div>
-    <div id="searched">
-        <div id="searchPosterContainer">
-            <img id="searchPoster" url="picB.png" alt="can't display picture" />
-        </div>
-        <div id="searchInfoContainer">
-            <h1 id="searchTitle">Title</h1>
-            <h3 id="searchPlot">Plot</h3>
-            <h3 id="searchDirector">Director</h3>
-            <h3 id="searchActors">Actors</h3>
-            <h3 id="searchRuntime">Runtime</h3>
-            <h3 id="searchGenres">Genres</h3>
-        </div>
-    </div>
+
 
     <div id="graphbar">
         <div id="sliderWidth" >
@@ -75,58 +57,134 @@
         </form>
         <br>
         <input type="submit" value="View Bar Graphs" onclick="post_details('flag','flag')">
+<div id="treemap"></div>
+<!--<div id="sliderbar">-->
+
+<div id="searched">
+    <div id="searchPosterContainer">
+        <img id="searchPoster" url="picB.png" alt="can't display picture" />
     </div>
-
-
-
-    <div id = "svgcontainer">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox='-10 -10 20 20'  width='70%' height='85%'>
-        </svg>
+    <div id="searchInfoContainer">
+        <h1 id="searchTitle">Title</h1>
+        <h3 id="searchPlot">Plot</h3>
+        <h3 id="searchDirector">Director</h3>
+        <h3 id="searchActors">Actors</h3>
+        <h3 id="searchRuntime">Runtime</h3>
+        <h3 id="searchGenres">Genres</h3>
     </div>
+</div>
 
-    <script>
-        var globalResizeTimer = null;
+<div id="graphbar">
+	<div id="sliderWidth" >
+		<label for="actor"
+			style="display: inline-block; width: 240px; text-align: right">
+			actor = <span id="actor-value">…</span>
+		</label>
+		<input type="range" min="5" max="20" step="1" id="actor"><br>
+		<label for="rating"
+			style="display: inline-block; width: 240px; text-align: right">
+			rating = <span id="rating-value">…</span>
+		</label>
+		<input type="range" min="5" max="20" step="1" id="rating"><br>
+		<label for="genre"
+			style="display: inline-block; width: 240px; text-align: right">
+			genre = <span id="genre-value">…</span>
+		</label>
+		<input type="range" min="5" max="20" step="1" id="genre"><br>
+			<label for="director"
+				style="display: inline-block; width: 240px; text-align: right">
+				director = <span id="director-value">…</span>
+			</label>
+		<input type="range" min="5" max="20" step="1" id="director"><br>
+		<label for="year"
+			style="display: inline-block; width: 240px; text-align: right">
+			year = <span id="year-value">…</span>
+		</label>
+		<input type="range" min="5" max="20" step="1" id="year"><br>
+			<label for="score"
+				style="display: inline-block; width: 240px; text-align: right">
+				score = <span id="score-value">…</span>
+			</label>
+		<input type="range" min="5" max="20" step="1" id="score"><br>
+	</div>
+	
+	<!--view in general-->
+    <input id="generalButton" type="submit" value="Circle view" onclick="post_details('circle','circle')"></input>
 
-        //keeping dirty data from backend in client memory for debug purposes
-        var dirtyData = {{ data }};
+	<!--view graphs-->
+    <input id="graphButton" type="submit" value="View Bar Graphs" onclick="post_details('flag','flag')"></input>
 
-        //cleaned data from backend data dictionary
-        var cleanedData = JSON.parse("{{ data|escapejs }}");
-        console.log(cleanedData[0].fields.poster)
-        document.getElementById("searchPoster").setAttribute("src",cleanedData[0].fields.poster);
-        document.getElementById("searchTitle").innerHTML = cleanedData[0].fields.title + " [" +
-            cleanedData[0].fields.year + "]";
-        document.getElementById("searchPlot").innerHTML = cleanedData[0].fields.plot;
-        document.getElementById("searchDirector").innerHTML = "Director: " + cleanedData[0].fields.director;
-        document.getElementById("searchActors").innerHTML = "Featuring: " + cleanedData[0].fields.actor1 + ", " +
-            cleanedData[0].fields.actor2 + ", " + cleanedData[0].fields.actor3;
-        document.getElementById("searchRuntime").innerHTML = "Runtime: " + cleanedData[0].fields.runtime;
-        document.getElementById("searchGenres").innerHTML = "Genres: " + cleanedData[0].fields.genres;
+	<!--Update Weights!! Re-runs algorithm-->
+	<form name = "movieWeight" action="/explore/weight/" onsubmit="return valid()" method="get">
+		{% csrf_token %}
+		<input type="hidden" id="update" name="update" autocomplete="off">
+		<input type="submit" value="Update Criteria Weight" onclick="weight()")></input>
+	</form>
+
+	<!--New search!! Redirects home-->
+	<form name = "movieInput" action="/explore" onsubmit="return valid()" method="get">
+		<input type="submit" value="New Search"></input>
+	</form>
+    <br>
+
+</div>
 
 
-        //create new movieList object to represent all of the movies
-        var movieObjList = new Object();
-        movieObjList.name = "movies";
-        movieObjList.children = [];
-        //array for preload caching
-        //images = [];
-        moviePictures = [];
-        barData = [];
 
-        scores = [];
+<div id = "svgcontainer" >
+	<svg xmlns="http://www.w3.org/2000/svg" viewBox='-10 -10 20 20'  width='70%' height='85%'>
+	</svg>
+</div>
 
-        for ( var i = 1; i < cleanedData.length ; i++) {
-            scores.push(parseInt(cleanedData[i].fields.relevance));
-        }
-        var scale = d3.scale.linear();
-        scale.range([400, 1000]);
-        scale.domain([d3.min(scores), d3.max(scores)])
+<script src="http://d3js.org/d3.v3.min.js"></script>
 
-        //build up objects with cleaned data from views.py
-        for ( var i = 1; i < cleanedData.length ; i++) {
-            moviePictureObj = new Object();
-            barGraphDataObj = new Object();
-            moviePictureObj.weight = scale(parseInt(cleanedData[i].fields.relevance));
+<!--<script src="https://d3js.org/d3.v4.min.js"></script>-->
+<script src="{% static "picturecloud.js" %}"></script>
+<script src="http://davidbau.com/encode/seedrandom-min.js"></script>
+
+<script>
+    var globalResizeTimer = null;
+
+    //keeping dirty data from backend in client memory for debug purposes
+    var dirtyData = {{ data }};
+
+    //cleaned data from backend data dictionary
+    var cleanedData = JSON.parse("{{ data|escapejs }}");
+    console.log(cleanedData[0].fields.poster)
+    document.getElementById("searchPoster").setAttribute("src",cleanedData[0].fields.poster);
+    document.getElementById("searchTitle").innerHTML = cleanedData[0].fields.title + " [" +
+        cleanedData[0].fields.year + "]";
+    document.getElementById("searchPlot").innerHTML = cleanedData[0].fields.plot;
+    document.getElementById("searchDirector").innerHTML = "Director: " + cleanedData[0].fields.director;
+    document.getElementById("searchActors").innerHTML = "Featuring: " + cleanedData[0].fields.actor1 + ", " +
+        cleanedData[0].fields.actor2 + ", " + cleanedData[0].fields.actor3;
+    document.getElementById("searchRuntime").innerHTML = "Runtime: " + cleanedData[0].fields.runtime;
+    document.getElementById("searchGenres").innerHTML = "Genres: " + cleanedData[0].fields.genres;
+
+
+    //create new movieList object to represent all of the movies
+    var movieObjList = new Object();
+    movieObjList.name = "movies";
+    movieObjList.children = [];
+    //array for preload caching
+    //images = [];
+    moviePictures = [];
+    barData = [];
+
+	scores = [];
+
+		for ( var i = 1; i < cleanedData.length ; i++) {
+		    scores.push(parseInt(cleanedData[i].fields.relevance));
+		}
+		var scale = d3.scale.linear();
+		scale.range([400, 1000]);
+		scale.domain([d3.min(scores), d3.max(scores)])
+
+		//build up objects with cleaned data from views.py
+		for ( var i = 0; i < cleanedData.length ; i++) {
+		    moviePictureObj = new Object();
+		    barGraphDataObj = new Object();
+		    moviePictureObj.weight = scale(parseInt(cleanedData[i].fields.relevance));
             moviePictureObj.name = cleanedData[i].fields.title;
             moviePictureObj.year = cleanedData[i].fields.year;
             moviePictureObj.plot = cleanedData[i].fields.plot;
@@ -145,393 +203,405 @@
             moviePictures.push(moviePictureObj);
             barData.push(barGraphDataObj);
             //document.write(data[i].fields.title + " " + data[i].fields.relevance + "<br>");
-        }
+    }
 
-        var pictures = []; // pictures that are already displaced by the layout are pushed into this array
-        var svg = d3.select('svg') // obtain a d3 reference to the SVG
+    var pictures = []; // pictures that are already displaced by the layout are pushed into this array
+    var svg = d3.select('svg') // obtain a d3 reference to the SVG
 
-        var div = d3.select("body").append("div")
-            .attr("id", "tooltipdiv")
-            .attr("class", "tooltip")
-            .style("opacity", 1e-6);
+    var div = d3.select("body").append("div")
+        .attr("id", "tooltipdiv")
+        .attr("class", "tooltip")
+        .style("opacity", 1e-6);
 
-        d3.layout.picturecloud().size([20, 20])
-            .pictures(moviePictures)
-            .padding(0) // define the minimum distance between pictures
-            .on('picture', function(picture, extent) { // whenever a picture is displaced, call this callback
-                pictures.push(picture); // store the picture into the global array
-                draw(pictures, extent); // call the function that actually draws the picture (more on that below)
-            } )
-            .start(); // execute the layout
+    d3.layout.picturecloud().size([20, 20])
+        .pictures(moviePictures)
+        .padding(0) // define the minimum distance between pictures
+        .on('picture', function(picture, extent) { // whenever a picture is displaced, call this callback
+            pictures.push(picture); // store the picture into the global array
+            draw(pictures, extent); // call the function that actually draws the picture (more on that below)
+        } )
+        .start(); // execute the layout
 
-        function draw(pictures, extent) {
-            svg.selectAll('.picture') // select all elements having the class 'picture'
-                .data(pictures) // bind those elements to the global array containing all the pictures that have already been displaced
-                .enter().append('image') // for each new picture found, create an SVG image element
-                .attr('class', 'picture') // assign the class 'picture' to it
-                .attr('xlink:href', function(d) { return d.url; }) // set the source URL for the image
-                .attr('width', function(d) { return d.width; }) // set width and height (that have been computed by the layout)
-                .attr('height', function(d) { return d.height; })
-                .attr('transform', function(d) {
-                    return 'translate(' + [d.x-d.width/2, d.y-d.height/2] + ')'; // center the image in d.x and d.y (also computed by the layout)
-                })
-                .on("mouseover", mouseover)
-                .on("mouseenter", function (d) { return mouseenter(d, d.name); })
-                .on("click", function (d) { post_details(d, d.name); })
-                .on("mouseout", mouseout)
-                .attr('opacity','0') // fade in animation
-                .transition()
-                .duration(600)
-                .attr('opacity','1')
+    function draw(pictures, extent) {
+        svg.selectAll('.picture') // select all elements having the class 'picture'
+            .data(pictures) // bind those elements to the global array containing all the pictures that have already been displaced
+          .enter().append('image') // for each new picture found, create an SVG image element
+            .attr('class', 'picture') // assign the class 'picture' to it
+            .attr('xlink:href', function(d) { return d.url; }) // set the source URL for the image
+            .attr('width', function(d) { return d.width; }) // set width and height (that have been computed by the layout)
+            .attr('height', function(d) { return d.height; })
+            .attr('transform', function(d) {
+                return 'translate(' + [d.x-d.width/2, d.y-d.height/2] + ')'; // center the image in d.x and d.y (also computed by the layout)
+            })
+            .on("mouseover", mouseover)
+            .on("mouseenter", function (d) { return mouseenter(d, d.name); })
+			.on("click", function (d) { post_details(d, d.name); })
+            .on("mouseout", mouseout)
+            .attr('opacity','0') // fade in animation
+          .transition()
+            .duration(600)
+            .attr('opacity','1')
 
-            // update the SVG viewBox using extent data (provided by the layout)
-            svg.transition()
-                .duration(600) // animate the update
-                .attr('viewBox', extent.left+' '+extent.top+' '+(extent.right-extent.left)+' '+(extent.bottom-extent.top));
+        // update the SVG viewBox using extent data (provided by the layout)
+        svg.transition()
+            .duration(600) // animate the update
+            .attr('viewBox', extent.left+' '+extent.top+' '+(extent.right-extent.left)+' '+(extent.bottom-extent.top));
 
-            function mouseover() {
-                div.transition()
-                    .duration(200)
-                    .style("opacity", 1);
-            }
-            function mouseenter(d, ID) {
-                div
-                    .attr("id", "imageContainer")
-                    .html("<span><h1>" + d.name + " [" + d.year +"]</h1><br><ahref='imageURL()'><img height='75%' src='" + imageUrl(d) + ")'></ahref></span>")
-                    .style("left", ((d3.event.pageX + 400) > d3.select("#svgcontainer").node().getBoundingClientRect().width) ? (d3.event.pageX - ((d3.event.pageX + 400)- d3.select("#svgcontainer").node().getBoundingClientRect().width)) + "px" : (d3.event.pageX) + "px")
-                    .style("top", ((d3.event.pageY + 400) > d3.select("#svgcontainer").node().getBoundingClientRect().height) ? (d3.event.pageY - ((d3.event.pageY + 400)- d3.select("#svgcontainer").node().getBoundingClientRect().height)) + "px" : (d3.event.pageY) + "px");
+        function mouseover() {
+				div.transition()
+				.duration(200)
+				.style("opacity", 1);
+			}
+        function mouseenter(d, ID) {
+            div
+                .attr("id", "imageContainer")
+                .html("<span><h1>" + d.name + " [" + d.year +"]</h1><br><ahref='imageURL()'><img height='75%' src='" + imageUrl(d) + ")'></ahref></span>")
+                .style("left", ((d3.event.pageX + 400) > d3.select("#svgcontainer").node().getBoundingClientRect().width) ? (d3.event.pageX - ((d3.event.pageX + 400)- d3.select("#svgcontainer").node().getBoundingClientRect().width)) + "px" : (d3.event.pageX) + "px")
+                .style("top", ((d3.event.pageY + 400) > d3.select("#svgcontainer").node().getBoundingClientRect().height) ? (d3.event.pageY - ((d3.event.pageY + 400)- d3.select("#svgcontainer").node().getBoundingClientRect().height)) + "px" : (d3.event.pageY) + "px");
 
-                div
-                    .append("div")
-                    .attr("id", "movieInfoContainer")
-                    .html("<h3>" + d.plot + "</h3>" +
-                        "<h3> Directed by:" + d.director + "</h3>" +
-                        "<h3> Featuring: " + d.actor1 + ", " + d.actor2 + ", " +  d.actor3 +  "</h3>" +
-                        "<h3> Runtime: " + d.runtime + "</h3>"+
-                        "<h3> Genres: " + d.genres + "</h3>"+
-                        "<h2>Click for more info</h2>")
-                    .style("top", (d3.event.pageY - 10) + "px");
-
-
-                data = barData;
-                //console.log(barData);
-
-                // set the dimensions and margins of the graph
-                var margin = {top: 20, right: 20, bottom: 250, left: 60},
-                    width = 300 - margin.left - margin.right,
-                    height = 500 - margin.top - margin.bottom;
-
-                var x = d3.scale.ordinal()
-                    .rangeRoundBands([0, width], .1);
-
-                var y = d3.scale.linear()
-                    .range([height, 0]);
-
-                var xAxis = d3.svg.axis().scale(x);
-                var yAxis = d3.svg.axis().scale(y).orient("left");
-
-                //add SVG
-                var svg = d3.select('#graphbar').append("svg:svg")
-                    .attr("id", "chartsvg")
-                    .attr("width", width + margin.left + margin.right)
-                    .attr("height", height + margin.top + margin.bottom)
-                    .append("g")
-                    .attr("transform",
-                        "translate(" + margin.left + "," + margin.top + ")");
-
-                data.forEach(function(d) {
-                    d.name = d.name;
-                    //console.log(d.name);
-                    d.size = +d.size;
-                });
-
-                //scale
-                x.domain(data.map(function(d) { return d.name; }));
-                y.domain([0, d3.max(data, function(d) { return d.size; })]);
-
-                //axis
-                svg.append("g")
-                    .attr("class", "x axis")
-                    .attr("transform", "translate(0," + height + ")")
-                    .call(xAxis)
-                    .selectAll("text")
-                    .style("text-anchor", "end")
-                    .style("font-weight", "bold")
-                    .attr("dx", "-.8em")
-                    .attr("dy", "-.55em")
-                    .attr("transform", "rotate(-75)" );
-
-                svg.append("g")
-                    .attr("class", "y axis")
-                    .call(yAxis)
-                    .append("text")
-                    .style("font-weight", "italic")
-                    .attr("transform", "rotate(-90)")
-                    .attr("y", 5)
-                    .attr("dy", ".71em")
-                    .style("text-anchor", "end");
+            div
+				.append("div")
+				.attr("id", "movieInfoContainer")
+				.html("<h3>" + d.plot + "</h3>" +
+				    "<h3> Directed by:" + d.director + "</h3>" +
+				    "<h3> Featuring: " + d.actor1 + ", " + d.actor2 + ", " +  d.actor3 +  "</h3>" +
+                    "<h3> Runtime: " + d.runtime + "</h3>"+
+                    "<h3> Genres: " + d.genres + "</h3>"+
+                    "<h2>Click for more info</h2>")
+                .style("top", (d3.event.pageY - 10) + "px");
 
 
-                svg.selectAll(".bar")
-                    .data(data)
-                    .enter().append("rect")
-                    .attr("class", "bar")
-                    .attr("x", function(d) { return x(d.name); })
-                    .attr("y", function(d) { return y(d.size); })
-                    .attr("height", function(d) { return height - y(d.size); })
-                    .attr("width", x.rangeBand())
-                    .style("fill", function(d) { return colorizer(d, ID); });
+            data = barData;
+            //console.log(barData);
 
-                //coloring function (black)
-                function colorizer(d, ID) {
-                    console.log(d.name);
-                    console.log(ID);
-                    if(d.name == ID){
-                        return "brown"
-                    }else{
-                        return "steelblue"
-                    }
+            // set the dimensions and margins of the graph
+            var margin = {top: 20, right: 20, bottom: 250, left: 60},
+                width = 300 - margin.left - margin.right,
+                height = 500 - margin.top - margin.bottom;
+
+            var x = d3.scale.ordinal()
+                .rangeRoundBands([0, width], .1);
+
+            var y = d3.scale.linear()
+                .range([height, 0]);
+
+            var xAxis = d3.svg.axis().scale(x);
+            var yAxis = d3.svg.axis().scale(y).orient("left");
+
+            //add SVG
+            var svg = d3.select('#graphbar').append("svg:svg")
+								.attr("id", "chartsvg")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom)
+                .append("g")
+                .attr("transform",
+                      "translate(" + margin.left + "," + margin.top + ")");
+
+            data.forEach(function(d) {
+                d.name = d.name;
+                //console.log(d.name);
+                d.size = +d.size;
+            });
+
+            //scale
+            x.domain(data.map(function(d) { return d.name; }));
+            y.domain([0, d3.max(data, function(d) { return d.size; })]);
+
+            //axis
+            svg.append("g")
+                .attr("class", "x axis")
+                .attr("transform", "translate(0," + height + ")")
+                .call(xAxis)
+                .selectAll("text")
+                .style("text-anchor", "end")
+				.style("font-weight", "bold")
+                .attr("dx", "-.8em")
+                .attr("dy", "-.55em")
+                .attr("transform", "rotate(-75)" );
+
+            svg.append("g")
+                .attr("class", "y axis")
+                .call(yAxis)
+                .append("text")
+				.style("font-weight", "italic")
+                .attr("transform", "rotate(-90)")
+                .attr("y", 5)
+                .attr("dy", ".71em")
+                .style("text-anchor", "end");
+
+
+            svg.selectAll(".bar")
+                .data(data)
+                .enter().append("rect")
+                .attr("class", "bar")
+                .attr("x", function(d) { return x(d.name); })
+                .attr("y", function(d) { return y(d.size); })
+                .attr("height", function(d) { return height - y(d.size); })
+                .attr("width", x.rangeBand())
+                .style("fill", function(d) { return colorizer(d, ID); });
+
+            //coloring function (black)
+            function colorizer(d, ID) {
+                console.log(d.name);
+                console.log(ID);
+                if(d.name == ID){
+                    return "brown"
+                }else{
+                    return "steelblue"
                 }
             }
-
-            function mouseout() {
-                div.transition()
-                    .duration(200)
-                    .style("opacity", 1e-6);
-
-                d3.select("#chartsvg").remove();
-            }
-
-            function imageUrl(d) {
-                return d.url;
-            }
         }
 
-        var detailsJson;
-        var detailsFlag = 0;
-        function post_details(d,ID) {
+        function mouseout() {
+            div.transition()
+                .duration(200)
+                .style("opacity", 1e-6);
 
-            console.log("length of cleandata", cleanedData.length);
-            var movieIDs = [];
-            for (var i = 0; i <= cleanedData.length - 1; i++) {
-                console.log("movie id in bargraph loop:", cleanedData[i].fields.movieID, "index: ", i);
-                movieIDs.push(cleanedData[i].fields.movieID);
-            }
-            var movieidlist = movieIDs.join();
+						d3.select("#chartsvg").remove();
+      	}
 
-            console.log("posting id: " + d.movieID)
-            $.ajax({
-                url: "/explore/details/", //endpoint (might need to be /explore/details/)
-                type: "GET", //http method
-                data: { node_ID : d.movieID,
+        function imageUrl(d) {
+            return d.url;
+        }
+    }
+
+</script>
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script>
+	var detailsJson;
+	var detailsFlag = 0;
+	function post_details(d,ID) {
+
+		console.log(ID + "IDIDIDIDIDIIDIDID");
+        console.log("length of cleandata", cleanedData.length);
+        var movieIDs = [];
+        for (var i = 0; i <= cleanedData.length - 1; i++) {
+            //console.log("movie id in bargraph loop:", cleanedData[i].fields.movieID, "index: ", i);
+            movieIDs.push(cleanedData[i].fields.movieID);
+        }
+        var movieidlist = movieIDs.join();
+
+		console.log("posting id: " + d.movieID)	
+		$.ajax({
+			url: "/explore/details/", //endpoint (might need to be /explore/details/)
+			type: "GET", //http method
+			data: { node_ID : d.movieID,
                     movieidlist : movieidlist,
                     flag : ID,
-                },
-                //handle a success
-                success : function(json) {
-                    console.log("Success: " + d.movieID);
+					circle : ID,
+			},
+			//handle a success
+			success : function(json) {
+				console.log("Success: " + d.movieID);
 
-                    //log htmlresponse to console for debug :)
-                    console.log(json);
+				//log htmlresponse to console for debug :)
+				//console.log(json);
+				
+                //update view
+				
+				$('#svgcontainer').html(json);
 
-                    //save state (broken for now)
-                    //var state = document.getElementById('svgcontainer').innerHTML;
+				//$('#svgcontainer').html(json);
+				//$().html(json);
+				
 
-                    //update view
-                    $('#svgcontainer').html(json);
-                    detailsFlag = 1;
 
-                    // removes tooltip if it exists
-                    if (($('#imageContainer').length > 0) && (ID != 'flag')) {
-                        var element = document.getElementById("imageContainer");
-                        element.parentNode.removeChild(element); // testing - Steve
-                    }
+				detailsFlag = 1;
 
-                    detailsJson = json;  // testing - Steve
+				
 
-                    addButton(detailsFlag);
-
-                },
-            });
-        };
-
-        function addButton(detailsFlag){
-            if (detailsFlag == 1){
-                //dynamically add back button to svg
-                var button = document.createElement("button");
-                button.innerHTML = "Back to movie cloud";
-                var body = document.getElementById("svgcontainer");
-                body.appendChild(button);
-            }
-
-            //reload svg on back button click
-            button.addEventListener ("click", function() {
-                detailsFlag = 0;
-                location.reload();
-            });
-        }
-
-        $(window).resize(function() {
-            if(globalResizeTimer != null) window.clearTimeout(globalResizeTimer);
-            globalResizeTimer = window.setTimeout(function() {
-                //$("svg g").remove();
-                //$("svg").remove();
-                if (detailsJson != null){
-                    $('#svgcontainer').html(detailsJson);
+                // removes tooltip if it exists
+                if (($('#imageContainer').length > 0) && (ID != 'flag')) {
+                    var element = document.getElementById("imageContainer");
+                    element.parentNode.removeChild(element); // testing - Steve
                 }
-                addButton(detailsFlag);
-            }, 500);
-        });
 
+				detailsJson = json;  // testing - Steve
 
-    </script>
+				addButton(detailsFlag);
+				
+			},
+		});
+	};
+	
+	function addButton(detailsFlag){
+		if (detailsFlag == 1){
+			//dynamically add back button to svg
+			var button = document.createElement("button");
+			button.innerHTML = "Back to movie cloud";
+			var body = document.getElementById("graphbar");
+			body.appendChild(button);
+		}
 
-    <script>
+		//reload svg on back button click
+		button.addEventListener ("click", function() {
+			detailsFlag = 0;
+			location.reload();
 
-        var width = 900;
-        var height = 600;
+		});
+	}
+	/*
+	$(window).resize(function() {
+		if(globalResizeTimer != null) window.clearTimeout(globalResizeTimer);
+		globalResizeTimer = window.setTimeout(function() {
+			//$("svg g").remove();
+			//$("svg").remove();
+			if (detailsJson != null){
+				$('#svgcontainer').html(detailsJson);
+			}
+			addButton(detailsFlag);
+		}, 0001);
+	}); 
+	*/
+	
+</script>
 
-        //get original search value for repeat search
-        var originalMovie = cleanedData[0].fields.title;
-        //document.getElementById("update").value = originalMovie;
+<script>
 
-        //on click 'update'
-        //prepare weights for processing by algorithm on backend
-        //function weight(){
+	var width = 900;
+	var height = 600;
 
-        //document.getElementById("update").value = newWeights;
-        //}
+	//get original search value for repeat search
+	var originalMovie = cleanedData[0].fields.title;
+	//document.getElementById("update").value = originalMovie;
 
-        var newWeights = [];
-        newWeights.push(originalMovie);
-        for (var i = 0; i < 6; i++){
-            newWeights.push(10);
-        }
+	//on click 'update'
+	//prepare weights for processing by algorithm on backend
+	//function weight(){
 
-        var holder = d3.select("body")
-            .append("svg")
-            .attr("width", width)
-            .attr("height", height);
+		//document.getElementById("update").value = newWeights;
+	//}
 
-        // update the actor element
-        d3.select("#actor").on("input", function() {
-            updateActor(+this.value);
-        });
-        updateActor(10);
+	var newWeights = [];
+	newWeights.push(originalMovie);
+	for (var i = 0; i < 6; i++){
+		newWeights.push(10);
+	}
 
-        var actorVar = 1;
-        function updateActor(actor) {
-            // adjust the text on the range slider
-            d3.select("#actor-value").text(actor);
-            d3.select("#actor").property("value", actor);
-            actorVar = parseInt(d3.select("#actor-value")[0][0].textContent);
-            //actorVar = parseInt(d3.select("#actor-value").text(actor)._groups[0][0].textContent);
-            newWeights[1] = actorVar;
-            updateWeightArr();
-        }
+	var holder = d3.select("body")
+			.append("svg")
+			.attr("width", width)
+			.attr("height", height);
 
-        // update the rating element
-        d3.select("#rating").on("input", function() {
-            updateRating(+this.value);
-        });
-        updateRating(10);
+	// update the actor element
+	d3.select("#actor").on("input", function() {
+		updateActor(+this.value);
+	});
+	updateActor(10);
 
-        var ratingVar = 1;
-        function updateRating(rating) {
-            // adjust the text on the range slider
-            d3.select("#rating-value").text(rating);
-            d3.select("#rating").property("value", rating);
-            ratingVar = parseInt(d3.select("#rating-value")[0][0].textContent);
-            newWeights[2] = ratingVar;
-            updateWeightArr();
-        }
+	var actorVar = 1;
+	function updateActor(actor) {
+		// adjust the text on the range slider
+		d3.select("#actor-value").text(actor);
+		d3.select("#actor").property("value", actor);
+		actorVar = parseInt(d3.select("#actor-value")[0][0].textContent);
+		//actorVar = parseInt(d3.select("#actor-value").text(actor)._groups[0][0].textContent);
+		newWeights[1] = actorVar;
+		updateWeightArr();
+	}
 
-        // update the genre element
-        d3.select("#genre").on("input", function() {
-            updateGenre(+this.value);
-        });
-        updateGenre(10);
+	// update the rating element
+	d3.select("#rating").on("input", function() {
+		updateRating(+this.value);
+	});
+	updateRating(10);
 
-        var genreVar = 1;
-        function updateGenre(genre) {
-            // adjust the text on the range slider
-            d3.select("#genre-value").text(genre);
-            d3.select("#genre").property("value", genre);
-            genreVar = parseInt(d3.select("#genre-value")[0][0].textContent);
-            newWeights[3] = genreVar;
-            updateWeightArr();
-        }
+	var ratingVar = 1;
+	function updateRating(rating) {
+		// adjust the text on the range slider
+		d3.select("#rating-value").text(rating);
+		d3.select("#rating").property("value", rating);
+		ratingVar = parseInt(d3.select("#rating-value")[0][0].textContent);
+		newWeights[2] = ratingVar;
+		updateWeightArr();
+	}
 
-        // update the director element
-        d3.select("#director").on("input", function() {
-            updateDirector(+this.value);
-        });
-        updateDirector(10);
+	// update the genre element
+	d3.select("#genre").on("input", function() {
+		updateGenre(+this.value);
+	});
+	updateGenre(10);
 
-        var directorVar = 1;
-        function updateDirector(director) {
-            // adjust the text on the range slider
-            d3.select("#director-value").text(director);
-            d3.select("#director").property("value", director);
-            directorVar = parseInt(d3.select("#director-value")[0][0].textContent);
-            newWeights[4] = directorVar;
-            updateWeightArr();
-        }
+	var genreVar = 1;
+	function updateGenre(genre) {
+		// adjust the text on the range slider
+		d3.select("#genre-value").text(genre);
+		d3.select("#genre").property("value", genre);
+		genreVar = parseInt(d3.select("#genre-value")[0][0].textContent);
+		newWeights[3] = genreVar;
+		updateWeightArr();
+	}
 
-        // update the year element
-        d3.select("#year").on("input", function() {
-            updateYear(+this.value);
-        });
-        updateYear(10);
+	// update the director element
+	d3.select("#director").on("input", function() {
+		updateDirector(+this.value);
+	});
+	updateDirector(10);
 
-        var yearVar = 1;
-        function updateYear(year) {
-            //adjust the text on the range slider
-            d3.select("#year-value").text(year);
-            d3.select("#year").property("value", year);
-            //updateVar._groups[0][0].textContent
-            yearVar = parseInt(d3.select("#year-value")[0][0].textContent);
-            newWeights[5] = yearVar;
-            updateWeightArr();
-        }
+	var directorVar = 1;
+	function updateDirector(director) {
+		// adjust the text on the range slider
+		d3.select("#director-value").text(director);
+		d3.select("#director").property("value", director);
+		directorVar = parseInt(d3.select("#director-value")[0][0].textContent);
+		newWeights[4] = directorVar;
+		updateWeightArr();
+	}
 
-        // update the score element
-        d3.select("#score").on("input", function() {
-            updateScore(+this.value);
-        });
-        updateScore(10);
+	// update the year element
+	d3.select("#year").on("input", function() {
+		updateYear(+this.value);
+	});
+	updateYear(10);
 
-        var scoreVar = 1;
-        function updateScore(score) {
-            // adjust the text on the range slider
-            d3.select("#score-value").text(score);
-            d3.select("#score").property("value", score);
-            //scoreVar._groups[0][0].textContent
-            scoreVar = parseInt(d3.select("#score-value")[0][0].textContent);
-            newWeights[6] = scoreVar;
-            updateWeightArr();
-        }
+	var yearVar = 1;
+	function updateYear(year) {
+		//adjust the text on the range slider
+		d3.select("#year-value").text(year);
+		d3.select("#year").property("value", year);
+		//updateVar._groups[0][0].textContent
+		yearVar = parseInt(d3.select("#year-value")[0][0].textContent);
+		newWeights[5] = yearVar;
+		updateWeightArr();
+	}
 
-        function updateWeightArr(){
-            document.getElementById("update").value = newWeights;
-        }
+	// update the score element
+	d3.select("#score").on("input", function() {
+		updateScore(+this.value);
+	});
+	updateScore(10);
 
+	var scoreVar = 1;
+	function updateScore(score) {
+		// adjust the text on the range slider
+		d3.select("#score-value").text(score);
+		d3.select("#score").property("value", score);
+		//scoreVar._groups[0][0].textContent
+		scoreVar = parseInt(d3.select("#score-value")[0][0].textContent);
+		newWeights[6] = scoreVar;
+		updateWeightArr();
+	}
 
-    </script>
-    <script>
-        $('input[type="range"]').change(function () {
-            var val = ($(this).val() - $(this).attr('min')) / ($(this).attr('max') - $(this).attr('min'));
-            //$('input[type="range"]').foundation('slider', 'set_value', 50);
-            //$("input#actor").change('value',51);
-
-            $(this).css('background-image',
-                '-webkit-gradient(linear, left top, right top, '
-                + 'color-stop(' + val + ', #94A14E), '
-                + 'color-stop(' + val + ', #C5C5C5)'
-                + ')'
-            );
-        });
-    </script>
+	function updateWeightArr(){
+		document.getElementById("update").value = newWeights;
+	}
+	
+	
+</script>
+<script>
+	$('input[type="range"]').change(function () {
+		var val = ($(this).val() - $(this).attr('min')) / ($(this).attr('max') - $(this).attr('min'));
+		//$('input[type="range"]').foundation('slider', 'set_value', 50);
+		//$("input#actor").change('value',51);
+		
+		$(this).css('background-image',
+					'-webkit-gradient(linear, left top, right top, '
+					+ 'color-stop(' + val + ', #94A14E), '
+					+ 'color-stop(' + val + ', #C5C5C5)'
+					+ ')'
+		);
+	});
+</script>
 {% endblock %}
 </html>
 

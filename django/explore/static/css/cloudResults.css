@@ -165,7 +165,6 @@ input[type='range']::-webkit-slider-thumb {
     height: 15px;
     width: 15px;
 }
-
 button{
     height: 100px;
     width: 200px;
@@ -194,7 +193,6 @@ input#year{
 input#score{
     width: 80%;
 }
-
 
 
 
