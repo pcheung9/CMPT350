@@ -25,8 +25,7 @@ https://bl.ocks.org/mbostock/7607535
 <body>
     <div id="tooltip-container"></div>
     <div id="svgcontainer">
-        <h1>"A BUNCH OF TEXT FOR YA BOY"</h1>
-        <svg width="960" height="960"></svg>
+        <svg width="1800" height="1800"></svg>
     </div>
 </body>
 </html>
@@ -72,7 +71,7 @@ https://bl.ocks.org/mbostock/7607535
 		var year = 1910;
 		for (var j = 0; j < 11; j++) {
 		    var yearObj = Object();
-		    yearObj.name = year;
+		    yearObj.name = year.toString().concat("s");
 		    yearObj.children = [];
 		    genre.children.push({"name": yearObj.name, "children": yearObj.children});
 		    year += 10;
@@ -86,7 +85,8 @@ https://bl.ocks.org/mbostock/7607535
 	            for (var k = 0; k < root.children.length; k++) { // genres[k]
 	                for (var l = 0; l < root.children[k].children.length; l++) { // years[l]
 	                    if (genreArr[j] == root.children[k].name) {
-	                        if ((root.children[k].children[l].name <= cleanedData[i].fields.year) && (cleanedData[i].fields.year < (root.children[k].children[l].name + 10))) {
+	                        if (parseInt(root.children[k].children[l].name.slice(0, -1)) <= cleanedData[i].fields.year
+                                    && (cleanedData[i].fields.year < (parseInt(root.children[k].children[l].name.slice(0, -1))) + 10)) {
 	                            var movie = Object();
 	                            movie.name = cleanedData[i].fields.title;
 								movie.id = cleanedData[i].fields.movieID;
@@ -186,7 +186,7 @@ https://bl.ocks.org/mbostock/7607535
     var node = g.selectAll("circle,text");
 
     svg
-        .style("background", color(-1))
+        .style("background", "#666666")
         .on("click", function() { zoom(root); });
 
     zoomTo([root.x, root.y, root.r * 2 + margin]);

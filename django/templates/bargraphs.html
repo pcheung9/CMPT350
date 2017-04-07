@@ -12,16 +12,66 @@
 </head>
 
 <body>
-<div id="canvas-svg"></div>
-<div id="first-div"></div>
-<div id="second-div"></div>
-<div id="third-div"></div>
+<div class="container">
+    <span id="first-div">
+    </span>
+    <br>
+    <span id="second-div">
+    </span>
+    <br>
+    <span id="third-div">
+    </span>
+    <br>
+    <span id="forth-div">
+    </span>
+    <br>
+    <span id="fifth-div">
+    </span>
+    <br>
+    <span id="sixth-div">
+    </span>
+</div>
+
 </body>
+
+<style>
+
+    #first-div{
+        width: 100%;
+    }
+
+    #second-div{
+        width: 100%;
+    }
+
+    .container {
+        display: table-cell;
+        text-align: center;
+        vertical-align: middle;
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .tick {
+        stroke: lightgrey;
+        opacity: 0.7;
+        font-size: 30px;
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+
+
+</style>
 
 <script>
     //Put data returned from views.py into JSON format
     var cleanedData = JSON.parse("{{ data|escapejs }}");
-    barGraphDataList = [];
+    barGraphNumCriticList = [];
+    barGraphGrossList = [];
+    barGraphFblikesList = [];
+    barGraphBudgetList = [];
+    barGraphNumReviewsList = [];
+    barGraphIMDBScoreList=[];
 
     //build up objects with cleaned data from views.py
     for (var i = 1; i < cleanedData.length ; i++) {
@@ -36,27 +86,107 @@
         else {
             moviePictureObj.IMDBScore=0;
         }
-        moviePictureObj.title = cleanedData[i].fields.title;
+
+        var numCritic = parseInt(cleanedData[i].fields.numCritic);
+        moviePictureObj.numCritic = numCritic;
+
+        var gross = parseInt(cleanedData[i].fields.gross)/1000000;
+        moviePictureObj.gross = gross;
+
+        var fblikes = parseInt(cleanedData[i].fields.fblikes);
+        moviePictureObj.fblikes = fblikes;
+
+        var budget = parseInt(cleanedData[i].fields.budget)/1000000;;
+        moviePictureObj.budget = budget;
+
+        var numReviews = parseInt(cleanedData[i].fields.numReviews);
+        moviePictureObj.numReviews = numReviews;
+
+        //add the tile
+        var upper = cleanedData[i].fields.title.toUpperCase()
+        moviePictureObj.title = upper;
 
         //add the movie objects to list
-        barGraphDataList.push(moviePictureObj);
+        barGraphIMDBScoreList.push(moviePictureObj);
+        barGraphNumCriticList.push(moviePictureObj);
+        barGraphGrossList.push(moviePictureObj);
+        barGraphFblikesList.push(moviePictureObj);
+        barGraphBudgetList.push(moviePictureObj);
+        barGraphNumReviewsList.push(moviePictureObj);
+
+
     }
+    //Sort the lists
+    barGraphIMDBScoreList.sort(function(a,b){
+        var a=a.IMDBScore;
+        var b=b.IMDBScore;
+        if (a < b)
+            return -1;
+        if (a > b)
+            return 1;
+        return 0;
+    });
 
-    console.log("in bargraphs.html");
+    barGraphNumCriticList.sort(function(a,b){
+        var a=a.numCritic;
+        var b=b.numCritic;
+        if (a < b)
+            return -1;
+        if (a > b)
+            return 1;
+        return 0;
+    });
 
-    //set the list to data var
-    var data=barGraphDataList;
-    console.log(data)
+    barGraphGrossList.sort(function(a,b){
+        var a=a.gross;
+        var b=b.gross;
+        if (a < b)
+            return -1;
+        if (a > b)
+            return 1;
+        return 0;
+    });
+
+    barGraphFblikesList.sort(function(a,b){
+        var a=a.fblikes;
+        var b=b.fblikes;
+        if (a < b)
+            return -1;
+        if (a > b)
+            return 1;
+        return 0;
+    });
+
+    barGraphBudgetList.sort(function(a,b){
+        var a=a.budget;
+        var b=b.budget;
+        if (a < b)
+            return -1;
+        if (a > b)
+            return 1;
+        return 0;
+    });
+
+    barGraphNumReviewsList.sort(function(a,b){
+        var a=a.numReviews;
+        var b=b.numReviews;
+        if (a < b)
+            return -1;
+        if (a > b)
+            return 1;
+        return 0;
+    });
+
 
     //define the margins of the bar graph
-    var margin = {top: 30, right: 20, bottom: 200, left: 75};
+    var margin = {top: 60, right: 75, bottom: 200, left: 150};
 
     //set the inner dimensions of the barchart
-    var width = 500 - margin.left - margin.right;
-    var height = 600 - margin.top - margin.bottom;
+    var width = 1000;
+    var height = 800 - margin.top - margin.bottom;
 
-    //add SVG
-    var svg = d3.select("#first-div").append("svg")
+    //Graph #1: add IMDB SVG
+    var svgIMDB = d3.select("#first-div").append("svg")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
         .append("g")
@@ -65,8 +195,12 @@
     //get the scaled output for the x values
     var x = d3.scale.ordinal()
         .rangeRoundBands([0, width], 0.10) //1% of each band to be used for spacing
+
+    //set the list to data IMDB Score
+    var data=barGraphIMDBScoreList;
+    //console.log(data)
+
     x.domain(data.map(function(d) { return d.title; }));
-    //.domain(d3.range(data.length)); //set x range to length of movie set
 
     //get the scaled output for the y values
     var y = d3.scale.linear() //linear as numeric values
@@ -81,7 +215,8 @@
     //Generate the y axis elements
     var yAxis = d3.svg.axis()
         .scale(y)
-        .orient("left");
+        .orient("left")
+        //.ticks(1);
 
     //convert strings to number
     function type(d) {
@@ -90,20 +225,21 @@
     }
 
     //set the y-axis to the left
-    svg.append("g")
+    svgIMDB.append("g")
         .attr("class", "y axis")
         .call(yAxis)
         .append("text")
+        .style("font-size", "28px")
         .style("stroke","white")
         .attr("transform", "rotate(90)")
-        .attr("y",25)
+        .attr("y",10)
         .attr("x",125)
         .attr("dy", "2em") //vertically centre the text
         .style("text-anchor", "start")
         .text("IMDB Score");
 
     //add the bars
-    svg.selectAll(".bar")
+    svgIMDB.selectAll(".bar")
         .data(data)
         .enter().append("rect")
         .attr("class", "bar")
@@ -113,23 +249,434 @@
         .attr("height", function(d) { return height - y(d.IMDBScore); })
 
     //set the x-axis to the bottom and add the movie titles
-    svg.append("g")
+    svgIMDB.append("g")
         .attr("class", "x axis")
         .attr("transform", "translate(0," + height + ")")
         .call(xAxis)
         .selectAll("text")
+        .style("font-size", "20px")
         .style("stroke","white")
         .style('text-anchor', 'start')
-        .attr('transform', 'rotate(45 -10 10)');
+        .attr('transform', 'rotate(45 10 10)');
 
-    //add a title to the graph
-    svg.append("text")
+    //add a title to the IMDB Score graph
+    svgIMDB.append("text")
         .attr("x", (width/2))
         .attr("y", 0-(margin.top/2))
         .attr("text-anchor", "middle")
-        .style("font-size", "20px")
-        //  .style("text-decoration", "underline")
+        .style("font-size", "32px")
         .text("IMDB Score")
+        .style("stroke","white");
+
+
+    //Graph #2: add Number of Critic reviews SVG
+    var svgCritics = d3.select("#second-div").append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")"); //set the origin to the top left corner of the bar chart
+
+    //get the scaled output for the x values
+    var x = d3.scale.ordinal()
+        .rangeRoundBands([0, width], 0.10) //1% of each band to be used for spacing
+
+    //set the list to data Number of Critic reviews
+    var data=barGraphNumCriticList;
+    //console.log(data)
+
+    x.domain(data.map(function(d) { return d.title; }));
+
+    //get the scaled output for the y values
+    var y = d3.scale.linear() //linear as numeric values
+        .range([height, 0])
+        .domain([0, d3.max(data, function(d) { return d.numCritic; })]);
+
+    //Generate the x axis elements
+    var xAxis = d3.svg.axis()
+        .scale(x)
+        .orient("bottom");
+
+    //Generate the y axis elements
+    var yAxis = d3.svg.axis()
+        .scale(y)
+        .orient("left");
+
+    //convert strings to number
+    function type(d) {
+        d.numCritic = +d.numCritic;
+        return d;
+    }
+
+    //set the y-axis to the left
+    svgCritics.append("g")
+        .attr("class", "y axis")
+        .call(yAxis)
+        .append("text")
+        .style("font-size", "28px")
+        .style("stroke","white")
+        .attr("transform", "rotate(90)")
+        .attr("y",50)
+        .attr("x",125)
+        .attr("dy", "2em") //vertically centre the text
+        .style("text-anchor", "start")
+        .text("Number of Critic Reviews");
+
+    //add the bars
+    svgCritics.selectAll(".bar")
+        .data(data)
+        .enter().append("rect")
+        .attr("class", "bar")
+        .attr("x", function(d) { return x(d.title); })
+        .attr("y", function(d) { return y(d.numCritic); })
+        .attr("width", x.rangeBand())
+        .attr("height", function(d) { return height - y(d.numCritic); })
+
+    //set the x-axis to the bottom
+    svgCritics.append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + height + ")")
+        .call(xAxis)
+        .selectAll("text")
+        .style("font-size", "20px")
+        .style("stroke","white")
+        .style('text-anchor', 'start')
+        .attr('transform', 'rotate(45 10 10)');
+
+    //add a title to the graph
+    svgCritics.append("text")
+        .attr("x", (width/2))
+        .attr("y", 0-(margin.top/2))
+        .attr("text-anchor", "middle")
+        .style("font-size", "32px")
+        .text("Number of Critic Reviews")
+        .style("stroke","white");
+
+    //Graph #3: add Cast total FB likes Data to SVG
+    var svgFbLikes = d3.select("#third-div").append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")"); //set the origin to the top left corner of the bar chart
+
+    //get the scaled output for the x values
+    var x = d3.scale.ordinal()
+        .rangeRoundBands([0, width], 0.10) //1% of each band to be used for spacing
+
+    //set the list to data for FB Likes
+    var data=barGraphFblikesList;
+    //console.log(data)
+
+    x.domain(data.map(function(d) { return d.title; }));
+
+    //get the scaled output for the y values
+    var y = d3.scale.linear() //linear as numeric values
+        .range([height, 0])
+        .domain([0, d3.max(data, function(d) { return d.fblikes; })]);
+
+    //Generate the x axis elements
+    var xAxis = d3.svg.axis()
+        .scale(x)
+        .orient("bottom");
+
+    //Generate the y axis elements
+    var yAxis = d3.svg.axis()
+        .scale(y)
+        .orient("left");
+
+    //convert strings to number
+    function type(d) {
+        d.fblikes = +d.fblikes;
+        return d;
+    }
+
+    //set the y-axis to the left
+    svgFbLikes.append("g")
+        .attr("class", "y axis")
+        .call(yAxis)
+        .append("text")
+        .style("font-size", "28px")
+        .style("stroke","white")
+        .attr("transform", "rotate(90)")
+        .attr("y",85)
+        .attr("x",125)
+        .attr("dy", "2em") //vertically centre the text
+        .style("text-anchor", "start")
+        .text("Cast Total FB Likes");
+
+    //add the bars
+    svgFbLikes.selectAll(".bar")
+        .data(data)
+        .enter().append("rect")
+        .attr("class", "bar")
+        .attr("x", function(d) { return x(d.title); })
+        .attr("y", function(d) { return y(d.fblikes); })
+        .attr("width", x.rangeBand())
+        .attr("height", function(d) { return height - y(d.fblikes); })
+
+    //set the x-axis to the bottom
+    svgFbLikes.append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + height + ")")
+        .call(xAxis)
+        .selectAll("text")
+        .style("font-size", "20px")
+        .style("stroke","white")
+        .style('text-anchor', 'start')
+        .attr('transform', 'rotate(45 10 10)');
+
+    //add a title to the graph
+    svgFbLikes.append("text")
+        .attr("x", (width/2))
+        .attr("y", 0-(margin.top/2))
+        .attr("text-anchor", "middle")
+        .style("font-size", "32px")
+        .text("Facebook Likes")
+        .style("stroke","white");
+
+    //Graph #4: add Gross Data to SVG
+    var svgGross = d3.select("#forth-div").append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")"); //set the origin to the top left corner of the bar chart
+
+    //get the scaled output for the x values
+    var x = d3.scale.ordinal()
+        .rangeRoundBands([0, width], 0.10) //1% of each band to be used for spacing
+
+    //set the list to data
+    var data=barGraphGrossList;
+    //console.log(data)
+
+    x.domain(data.map(function(d) { return d.title; }));
+
+    //get the scaled output for the y values
+    var y = d3.scale.linear() //linear as numeric values
+        .range([height, 0])
+        .domain([0, d3.max(data, function(d) { return d.gross; })]);
+
+    //Generate the x axis elements
+    var xAxis = d3.svg.axis()
+        .scale(x)
+        .orient("bottom");
+
+    //Generate the y axis elements
+    var yAxis = d3.svg.axis()
+        .scale(y)
+        .orient("left");
+
+    //convert strings to number
+    function type(d) {
+        d.gross = +d.gross;
+        return d;
+    }
+
+    //set the y-axis to the left
+    svgGross.append("g")
+        .attr("class", "y axis")
+        .call(yAxis)
+        .append("text")
+        .style("font-size", "28px")
+        .style("stroke","white")
+        .attr("transform", "rotate(90)")
+        .attr("y",50)
+        .attr("x",125)
+        .attr("dy", "2em") //vertically centre the text
+        .style("text-anchor", "start")
+        .text("Gross ($ millions)");
+
+    //add the bars
+    svgGross.selectAll(".bar")
+        .data(data)
+        .enter().append("rect")
+        .attr("class", "bar")
+        .attr("x", function(d) { return x(d.title); })
+        .attr("y", function(d) { return y(d.gross); })
+        .attr("width", x.rangeBand())
+        .attr("height", function(d) { return height - y(d.gross); })
+
+    //set the x-axis to the bottom
+    svgGross.append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + height + ")")
+        .call(xAxis)
+        .selectAll("text")
+        .style("font-size", "20px")
+        .style("stroke","white")
+        .style('text-anchor', 'start')
+        .attr('transform', 'rotate(45 10 10)');
+
+    //add a title to the graph
+    svgGross.append("text")
+        .attr("x", (width/2))
+        .attr("y", 0-(margin.top/2))
+        .attr("text-anchor", "middle")
+        .style("font-size", "32px")
+        .text("Movie Gross")
+        .style("stroke","white");
+
+    //Graph #5: add budget Data to SVG
+    var svgBudget = d3.select("#fifth-div").append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")"); //set the origin to the top left corner of the bar chart
+
+    //get the scaled output for the x values
+    var x = d3.scale.ordinal()
+        .rangeRoundBands([0, width], 0.10) //1% of each band to be used for spacing
+
+    //set the list to data
+    var data=barGraphBudgetList;
+    //console.log(data)
+
+    x.domain(data.map(function(d) { return d.title; }));
+
+    //get the scaled output for the y values
+    var y = d3.scale.linear() //linear as numeric values
+        .range([height, 0])
+        .domain([0, d3.max(data, function(d) { return d.budget; })]);
+
+    //Generate the x axis elements
+    var xAxis = d3.svg.axis()
+        .scale(x)
+        .orient("bottom");
+
+    //Generate the y axis elements
+    var yAxis = d3.svg.axis()
+        .scale(y)
+        .orient("left");
+
+    //convert strings to number
+    function type(d) {
+        d.budget = +d.budget;
+        return d;
+    }
+
+    //set the y-axis to the left
+    svgBudget.append("g")
+        .attr("class", "y axis")
+        .call(yAxis)
+        .append("text")
+        .style("font-size", "28px")
+        .style("stroke","white")
+        .attr("transform", "rotate(90)")
+        .attr("y",50)
+        .attr("x",125)
+        .attr("dy", "2em") //vertically centre the text
+        .style("text-anchor", "start")
+        .text("Budget ($ millions)");
+
+    //add the bars
+    svgBudget.selectAll(".bar")
+        .data(data)
+        .enter().append("rect")
+        .attr("class", "bar")
+        .attr("x", function(d) { return x(d.title); })
+        .attr("y", function(d) { return y(d.budget); })
+        .attr("width", x.rangeBand())
+        .attr("height", function(d) { return height - y(d.budget); })
+
+    //set the x-axis to the bottom
+    svgBudget.append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + height + ")")
+        .call(xAxis)
+        .selectAll("text")
+        .style("font-size", "20px")
+        .style("stroke","white")
+        .style('text-anchor', 'start')
+        .attr('transform', 'rotate(45 10 10)');
+
+    //add a title to the graph
+    svgBudget.append("text")
+        .attr("x", (width/2))
+        .attr("y", 0-(margin.top/2))
+        .attr("text-anchor", "middle")
+        .style("font-size", "32px")
+        .text("Movie Budget")
+        .style("stroke","white");
+
+    //Graph #6: add number of User Reviews Data to SVG
+    var svgUsers = d3.select("#fifth-div").append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")"); //set the origin to the top left corner of the bar chart
+
+    //get the scaled output for the x values
+    var x = d3.scale.ordinal()
+        .rangeRoundBands([0, width], 0.10) //1% of each band to be used for spacing
+
+    //set the list to data
+    var data=barGraphNumReviewsList;
+    //console.log(data)
+
+    x.domain(data.map(function(d) { return d.title; }));
+
+    //get the scaled output for the y values
+    var y = d3.scale.linear() //linear as numeric values
+        .range([height, 0])
+        .domain([0, d3.max(data, function(d) { return d.numReviews; })]);
+
+    //Generate the x axis elements
+    var xAxis = d3.svg.axis()
+        .scale(x)
+        .orient("bottom");
+
+    //Generate the y axis elements
+    var yAxis = d3.svg.axis()
+        .scale(y)
+        .orient("left");
+
+    //convert strings to number
+    function type(d) {
+        d.numReviews = +d.numReviews;
+        return d;
+    }
+
+    //set the y-axis to the left
+    svgUsers.append("g")
+        .attr("class", "y axis")
+        .call(yAxis)
+        .append("text")
+        .style("font-size", "28px")
+        .style("stroke","white")
+        .attr("transform", "rotate(90)")
+        .attr("y",70)
+        .attr("x",125)
+        .attr("dy", "2em") //vertically centre the text
+        .style("text-anchor", "start")
+        .text("Number of User Reviews");
+
+    //add the bars
+    svgUsers.selectAll(".bar")
+        .data(data)
+        .enter().append("rect")
+        .attr("class", "bar")
+        .attr("x", function(d) { return x(d.title); })
+        .attr("y", function(d) { return y(d.numReviews); })
+        .attr("width", x.rangeBand())
+        .attr("height", function(d) { return height - y(d.numReviews); })
+
+    //set the x-axis to the bottom
+    svgUsers.append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + height + ")")
+        .call(xAxis)
+        .selectAll("text")
+        .style("font-size", "20px")
+        .style("stroke","white")
+        .style('text-anchor', 'start')
+        .attr('transform', 'rotate(45 10 10)');
+
+    //add a title to the graph
+    svgUsers.append("text")
+        .attr("x", (width/2))
+        .attr("y", 0-(margin.top/2))
+        .attr("text-anchor", "middle")
+        .style("font-size", "32px")
+        .text("Number of User Reviews")
         .style("stroke","white");
 
 </script>

@@ -6,9 +6,57 @@
 {% block head %}
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
     <link rel="stylesheet" href="{% static "/css/cloudResults.css" %}">
+    <title>Cloud View</title>
 {% endblock %}
 {% block content %}
 
+
+    <div id="graphbar">
+        <div id="sliderWidth" >
+            <label for="actor">
+                Actor = <span id="actor-value">…</span>
+            </label><br>
+            <input type="range" min="5" max="20" step="1" id="actor">
+            <br>
+            <label for="rating">
+                Rating = <span id="rating-value">…</span>
+            </label>
+            <br>
+            <input type="range" min="5" max="20" step="1" id="rating">
+            <br>
+            <label for="genre">
+                Genre = <span id="genre-value">…</span>
+            </label>
+            <br>
+            <input type="range" min="5" max="20" step="1" id="genre">
+            <br>
+            <label for="director">
+                Director = <span id="director-value">…</span>
+            </label>
+            <br>
+            <input type="range" min="5" max="20" step="1" id="director">
+            <br>
+            <label for="year">
+                Year = <span id="year-value">…</span>
+            </label>
+            <br>
+            <input type="range" min="5" max="20" step="1" id="year">
+            <br>
+            <label for="score">
+                Score = <span id="score-value">…</span>
+            </label>
+            <br>
+            <input type="range" min="5" max="20" step="1" id="score">
+        </div>
+        <!--Update Weights!! Re-runs algorithm-->
+        <br>
+        <br>
+        <form name = "movieWeight" action="/explore/weight/" onsubmit="return valid()" method="get">
+            <input type="hidden" id="update" name="update" autocomplete="off">
+            <input type="submit" value="Update Criteria Weight" onclick="weight()")>
+        </form>
+        <br>
+        <input type="submit" value="View Bar Graphs" onclick="post_details('flag','flag')">
 <div id="treemap"></div>
 <!--<div id="sliderbar">-->
 
