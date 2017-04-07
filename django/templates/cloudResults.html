@@ -31,53 +31,50 @@
 
     <div id="graphbar">
         <div id="sliderWidth" >
-            <label for="actor"
-                   style="display: inline-block; width: 240px; text-align: right">
-                actor = <span id="actor-value">…</span>
+            <label for="actor">
+                Actor = <span id="actor-value">…</span>
+            </label><br>
+            <input type="range" min="5" max="20" step="1" id="actor">
+            <br>
+            <label for="rating">
+                Rating = <span id="rating-value">…</span>
             </label>
-            <input type="range" min="5" max="20" step="1" id="actor"><br>
-            <label for="rating"
-                   style="display: inline-block; width: 240px; text-align: right">
-                rating = <span id="rating-value">…</span>
+            <br>
+            <input type="range" min="5" max="20" step="1" id="rating">
+            <br>
+            <label for="genre">
+                Genre = <span id="genre-value">…</span>
             </label>
-            <input type="range" min="5" max="20" step="1" id="rating"><br>
-            <label for="genre"
-                   style="display: inline-block; width: 240px; text-align: right">
-                genre = <span id="genre-value">…</span>
+            <br>
+            <input type="range" min="5" max="20" step="1" id="genre">
+            <br>
+            <label for="director">
+                Director = <span id="director-value">…</span>
             </label>
-            <input type="range" min="5" max="20" step="1" id="genre"><br>
-            <label for="director"
-                   style="display: inline-block; width: 240px; text-align: right">
-                director = <span id="director-value">…</span>
+            <br>
+            <input type="range" min="5" max="20" step="1" id="director">
+            <br>
+            <label for="year">
+                Year = <span id="year-value">…</span>
             </label>
-            <input type="range" min="5" max="20" step="1" id="director"><br>
-            <label for="year"
-                   style="display: inline-block; width: 240px; text-align: right">
-                year = <span id="year-value">…</span>
+            <br>
+            <input type="range" min="5" max="20" step="1" id="year">
+            <br>
+            <label for="score">
+                Score = <span id="score-value">…</span>
             </label>
-            <input type="range" min="5" max="20" step="1" id="year"><br>
-            <label for="score"
-                   style="display: inline-block; width: 240px; text-align: right">
-                score = <span id="score-value">…</span>
-            </label>
-            <input type="range" min="5" max="20" step="1" id="score"><br>
+            <br>
+            <input type="range" min="5" max="20" step="1" id="score">
         </div>
-
-        <!--view graphs-->
-        <input type="submit" value="View Bar Graphs" onclick="post_details('flag','flag')"></input>
-
         <!--Update Weights!! Re-runs algorithm-->
+        <br>
+        <br>
         <form name = "movieWeight" action="/explore/weight/" onsubmit="return valid()" method="get">
             <input type="hidden" id="update" name="update" autocomplete="off">
-            <input type="submit" value="Update Criteria Weight" onclick="weight()")></input>
-        </form>
-
-        <!--New search!! Redirects home-->
-        <form name = "movieInput" action="/explore" onsubmit="return valid()" method="get">
-            <input type="submit" value="New Search"></input>
+            <input type="submit" value="Update Criteria Weight" onclick="weight()")>
         </form>
         <br>
-
+        <input type="submit" value="View Bar Graphs" onclick="post_details('flag','flag')">
     </div>
 
 
